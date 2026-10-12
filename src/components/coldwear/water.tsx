@@ -1,6 +1,6 @@
 import { Droplets } from 'lucide-react';
 
-const CHIPS = ['Esőben', 'Havas esőben', 'Lanyakban'];
+const CHIPS = ['Esőben', 'Havas esőben', 'Latyakban'];
 
 export function Water() {
   return (
