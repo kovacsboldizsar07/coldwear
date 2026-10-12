@@ -1,18 +1,19 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowRight, Check, Ruler, ShoppingBag } from 'lucide-react';
+import { Lock, Truck, RefreshCcw, Ruler } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getCatalog,getQuote } from '@/lib/shopify.functions';
 import { copyFirstSize,money } from '@/lib/commerce';
 import { useCart } from '@/stores/cart';
 import { track } from '@/lib/track';
 export const catalogOptions={queryKey:['coldwear-catalog'],queryFn:()=>getCatalog(),staleTime:60_000};
+const OPTIONS=[{count:1,title:'1 KESZTYŰ',sub:'1 pár · + szállítási díj'},{count:2,title:'2 KESZTYŰ',sub:'2 pár · egy neked, egy ajándékba',badge:'AJÁNLOTT'},{count:3,title:'3 KESZTYŰ + ZOKNI',sub:'3 pár + 1 ajándék zokni · ingyenes szállítás',badge:'INGYEN SZÁLLÍTÁS'}];
 export function BundleSelector(){
  const {data:products=[],isPending,isError}=useQuery(catalogOptions);
  const glove=products.find(p=>p.title.toLowerCase().includes('kesztyű')); const sock=products.find(p=>p.title.toLowerCase().includes('zokni'));
  const [bundle,setBundle]=useState(2);const [sizes,setSizes]=useState(['','','']);const [sockSize,setSockSize]=useState('');
  const busy=useCart(s=>s.busy); const add=useCart(s=>s.add); const [sticky,setSticky]=useState(false);
- useEffect(()=>{const hero=document.getElementById('hero');if(!hero)return;const observer=new IntersectionObserver(([entry])=>setSticky(Boolean(entry&&!entry.isIntersecting)));observer.observe(hero);return()=>observer.disconnect()},[]);
+ useEffect(()=>{const el=document.getElementById('bundle_selector');if(!el)return;const observer=new IntersectionObserver(([entry])=>setSticky(Boolean(entry&&!entry.isIntersecting&&entry.boundingClientRect.top<0)));observer.observe(el);return()=>observer.disconnect()},[]);
  const allSizes=sizes.slice(0,bundle).every(Boolean)&&(bundle!==3||Boolean(sockSize));
  const lines=sizes.slice(0,bundle).map(size=>({merchandiseId:glove?.variants.nodes.find(v=>v.title===size)?.id||'',quantity:1}));
  if(bundle===3)lines.push({merchandiseId:sockSize,quantity:1});
@@ -23,23 +24,22 @@ export function BundleSelector(){
  function choose(count:number){setBundle(count);track('bundle_select',{quantity:count})}
  function chooseSize(index:number,value:string){setSizes(previous=>copyFirstSize(previous,index,value));track('size_select',{pair:index+1,size:value})}
  function submit(){if(!allSizes){document.getElementById('bundle_selector')?.scrollIntoView({behavior:'smooth'});return}if(!glove||lines.some(l=>!l.merchandiseId))return;void add(lines)}
- return <>
- <section id="bundle_selector" className="cw-section"><div className="cw-container">
- <div className="mb-9 flex flex-wrap items-end justify-between gap-4"><div><p className="cw-label mb-3 text-text-muted">06 / VÁLASZD KI A CSOMAGOD</p><h2 className="cw-heading">Egy neked. Egy annak, aki mindig fázik.</h2></div><Button variant="ghost" onClick={()=>{track('size_chart_open');document.getElementById('size_chart')?.scrollIntoView()}}><Ruler/>Mérettáblázat</Button></div>
- <div className="cw-grid3">{[1,2,3].map(count=><Button key={count} variant="outline" aria-pressed={bundle===count} onClick={()=>choose(count)} className={`relative h-auto min-h-[184px] flex-col items-start justify-start whitespace-normal p-6 text-left ${bundle===count?'border-2 border-text bg-surface':'bg-bg'}`}>
- {count===2&&<span className="cw-label absolute -top-3 right-4 rounded bg-signal px-3 py-1 text-on-signal">Ajánlott</span>}
- <span className="mb-4 flex w-full items-center justify-between text-lg font-bold">{count===3?'3 kesztyű + ajándék zokni':`${count} kesztyű`}<span className={`flex size-5 shrink-0 items-center justify-center rounded-full border ${bundle===count?'bg-text text-bg':'border-line'}`}>{bundle===count&&<Check className="size-3"/>}</span></span>
- <span className="text-3xl font-extrabold tabular-nums">{money(quotes.data?.[count-1]?.cost.totalAmount)}</span>
- {quotes.data?.[count-1]?.lines.nodes[0]?.cost.amountPerQuantity&&<span className="mt-2 font-mono text-xs text-text-muted">{money(quotes.data[count-1]?.lines.nodes[0]?.cost.amountPerQuantity)} / pár</span>}<span className="mt-4 text-sm font-normal text-text-muted">{count===3?'Ingyenes szállítás':'+ 1.490 Ft szállítás'}</span>
- </Button>)}</div>
- <p className="cw-body mt-4 text-sm">Tegyél a két kesztyű mellé egy zoknit, és ingyenes a szállítás.</p>
- <div className="mt-8 grid gap-8 border-t border-line pt-8 md:grid-cols-2"><div className="space-y-4">{Array.from({length:bundle},(_,i)=><div key={i} className="flex flex-wrap items-center gap-3"><span className="cw-label mr-3 w-16">{i+1}. pár</span>{['S','M','L','XL'].map(size=><Button key={size} aria-label={`${i+1}. pár ${size}`} aria-pressed={sizes[i]===size} variant="outline" onClick={()=>chooseSize(i,size)} disabled={Boolean(glove)&&!glove?.variants.nodes.find(v=>v.title===size)?.availableForSale} className={`h-11 min-w-12 font-mono ${sizes[i]===size?'bg-text text-bg border-text':''}`}>{size}</Button>)}</div>)}
- {bundle===3&&<label className="block cw-label">Ajándék zokni<select className="cw-input mt-2" value={sockSize} onChange={e=>setSockSize(e.target.value)}><option value="">[méretek]</option>{sock?.variants.nodes.map(v=><option key={v.id} value={v.id} disabled={!v.availableForSale}>{v.title}</option>)}</select></label>}
- </div><div className="md:pl-8"><div className="mb-5 flex items-center justify-between"><span className="text-sm">Kiválasztott csomag</span><strong className="text-2xl">{money(quote.data?.cost.totalAmount||quotes.data?.[bundle-1]?.cost.totalAmount)}</strong></div><Button className="w-full" disabled={!allSizes||!glove||busy} onClick={submit}><ShoppingBag/>{busy?'Frissítés…':'Kosárba teszem'}<ArrowRight className="ml-auto"/></Button>
- <p aria-live="polite" className="mt-3 text-sm text-signal-text">{!allSizes?'Válaszd ki minden pár méretét'+(bundle===3?' és az ajándék zokni méretét.':'.'):''}</p>
- {!glove&&<p className="mt-3 text-sm text-text-muted">{isPending?'A termékek betöltése…':isError?'A termékek betöltése nem sikerült.':'Még nincs elérhető termék az áruházban.'}</p>}
- <p className="cw-body mt-5 text-sm">Ingyenes méretcsere. Fizethetsz a GLS futárnál is.</p></div></div>
- </div></section>
- {sticky&&<div className="fixed inset-x-0 bottom-0 z-30 flex items-center justify-between gap-3 bg-block px-5 py-3 text-on-block md:hidden"><div><p className="text-xs">{bundle} kesztyű{bundle===3?' + zokni':''}</p><strong>{money(quote.data?.cost.totalAmount||quotes.data?.[bundle-1]?.cost.totalAmount)}</strong></div><Button variant="secondary" onClick={submit} disabled={busy||Boolean(allSizes&&!glove)}>Kosárba<ArrowRight/></Button></div>}
- </>;
+ const total=money(quote.data?.cost.totalAmount||quotes.data?.[bundle-1]?.cost.totalAmount);
+ return <div id="bundle_selector">
+  <div className="space-y-3" role="radiogroup" aria-label="Csomag">{OPTIONS.map(o=>{const active=bundle===o.count;const q=quotes.data?.[o.count-1];return <button type="button" role="radio" aria-checked={active} key={o.count} onClick={()=>choose(o.count)} className={`relative flex w-full items-center gap-4 rounded-xl border-2 px-5 py-4 text-left transition-colors ${active?'border-signal bg-signal-soft':'border-line bg-surface hover:border-signal/50'}`}>
+   {o.badge&&<span className="absolute -top-3 right-4 rotate-2 rounded-md bg-signal px-2.5 py-1 text-[11px] font-extrabold tracking-wide text-on-signal">{o.badge}</span>}
+   <span className={`flex size-6 shrink-0 items-center justify-center rounded-full border-2 ${active?'border-signal':'border-line'}`}>{active&&<span className="size-3 rounded-full bg-signal"/>}</span>
+   <span className="flex-1"><span className="block text-lg font-extrabold leading-tight">{o.title}</span><span className="mt-1 block text-sm text-text-muted">{o.sub}</span></span>
+   <span className="text-right"><span className="block text-xl font-extrabold tabular-nums text-signal-text">{q?money(q.cost.totalAmount):'–'}</span>{q?.lines.nodes[0]?.cost.amountPerQuantity&&<span className="block text-xs text-text-muted">{money(q.lines.nodes[0].cost.amountPerQuantity)} / pár</span>}</span>
+  </button>})}</div>
+  <div className="mt-6 space-y-3"><div className="flex items-center justify-between"><span className="text-sm font-bold">Válassz méretet</span><a href="#size_chart" onClick={()=>track('size_chart_open')} className="flex items-center gap-1.5 text-sm font-semibold text-signal-text underline underline-offset-4"><Ruler size={15}/>Mérettáblázat</a></div>
+   {Array.from({length:bundle},(_,i)=><div key={i} className="flex items-center gap-2"><span className="w-14 text-sm text-text-muted">{i+1}. pár</span>{['S','M','L','XL'].map(size=><button type="button" key={size} aria-label={`${i+1}. pár ${size}`} aria-pressed={sizes[i]===size} onClick={()=>chooseSize(i,size)} disabled={Boolean(glove)&&!glove?.variants.nodes.find(v=>v.title===size)?.availableForSale} className={`h-11 min-w-14 rounded-lg border-2 px-3 font-bold transition-colors disabled:opacity-40 ${sizes[i]===size?'border-signal bg-signal text-on-signal':'border-line bg-surface hover:border-signal/60'}`}>{size}</button>)}</div>)}
+   {bundle===3&&<label className="block text-sm font-bold">Ajándék zokni mérete<select className="cw-input mt-2" value={sockSize} onChange={e=>setSockSize(e.target.value)}><option value="">[méretek]</option>{sock?.variants.nodes.map(v=><option key={v.id} value={v.id} disabled={!v.availableForSale}>{v.title}</option>)}</select></label>}
+  </div>
+  <Button className="mt-6 h-16 w-full rounded-full text-lg font-extrabold tracking-wide" disabled={!glove||busy} onClick={submit}>{busy?'FRISSÍTÉS…':'KOSÁRBA TESZEM'}{total!=='–'&&!busy?<span className="font-semibold opacity-80">· {total}</span>:null}</Button>
+  <p aria-live="polite" className="mt-2 min-h-5 text-center text-sm text-signal-text">{glove&&!allSizes?'Válaszd ki minden pár méretét'+(bundle===3?' és a zokni méretét.':'.'):''}</p>
+  {!glove&&<p className="text-center text-sm text-text-muted">{isPending?'A termékek betöltése…':isError?'A termékek betöltése nem sikerült.':'Még nincs elérhető termék az áruházban.'}</p>}
+  <div className="mt-2 flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-text-muted">{[[Lock,'Utánvét a futárnál'],[Truck,'GLS, 1–2 munkanap'],[RefreshCcw,'Ingyenes méretcsere']].map(([Icon,l])=>{const I=Icon as typeof Lock;return <span key={String(l)} className="flex items-center gap-1.5"><I size={15} className="text-signal-text"/>{String(l)}</span>})}</div>
+  {sticky&&<div className="fixed inset-x-0 bottom-0 z-30 flex items-center justify-between gap-3 border-t border-line bg-surface px-5 py-3 md:hidden"><div><p className="text-xs text-text-muted">{bundle} kesztyű{bundle===3?' + zokni':''}</p><strong className="text-signal-text">{total}</strong></div><Button className="rounded-full font-extrabold" onClick={submit} disabled={busy||!glove}>KOSÁRBA</Button></div>}
+ </div>;
 }
