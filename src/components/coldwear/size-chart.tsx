@@ -136,7 +136,7 @@ export function SizeChart() {
   return (
     <section className="cw-section" id="size_chart">
       <div className="cw-container grid gap-10 md:grid-cols-[0.8fr_1.2fr] [&>*]:min-w-0">
-        <div>
+        <div className="md:sticky md:top-24 md:self-start">
           <h2 className="cw-heading mb-5">Pont a kezedre.</h2>
           <p className="cw-body max-w-md">30 másodperc, egy mérőszalag – és biztosan a jó méretet rendeled.</p>
           <div className="mt-8 overflow-hidden rounded-3xl border border-line bg-block">
