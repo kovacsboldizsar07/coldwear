@@ -10,8 +10,9 @@ export const catalogOptions={queryKey:['coldwear-catalog'],queryFn:()=>getCatalo
 const OPTIONS=[{count:1,title:'1 KESZTYŰ',sub:'1 pár · + szállítási díj'},{count:2,title:'2 KESZTYŰ',sub:'2 pár · egy neked, egy ajándékba',badge:'AJÁNLOTT'},{count:3,title:'3 KESZTYŰ + AJÁNDÉK ZOKNI',sub:'3 pár + 1 zokni ajándékba · ingyenes szállítás',badge:'LEGJOBB ÁR'}];
 export function BundleSelector(){
  const {data:products=[],isPending,isError}=useQuery(catalogOptions);
- const glove=products.find(p=>p.title.toLowerCase().includes('kesztyű')); const sock=products.find(p=>p.title.toLowerCase().includes('zokni'));
- const [bundle,setBundle]=useState(2);const [sizes,setSizes]=useState(['','','']);const [sockSize,setSockSize]=useState('');
+  const [ready,setReady]=useState(false);useEffect(()=>setReady(true),[]);
+  const glove=ready?products.find(p=>p.title.toLowerCase().includes('kesztyű')):undefined; const sock=ready?products.find(p=>p.title.toLowerCase().includes('zokni')):undefined;
+  const [bundle,setBundle]=useState(2);const [sizes,setSizes]=useState(['','','']);const [sockSize,setSockSize]=useState('');
  const busy=useCart(s=>s.busy); const add=useCart(s=>s.add); const [sticky,setSticky]=useState(false);
   useEffect(()=>{const el=document.getElementById('bundle_selector');if(!el)return;const observer=new IntersectionObserver(([entry])=>setSticky(Boolean(entry&&!entry.isIntersecting&&entry.boundingClientRect.top<0)));observer.observe(el);return()=>observer.disconnect()},[]);
   useEffect(()=>{const onPick=(e:Event)=>{const {kind,size}=(e as CustomEvent<{kind:string;size:string}>).detail;if(kind==='glove')setSizes([size,size,size]);else{const v=sock?.variants.nodes.find(n=>n.title===size);if(v){setSockSize(v.id);setBundle(3)}}};window.addEventListener('cw:size',onPick);return()=>window.removeEventListener('cw:size',onPick)},[sock]);
