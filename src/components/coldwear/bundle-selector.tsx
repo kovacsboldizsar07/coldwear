@@ -13,7 +13,8 @@ export function BundleSelector(){
  const glove=products.find(p=>p.title.toLowerCase().includes('kesztyű')); const sock=products.find(p=>p.title.toLowerCase().includes('zokni'));
  const [bundle,setBundle]=useState(2);const [sizes,setSizes]=useState(['','','']);const [sockSize,setSockSize]=useState('');
  const busy=useCart(s=>s.busy); const add=useCart(s=>s.add); const [sticky,setSticky]=useState(false);
- useEffect(()=>{const el=document.getElementById('bundle_selector');if(!el)return;const observer=new IntersectionObserver(([entry])=>setSticky(Boolean(entry&&!entry.isIntersecting&&entry.boundingClientRect.top<0)));observer.observe(el);return()=>observer.disconnect()},[]);
+  useEffect(()=>{const el=document.getElementById('bundle_selector');if(!el)return;const observer=new IntersectionObserver(([entry])=>setSticky(Boolean(entry&&!entry.isIntersecting&&entry.boundingClientRect.top<0)));observer.observe(el);return()=>observer.disconnect()},[]);
+  useEffect(()=>{const onPick=(e:Event)=>{const {kind,size}=(e as CustomEvent<{kind:string;size:string}>).detail;if(kind==='glove')setSizes([size,size,size]);else{const v=sock?.variants.nodes.find(n=>n.title===size);if(v){setSockSize(v.id);setBundle(3)}}};window.addEventListener('cw:size',onPick);return()=>window.removeEventListener('cw:size',onPick)},[sock]);
  const allSizes=sizes.slice(0,bundle).every(Boolean)&&(bundle!==3||Boolean(sockSize));
  const lines=sizes.slice(0,bundle).map(size=>({merchandiseId:glove?.variants.nodes.find(v=>v.title===size)?.id||'',quantity:1}));
  if(bundle===3)lines.push({merchandiseId:sockSize,quantity:1});
