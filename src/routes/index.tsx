@@ -18,7 +18,7 @@ function Home(){
  return <>
  <section id="hero" className="py-8 md:py-12"><div className="cw-container grid gap-10 md:grid-cols-[1.05fr_1fr] md:gap-14">
   <div className="md:sticky md:top-24 md:self-start">
-   <div className="relative aspect-square overflow-hidden rounded-2xl bg-surface"><img src={photos[photo].src} alt={photos[photo].alt} fetchPriority="high" className="h-full w-full object-contain p-6"/><span className="absolute left-4 top-4 rounded-full bg-signal px-3 py-1.5 text-xs font-extrabold text-on-signal">INGYENES MÉRETCSERE</span></div>
+   <div className="relative aspect-square overflow-hidden rounded-2xl bg-surface"><img src={photos[photo]?.src} alt={photos[photo]?.alt} fetchPriority="high" className="h-full w-full object-contain p-6"/><span className="absolute left-4 top-4 rounded-full bg-signal px-3 py-1.5 text-xs font-extrabold text-on-signal">INGYENES MÉRETCSERE</span></div>
    <div className="mt-3 flex gap-3">{photos.map((p,i)=><button type="button" key={p.src} aria-label={p.alt} aria-pressed={photo===i} onClick={()=>setPhoto(i)} className={`size-24 overflow-hidden rounded-xl border-2 bg-surface p-1.5 ${photo===i?'border-signal':'border-transparent'}`}><img src={p.src} alt="" className="h-full w-full object-contain"/></button>)}<div className="flex size-24 flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-line text-center text-[10px] text-text-muted"><ImageIcon size={16}/>[ujjbegy fotó]</div></div>
   </div>
   <div>
