@@ -16,6 +16,7 @@ import { Route as AszfRouteImport } from './routes/aszf'
 import { Route as KapcsolatRouteImport } from './routes/kapcsolat'
 import { Route as SutikRouteImport } from './routes/sutik'
 import { Route as SzallitasRouteImport } from './routes/szallitas'
+import { Route as ThermoKesztyuRouteImport } from './routes/thermo-kesztyu'
 import { Route as VisszakuldesRouteImport } from './routes/visszakuldes'
 import { Route as ProductHandleRouteImport } from './routes/product.$handle'
 import { Route as ApiPublicCollectRouteImport } from './routes/api.public.collect'
@@ -56,6 +57,11 @@ const SzallitasRoute = SzallitasRouteImport.update({
   path: '/szallitas',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ThermoKesztyuRoute = ThermoKesztyuRouteImport.update({
+  id: '/thermo-kesztyu',
+  path: '/thermo-kesztyu',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const VisszakuldesRoute = VisszakuldesRouteImport.update({
   id: '/visszakuldes',
   path: '/visszakuldes',
@@ -85,6 +91,7 @@ export interface FileRoutesByFullPath {
   '/kapcsolat': typeof KapcsolatRoute
   '/sutik': typeof SutikRoute
   '/szallitas': typeof SzallitasRoute
+  '/thermo-kesztyu': typeof ThermoKesztyuRoute
   '/visszakuldes': typeof VisszakuldesRoute
   '/product/$handle': typeof ProductHandleRoute
   '/api/public/collect': typeof ApiPublicCollectRoute
@@ -98,6 +105,7 @@ export interface FileRoutesByTo {
   '/kapcsolat': typeof KapcsolatRoute
   '/sutik': typeof SutikRoute
   '/szallitas': typeof SzallitasRoute
+  '/thermo-kesztyu': typeof ThermoKesztyuRoute
   '/visszakuldes': typeof VisszakuldesRoute
   '/product/$handle': typeof ProductHandleRoute
   '/api/public/collect': typeof ApiPublicCollectRoute
@@ -112,6 +120,7 @@ export interface FileRoutesById {
   '/kapcsolat': typeof KapcsolatRoute
   '/sutik': typeof SutikRoute
   '/szallitas': typeof SzallitasRoute
+  '/thermo-kesztyu': typeof ThermoKesztyuRoute
   '/visszakuldes': typeof VisszakuldesRoute
   '/product/$handle': typeof ProductHandleRoute
   '/api/public/collect': typeof ApiPublicCollectRoute
@@ -127,6 +136,7 @@ export interface FileRouteTypes {
     | '/kapcsolat'
     | '/sutik'
     | '/szallitas'
+    | '/thermo-kesztyu'
     | '/visszakuldes'
     | '/product/$handle'
     | '/api/public/collect'
@@ -140,6 +150,7 @@ export interface FileRouteTypes {
     | '/kapcsolat'
     | '/sutik'
     | '/szallitas'
+    | '/thermo-kesztyu'
     | '/visszakuldes'
     | '/product/$handle'
     | '/api/public/collect'
@@ -153,6 +164,7 @@ export interface FileRouteTypes {
     | '/kapcsolat'
     | '/sutik'
     | '/szallitas'
+    | '/thermo-kesztyu'
     | '/visszakuldes'
     | '/product/$handle'
     | '/api/public/collect'
@@ -167,6 +179,7 @@ export interface RootRouteChildren {
   KapcsolatRoute: typeof KapcsolatRoute
   SutikRoute: typeof SutikRoute
   SzallitasRoute: typeof SzallitasRoute
+  ThermoKesztyuRoute: typeof ThermoKesztyuRoute
   VisszakuldesRoute: typeof VisszakuldesRoute
   ProductHandleRoute: typeof ProductHandleRoute
   ApiPublicCollectRoute: typeof ApiPublicCollectRoute
@@ -224,6 +237,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SzallitasRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/thermo-kesztyu': {
+      id: '/thermo-kesztyu'
+      path: '/thermo-kesztyu'
+      fullPath: '/thermo-kesztyu'
+      preLoaderRoute: typeof ThermoKesztyuRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/visszakuldes': {
       id: '/visszakuldes'
       path: '/visszakuldes'
@@ -263,6 +283,7 @@ const rootRouteChildren: RootRouteChildren = {
   KapcsolatRoute: KapcsolatRoute,
   SutikRoute: SutikRoute,
   SzallitasRoute: SzallitasRoute,
+  ThermoKesztyuRoute: ThermoKesztyuRoute,
   VisszakuldesRoute: VisszakuldesRoute,
   ProductHandleRoute: ProductHandleRoute,
   ApiPublicCollectRoute: ApiPublicCollectRoute,
