@@ -37,7 +37,7 @@ export function bundleCode(cart: Cart): string | null {
 export async function withBundle(cart: Cart | null) {
  if (!cart) return cart;
  const code = bundleCode(cart);
- const current = (cart as Cart & {discountCodes?:{code:string}[]}).discountCodes?.map(d=>d.code) ?? [];
+ const current = cart.discountCodes?.map(d=>d.code) ?? [];
  if ((code ? [code] : []).join() === current.join()) return cart;
  return mutateCart('discounts',{cartId:cart.id,discountCodes:code?[code]:[]});
 }
