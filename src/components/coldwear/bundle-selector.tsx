@@ -7,7 +7,7 @@ import { copyFirstSize,money } from '@/lib/commerce';
 import { useCart } from '@/stores/cart';
 import { track } from '@/lib/track';
 export const catalogOptions={queryKey:['coldwear-catalog'],queryFn:()=>getCatalog(),staleTime:60_000};
-const OPTIONS=[{count:1,title:'1 KESZTYŰ',sub:'1 pár · + szállítási díj'},{count:2,title:'2 KESZTYŰ',sub:'2 pár · egy neked, egy ajándékba',badge:'AJÁNLOTT'},{count:3,title:'3 KESZTYŰ + ZOKNI',sub:'3 pár + 1 ajándék zokni · ingyenes szállítás',badge:'INGYEN SZÁLLÍTÁS'}];
+const OPTIONS=[{count:1,title:'1 KESZTYŰ',sub:'1 pár · + szállítási díj'},{count:2,title:'2 KESZTYŰ',sub:'2 pár · egy neked, egy ajándékba',badge:'AJÁNLOTT'},{count:3,title:'3 KESZTYŰ + AJÁNDÉK ZOKNI',sub:'3 pár + 1 zokni ajándékba · ingyenes szállítás',badge:'LEGJOBB ÁR'}];
 export function BundleSelector(){
  const {data:products=[],isPending,isError}=useQuery(catalogOptions);
  const glove=products.find(p=>p.title.toLowerCase().includes('kesztyű')); const sock=products.find(p=>p.title.toLowerCase().includes('zokni'));
@@ -30,7 +30,7 @@ export function BundleSelector(){
    {o.badge&&<span className="absolute -top-3 right-4 rotate-2 rounded-md bg-signal px-2.5 py-1 text-[11px] font-extrabold tracking-wide text-on-signal">{o.badge}</span>}
    <span className={`flex size-6 shrink-0 items-center justify-center rounded-full border-2 ${active?'border-signal':'border-line'}`}>{active&&<span className="size-3 rounded-full bg-signal"/>}</span>
    <span className="flex-1"><span className="block text-lg font-extrabold leading-tight">{o.title}</span><span className="mt-1 block text-sm text-text-muted">{o.sub}</span></span>
-   <span className="text-right"><span className="block text-xl font-extrabold tabular-nums text-signal-text">{q?money(q.cost.totalAmount):'–'}</span>{q?.lines.nodes[0]?.cost.amountPerQuantity&&<span className="block text-xs text-text-muted">{money(q.lines.nodes[0].cost.amountPerQuantity)} / pár</span>}</span>
+   <span className="text-right"><span className="block text-xl font-extrabold tabular-nums text-signal-text">{q?money(q.cost.totalAmount):'–'}</span>{q&&q.cost.subtotalAmount.amount!==q.cost.totalAmount.amount&&<span className="block text-sm text-text-muted line-through">{money(q.cost.subtotalAmount)}</span>}{o.count<3&&q?.lines.nodes[0]?.cost.amountPerQuantity&&<span className="block text-xs text-text-muted">{money(q.lines.nodes[0].cost.amountPerQuantity)} / pár</span>}</span>
   </button>})}</div>
   <div className="mt-6 space-y-3"><div className="flex items-center justify-between"><span className="text-sm font-bold">Válassz méretet</span><a href="#size_chart" onClick={()=>track('size_chart_open')} className="flex items-center gap-1.5 text-sm font-semibold text-signal-text underline underline-offset-4"><Ruler size={15}/>Mérettáblázat</a></div>
    {Array.from({length:bundle},(_,i)=><div key={i} className="flex items-center gap-2"><span className="w-14 text-sm text-text-muted">{i+1}. pár</span>{['S','M','L','XL'].map(size=><button type="button" key={size} aria-label={`${i+1}. pár ${size}`} aria-pressed={sizes[i]===size} onClick={()=>chooseSize(i,size)} disabled={Boolean(glove)&&!glove?.variants.nodes.find(v=>v.title===size)?.availableForSale} className={`h-11 min-w-14 rounded-lg border-2 px-3 font-bold transition-colors disabled:opacity-40 ${sizes[i]===size?'border-signal bg-signal text-on-signal':'border-line bg-surface hover:border-signal/60'}`}>{size}</button>)}</div>)}
