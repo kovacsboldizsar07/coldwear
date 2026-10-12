@@ -8,3 +8,9 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+## Architecture
+- Use a server-only Shopify module with fixed GraphQL operations and validated server functions; credentials must not enter browser bundles.
+- Keep all cart totals and discounts as Shopify response data; Zustand persists only cart identity and refreshes server state.
+- Store analytics and mirrored commerce records in Cloud with admin-only reads and validated server-only writes.
+- Keep the storefront shell shared and each information page as its own TanStack content route for navigation and metadata.
