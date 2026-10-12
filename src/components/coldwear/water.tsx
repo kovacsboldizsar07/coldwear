@@ -10,7 +10,7 @@ export function Water() {
           <div>
             <p className="text-sm font-bold uppercase tracking-wider text-signal">Vízlepergető felület</p>
             <h2 className="cw-heading mt-3">Az eső nem itatja át.</h2>
-            <p className="cw-body mt-4 max-w-md text-on-block-muted">A külső anyag vízlepergető felülettel készül. A csepp nem nyomódik át a szöveten, hanem a felszínén marad, majd lepereg. Havas esőben, latyakban és frissen hullott hóban is szárazon tartja a kezed.</p>
+            <p className="mt-4 max-w-md text-base leading-7 text-on-block-muted">A külső anyag vízlepergető felülettel készül. A csepp nem nyomódik át a szöveten, hanem a felszínén marad, majd lepereg. Havas esőben, latyakban és frissen hullott hóban is szárazon tartja a kezed.</p>
             <div className="mt-6 flex flex-wrap gap-2">
               {CHIPS.map((c) => (
                 <span key={c} className="rounded-full border border-signal/45 px-4 py-2 text-sm font-bold">{c}</span>
