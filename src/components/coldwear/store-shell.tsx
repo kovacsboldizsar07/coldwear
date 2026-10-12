@@ -9,7 +9,7 @@ import { CartDrawer } from './cart-drawer';
 import { CookieConsent } from './cookie-consent';
 export function StoreShell({children}:{children:ReactNode}){
  const [message,setMessage]=useState(0),[menu,setMenu]=useState(false),[hydrated,setHydrated]=useState(false);const location=useLocation();const count=useCart(s=>s.cart?.totalQuantity||0);const setOpen=useCart(s=>s.setOpen);
- useEffect(()=>{initializeTracking();setHydrated(true);void useCart.persist.rehydrate().then(()=>useCart.getState().sync());const sync=()=>{if(document.visibilityState==='visible')void useCart.getState().sync()};document.addEventListener('visibilitychange',sync);const interval=setInterval(()=>setMessage(m=>(m+1)%3),4000);return()=>{clearInterval(interval);document.removeEventListener('visibilitychange',sync)}},[]);
+ useEffect(()=>{initializeTracking();setHydrated(true);void Promise.resolve(useCart.persist.rehydrate()).then(()=>useCart.getState().sync());const sync=()=>{if(document.visibilityState==='visible')void useCart.getState().sync()};document.addEventListener('visibilitychange',sync);const interval=setInterval(()=>setMessage(m=>(m+1)%3),4000);return()=>{clearInterval(interval);document.removeEventListener('visibilitychange',sync)}},[]);
  useEffect(()=>{if(hydrated)track('PageView');setMenu(false)},[location.pathname]);
  const scroll=(id:string)=>{setMenu(false);document.getElementById(id)?.scrollIntoView({behavior:'smooth'})};
  return <><div className="bg-block text-on-block"><div className="cw-container flex h-9 items-center justify-center gap-2"><Truck size={14} strokeWidth={1.5}/><span className="cw-label text-[10px] sm:text-[11px]">{['Ingyenes szállítás 3 terméktől','1–2 munkanap alatt nálad, GLS','Ingyenes méretcsere'][message]}</span></div></div>

@@ -18,4 +18,4 @@ export const Route=createFileRoute('/api/public/collect')({server:{handlers:{POS
  const {sendCapi}=await import('@/lib/webhook.server');await sendCapi(data.event_name,data.event_id,{external_id:data.visitor_id?await (await import('@/lib/webhook.server')).hash(data.visitor_id):undefined},{...data.event_data},new URL(data.page_path,request.url).toString());
  }
  return new Response(null,{status:204});
-}}});
+}}}});

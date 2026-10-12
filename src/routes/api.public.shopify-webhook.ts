@@ -10,4 +10,4 @@ export const Route=createFileRoute('/api/public/shopify-webhook')({server:{handl
  if(result.error?.code==='23505')return new Response('ok');if(result.error)return new Response('Retry later',{status:503});
  try{const {processWebhook}=await import('@/lib/webhook.server');await processWebhook(topic,payload);await db.from('webhook_events').update({status:'completed'}).eq('webhook_id',webhookId);return new Response('ok')}
  catch{await db.from('webhook_events').update({status:'error',error:'A feldolgozás sikertelen. Ellenőrizd az adatokat és indítsd újra adminisztrátorként.'}).eq('webhook_id',webhookId);return new Response('Processing failed',{status:500})}
-}}});
+}}}});
