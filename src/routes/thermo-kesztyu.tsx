@@ -23,9 +23,9 @@ function Home(){
    <div className="relative aspect-square overflow-hidden rounded-3xl bg-surface"><img src={photos[photo]?.src} alt={photos[photo]?.alt} fetchPriority="high" className="h-full w-full object-contain p-6"/><span className="absolute left-4 top-4 rounded-full bg-signal px-3 py-1.5 text-xs font-extrabold text-on-signal">INGYENES MÉRETCSERE</span></div>
    <div className="mt-3 flex gap-3">{photos.map((p,i)=><button type="button" key={p.src} aria-label={p.alt} aria-pressed={photo===i} onClick={()=>setPhoto(i)} className={`size-24 overflow-hidden rounded-xl border-2 bg-surface p-1.5 ${photo===i?'border-signal':'border-transparent'}`}><img src={p.src} alt="" className="h-full w-full object-contain"/></button>)}<div className="flex size-24 flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-line text-center text-[10px] text-text-muted"><ImageIcon size={16}/>[ujjbegy fotó]</div></div>
   </div>
-  <div>
+  <div className="min-w-0">
    <p className="text-sm font-semibold text-signal-text">{dispatch||'Feladás még ma, ha 14:00 előtt rendelsz.'}</p>
-   <h1 className="mt-3 text-4xl font-extrabold leading-[1.02] tracking-tight md:text-[52px]">{bike?'ColdWear thermo kesztyű: biciklin sem fúj át rajta a szél':'ColdWear thermo kesztyű: telefonálj benne, ne vedd le'}</h1>
+   <h1 className="mt-3 text-3xl sm:text-4xl font-extrabold leading-[1.05] tracking-tight md:text-[52px]">{bike?'ColdWear thermo kesztyű: biciklin sem fúj át rajta a szél':'ColdWear thermo kesztyű: telefonálj benne, ne vedd le'}</h1>
    <div className="mt-6 grid grid-cols-1 gap-2.5 sm:grid-cols-2">{BENEFITS.map(b=><span key={b} className="flex items-center gap-2.5 rounded-full bg-signal-soft px-3.5 py-2.5 text-sm font-semibold"><span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-signal text-on-signal"><Check size={12} strokeWidth={3}/></span>{b}</span>)}</div>
    <div className="mt-7"><BundleSelector/></div>
    <div className="mt-8 rounded-2xl bg-signal-soft p-5"><p className="font-bold">Vékony, mégis meleg.</p><p className="mt-1.5 text-sm leading-6 text-text-muted">Vezetés közben érzed benne a kormányt. Ha megállsz és csörög a telefon, nem kell levenned. A kötött kesztyűn átfúj a szél, a síkesztyűben semmit nem tudsz csinálni. Ez a kettő között van.</p></div>
