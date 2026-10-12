@@ -1,0 +1,4 @@
+import { createHmac,timingSafeEqual } from 'node:crypto';
+export function telemetryToken(secret:string,now=Date.now()){const expires=String(now+30*60*1000);return `${expires}.${createHmac('sha256',secret).update(expires).digest('hex')}`}
+export function verifyTelemetry(token:string,secret:string,now=Date.now()){const [expires,signature]=token.split('.');if(!expires||!signature||Number(expires)<now||Number(expires)>now+31*60*1000)return false;const expected=createHmac('sha256',secret).update(expires).digest('hex');return signature.length===expected.length&&timingSafeEqual(Buffer.from(signature),Buffer.from(expected))}
+export function verifyShopify(raw:string,signature:string|null,secret:string){if(!signature)return false;const actual=Buffer.from(signature,'base64'),expected=createHmac('sha256',secret).update(raw).digest();return actual.length===expected.length&&timingSafeEqual(actual,expected)}

@@ -10,33 +10,128 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdatvedelemRouteImport } from './routes/adatvedelem'
+import { Route as AszfRouteImport } from './routes/aszf'
+import { Route as KapcsolatRouteImport } from './routes/kapcsolat'
+import { Route as SutikRouteImport } from './routes/sutik'
+import { Route as SzallitasRouteImport } from './routes/szallitas'
+import { Route as VisszakuldesRouteImport } from './routes/visszakuldes'
+import { Route as ProductHandleRouteImport } from './routes/product.$handle'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdatvedelemRoute = AdatvedelemRouteImport.update({
+  id: '/adatvedelem',
+  path: '/adatvedelem',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AszfRoute = AszfRouteImport.update({
+  id: '/aszf',
+  path: '/aszf',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KapcsolatRoute = KapcsolatRouteImport.update({
+  id: '/kapcsolat',
+  path: '/kapcsolat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SutikRoute = SutikRouteImport.update({
+  id: '/sutik',
+  path: '/sutik',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SzallitasRoute = SzallitasRouteImport.update({
+  id: '/szallitas',
+  path: '/szallitas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VisszakuldesRoute = VisszakuldesRouteImport.update({
+  id: '/visszakuldes',
+  path: '/visszakuldes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductHandleRoute = ProductHandleRouteImport.update({
+  id: '/product/$handle',
+  path: '/product/$handle',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/adatvedelem': typeof AdatvedelemRoute
+  '/aszf': typeof AszfRoute
+  '/kapcsolat': typeof KapcsolatRoute
+  '/sutik': typeof SutikRoute
+  '/szallitas': typeof SzallitasRoute
+  '/visszakuldes': typeof VisszakuldesRoute
+  '/product/$handle': typeof ProductHandleRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/adatvedelem': typeof AdatvedelemRoute
+  '/aszf': typeof AszfRoute
+  '/kapcsolat': typeof KapcsolatRoute
+  '/sutik': typeof SutikRoute
+  '/szallitas': typeof SzallitasRoute
+  '/visszakuldes': typeof VisszakuldesRoute
+  '/product/$handle': typeof ProductHandleRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/adatvedelem': typeof AdatvedelemRoute
+  '/aszf': typeof AszfRoute
+  '/kapcsolat': typeof KapcsolatRoute
+  '/sutik': typeof SutikRoute
+  '/szallitas': typeof SzallitasRoute
+  '/visszakuldes': typeof VisszakuldesRoute
+  '/product/$handle': typeof ProductHandleRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/adatvedelem'
+    | '/aszf'
+    | '/kapcsolat'
+    | '/sutik'
+    | '/szallitas'
+    | '/visszakuldes'
+    | '/product/$handle'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/adatvedelem'
+    | '/aszf'
+    | '/kapcsolat'
+    | '/sutik'
+    | '/szallitas'
+    | '/visszakuldes'
+    | '/product/$handle'
+  id:
+    | '__root__'
+    | '/'
+    | '/adatvedelem'
+    | '/aszf'
+    | '/kapcsolat'
+    | '/sutik'
+    | '/szallitas'
+    | '/visszakuldes'
+    | '/product/$handle'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdatvedelemRoute: typeof AdatvedelemRoute
+  AszfRoute: typeof AszfRoute
+  KapcsolatRoute: typeof KapcsolatRoute
+  SutikRoute: typeof SutikRoute
+  SzallitasRoute: typeof SzallitasRoute
+  VisszakuldesRoute: typeof VisszakuldesRoute
+  ProductHandleRoute: typeof ProductHandleRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +143,67 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/adatvedelem': {
+      id: '/adatvedelem'
+      path: '/adatvedelem'
+      fullPath: '/adatvedelem'
+      preLoaderRoute: typeof AdatvedelemRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/aszf': {
+      id: '/aszf'
+      path: '/aszf'
+      fullPath: '/aszf'
+      preLoaderRoute: typeof AszfRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/kapcsolat': {
+      id: '/kapcsolat'
+      path: '/kapcsolat'
+      fullPath: '/kapcsolat'
+      preLoaderRoute: typeof KapcsolatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sutik': {
+      id: '/sutik'
+      path: '/sutik'
+      fullPath: '/sutik'
+      preLoaderRoute: typeof SutikRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/szallitas': {
+      id: '/szallitas'
+      path: '/szallitas'
+      fullPath: '/szallitas'
+      preLoaderRoute: typeof SzallitasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/visszakuldes': {
+      id: '/visszakuldes'
+      path: '/visszakuldes'
+      fullPath: '/visszakuldes'
+      preLoaderRoute: typeof VisszakuldesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/product/$handle': {
+      id: '/product/$handle'
+      path: '/product/$handle'
+      fullPath: '/product/$handle'
+      preLoaderRoute: typeof ProductHandleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdatvedelemRoute: AdatvedelemRoute,
+  AszfRoute: AszfRoute,
+  KapcsolatRoute: KapcsolatRoute,
+  SutikRoute: SutikRoute,
+  SzallitasRoute: SzallitasRoute,
+  VisszakuldesRoute: VisszakuldesRoute,
+  ProductHandleRoute: ProductHandleRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
