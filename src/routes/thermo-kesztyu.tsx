@@ -6,6 +6,7 @@ import { BundleSelector } from '@/components/coldwear/bundle-selector';
 import { SizeChart } from '@/components/coldwear/size-chart';
 import { Reviews } from '@/components/coldwear/reviews';
 import { Guarantee } from '@/components/coldwear/guarantee';
+import { Care } from '@/components/coldwear/care';
 import { dispatchMessage } from '@/lib/dispatch';
 import { observeBlocks } from '@/lib/track';
 import palm from '@/assets/glove-palm.png.asset.json';
@@ -17,7 +18,7 @@ function Home(){
  const [photo,setPhoto]=useState(0),[bike,setBike]=useState(false),[dispatch,setDispatch]=useState(''),[faq,setFaq]=useState<number|null>(0);
  useEffect(()=>{setBike(new URLSearchParams(location.search).get('angle')==='bike');setDispatch(dispatchMessage(new Date()));const interval=setInterval(()=>setDispatch(dispatchMessage(new Date())),60_000);const cleanup=observeBlocks();return()=>{clearInterval(interval);cleanup()}},[]);
  const photos=[{src:pair.url,alt:'ColdWear thermo kesztyűpár felülnézetben, cipzáras csukló és csúszásgátló tenyér'},{src:zip.url,alt:'ColdWear thermo kesztyű felülnézet, cipzáras csukló'},{src:palm.url,alt:'ColdWear thermo kesztyű elölnézet, csúszásgátló tenyér'}];
- const faqs=[['Mosható a kesztyű?','[Mosási útmutató a gyártói adatok alapján.]'],['Milyen hidegre ajánlott?','[Őszinte válasz a saját teszt alapján. Nincs hőmérséklet ígéret.]'],['Mikor érkezik meg a rendelésem?','GLS házhozszállítással vagy csomagpontra, 1–2 munkanap alatt.'],['Lehet utánvéttel fizetni?','Igen. Átvételkor készpénzzel vagy kártyával is fizethetsz a GLS futárnál. [utánvét díja]']];
+ const faqs=[['Mosható a kesztyű?','Igen. Mosógépben 30 fokon, kímélő programon, becsukott cipzárral, mosózsákban. Kímélő mosószert használj, öblítőt és fehérítőt ne. Ne csavard ki, ne szárítsd gépben vagy radiátoron: fektetve, szobahőmérsékleten szárítsd. Lent részletes útmutatót találsz.'],['Milyen hidegre ajánlott?','[Őszinte válasz a saját teszt alapján. Nincs hőmérséklet ígéret.]'],['Mikor érkezik meg a rendelésem?','GLS házhozszállítással vagy csomagpontra, 1–2 munkanap alatt.'],['Lehet utánvéttel fizetni?','Igen. Átvételkor készpénzzel vagy kártyával is fizethetsz a GLS futárnál. [utánvét díja]']];
  return <>
  <section id="hero" className="py-8 md:py-12"><div className="cw-container grid gap-10 md:grid-cols-[1.05fr_1fr] md:gap-14">
   <div className="min-w-0 md:sticky md:top-24 md:self-start">
@@ -37,6 +38,7 @@ function Home(){
  <section id="features" className="bg-surface py-16 md:py-20"><div className="cw-container"><h2 className="max-w-xl text-3xl font-extrabold leading-tight md:text-4xl">Arra készült, amit naponta csinálsz.</h2><div className="mt-10 grid gap-6 md:grid-cols-3">{[{t:'Érintőképes ujjbegyek',b:'A [hüvelyk- és mutatóujj] hegye vezeti a kijelzőt, nem kell levenned.',img:null},{t:'Csúszásgátló tenyér',b:'Szilikon minta az egész tenyéren: a telefon nem csúszik ki, a kormányt stabilan fogod.',img:palm.url},{t:'Cipzáras csukló',b:'Széthúzod, könnyen belebújsz, összehúzod, és szorosan ül.',img:zip.url}].map(f=><article key={f.t} className="overflow-hidden rounded-2xl border border-line bg-bg"><div className="aspect-[4/3] bg-surface">{f.img?<img src={f.img} alt={f.t} loading="lazy" className="h-full w-full object-contain p-6"/>:<div className="flex h-full items-center justify-center text-sm text-text-muted">[Közeli fotó: ujjbegyek]</div>}</div><div className="border-t border-signal p-6"><h3 className="text-xl font-extrabold">{f.t}</h3><p className="mt-2 leading-7 text-text-muted">{f.b}</p></div></article>)}</div></div></section>
  <Reviews/>
  <Guarantee/>
- <SizeChart/>
+  <SizeChart/>
+  <Care/>
  </>;
 }
