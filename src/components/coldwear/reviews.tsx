@@ -20,7 +20,7 @@ function Stars({ value, className = '' }: { value: number; className?: string })
 }
 
 export function Reviews() {
-  return <section id="reviews" className="bg-signal-soft py-16 md:py-24"><div className="cw-container">
+  return <section id="reviews" className="bg-signal-soft py-12 md:py-14"><div className="cw-container">
     <div className="mb-8 flex flex-col gap-6 md:mb-12 md:flex-row md:items-center md:justify-between">
       <h2 className="text-4xl font-black uppercase leading-none tracking-tight sm:text-5xl md:text-7xl">Amit mások <span className="text-signal">mondanak.</span></h2>
       <div className="flex w-fit items-center gap-5 rounded-2xl border border-line bg-surface px-5 py-4 sm:px-6"><div className="text-center"><p className="text-4xl font-medium">4,8</p><Stars value={5} className="mt-1" /></div><span className="h-14 w-px bg-line" /><p className="font-semibold">6 értékelés</p></div>
