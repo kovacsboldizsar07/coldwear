@@ -152,7 +152,7 @@
 :root {
  --background: oklch(0.959 0.006 215); --foreground: oklch(0.205 0.026 250); --card: oklch(0.983 0.002 197); --card-foreground: var(--foreground); --popover: var(--card); --popover-foreground: var(--foreground);
  --primary: oklch(0.682 0.211 40); --primary-foreground: var(--foreground); --secondary: oklch(0.927 0.012 226); --secondary-foreground: var(--foreground);
- --muted: var(--secondary); --muted-foreground: oklch(0.51 0.03 243); --accent: var(--secondary); --accent-foreground: var(--foreground); --border: oklch(0.86 0.019 233); --input: var(--border); --ring: var(--foreground);
+ --muted: var(--secondary); --muted-foreground: oklch(0.51 0.03 243); --accent: var(--secondary); --accent-foreground: var(--foreground); --border: oklch(0.912 0.012 233); --input: var(--border); --ring: var(--foreground);
 }
 html { scroll-behavior: smooth; scroll-padding-top: 100px; }
 body { font-family: var(--font-sans); }
