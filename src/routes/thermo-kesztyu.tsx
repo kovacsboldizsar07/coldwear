@@ -15,6 +15,7 @@ import zip from '@/assets/glove-zip.png.asset.json';
 import pair from '@/assets/glove-pair.png.asset.json';
 import grip from '@/assets/grip-palm.png.asset.json';
 import zipClose from '@/assets/glove-zip-close.png.asset.json';
+import touch from '@/assets/touchscreen-fingertips.png.asset.json';
 export const Route=createFileRoute('/thermo-kesztyu')({head:()=>({meta:[{title:'ColdWear Thermo kesztyű | Szélálló, érintőképes, vízlepergető'},{name:'description',content:'ColdWear szélálló, vízlepergető thermo kesztyű érintőképes ujjbegyekkel. 14 napos pénzvisszafizetési garancia.'},{property:'og:title',content:'ColdWear Thermo kesztyű'},{property:'og:description',content:'Thermo kesztyű és zokni a téli hétköznapokhoz. Válaszd ki a méreted.'},...(zip.url.startsWith('https://')?[{property:'og:image',content:zip.url},{name:'twitter:image',content:zip.url}]:[]),{property:'og:type',content:'website'},{name:'twitter:card',content:'summary_large_image'}]}),component:Home});
 const BENEFITS=['Szélálló külső','Vízlepergető felület','Érintőképes ujjbegy','Csúszásgátló tenyér','Cipzáras csukló','Polár belső'];
 function Home(){
