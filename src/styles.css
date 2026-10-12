@@ -183,7 +183,7 @@ button { font-stretch: 112%; }
 :focus-visible { outline: 2px solid var(--foreground); outline-offset: 2px; }
 @media(max-width:767px) {
  .cw-container { width: calc(100% - 36px); }
- .cw-section { padding-block: 54px; }
+ .cw-section { padding-block: 40px; }
  .cw-grid3 { grid-template-columns: 1fr; gap: 18px; }
  .cw-hero-grid { grid-template-columns: 1fr; gap: 32px; }
  .cw-hero { padding-block: 36px; background: var(--color-block); color: var(--color-on-block); }
