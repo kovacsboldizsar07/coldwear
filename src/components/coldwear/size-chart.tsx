@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import palmMeasure from '@/assets/palm-measure.png.asset.json';
 import { Check, Footprints, Hand, Minus, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { track } from '@/lib/track';
@@ -138,12 +139,9 @@ export function SizeChart() {
         <div>
           <h2 className="cw-heading mb-5">Pont a kezedre.</h2>
           <p className="cw-body max-w-md">30 másodperc, egy mérőszalag – és biztosan a jó méretet rendeled.</p>
-          <svg viewBox="0 0 160 180" className="mt-8 h-44 w-40 text-text" fill="none" aria-label="Tenyérkörméret mérése a hüvelykujj alatt">
-            <path d="M50 155c-8-18-16-30-25-46-8-14 1-23 10-13l15 16V40c0-12 17-12 17 0v42-61c0-12 17-12 17 0v61-57c0-12 17-12 17 0v57-40c0-12 17-12 17 0v71c0 18-8 28-8 42" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M44 103h81" stroke="var(--color-signal)" strokeWidth="2.5" strokeLinecap="round" strokeDasharray="5 4" />
-            <path d="M44 96v14M125 96v14" stroke="var(--color-signal)" strokeWidth="2" strokeLinecap="round" />
-            <path d="M51 156h62" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-          </svg>
+          <div className="mt-8 overflow-hidden rounded-3xl border border-line bg-block">
+            <img src={palmMeasure.url} alt="Jobb tenyér felülnézetben, a hüvelykujj tövénél végigfutó narancs mérővonallal" loading="lazy" className="aspect-square w-full object-cover" />
+          </div>
           <p className="mt-3 max-w-xs text-sm text-text-muted">A narancs vonalnál mérj, a hüvelykujj nélkül. A szalag simuljon, de ne szorítson.</p>
         </div>
 
