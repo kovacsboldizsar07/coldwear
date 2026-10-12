@@ -1,0 +1,4 @@
+import { createFileRoute } from '@tanstack/react-router';
+import { InfoPage,infoHead } from '@/components/coldwear/info-page';
+export const Route=createFileRoute('/kapcsolat')({head:()=>infoHead("Kapcsolat és méretcsere","Kérdésed van a mérettel kapcsolatban, vagy cserélnél? Írj nekünk, munkanapokon 2 órán belül válaszolunk."),component:Page});
+function Page(){return <InfoPage {...{"title": "Kapcsolat és méretcsere", "intro": "Kérdésed van a mérettel kapcsolatban, vagy cserélnél? Írj nekünk, munkanapokon 2 órán belül válaszolunk.", "sections": [{"title": "Írj nekünk", "body": "Email: [email]\nElérhetőség: [nyitvatartás]"}, {"title": "Ingyenes méretcsere 3 lépésben", "body": "1. Írsz nekünk, és megadod a rendelésed számát és az új méretet.\n2. A futár viszi az új méretet, és elhozza a régit.\n3. Kész. Nem kell nyomtatni és postán sorba állni."}]}}/>}
