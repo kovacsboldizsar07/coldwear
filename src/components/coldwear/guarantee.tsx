@@ -1,4 +1,3 @@
-import { ShieldCheck } from 'lucide-react';
 import badge from '@/assets/guarantee-badge.png.asset.json';
 
 export function Guarantee() {
