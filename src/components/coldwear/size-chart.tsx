@@ -36,7 +36,7 @@ function GloveCalc() {
       </ol>
 
       <div className="rounded-2xl border border-line bg-bg p-5">
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <span className="text-sm font-medium text-text-muted">Tenyérkörméreted</span>
           <div className="flex items-center gap-2">
             <button type="button" aria-label="Csökkentés" onClick={() => set(cm - 0.5)} className="flex size-9 items-center justify-center rounded-full border border-line hover:border-signal"><Minus size={16} /></button>
@@ -134,7 +134,7 @@ export function SizeChart() {
   const [tab, setTab] = useState<'glove' | 'sock'>('glove');
   return (
     <section className="cw-section" id="size_chart">
-      <div className="cw-container grid gap-10 md:grid-cols-[0.8fr_1.2fr]">
+      <div className="cw-container grid gap-10 md:grid-cols-[0.8fr_1.2fr] [&>*]:min-w-0">
         <div>
           <h2 className="cw-heading mb-5">Pont a kezedre.</h2>
           <p className="cw-body max-w-md">30 másodperc, egy mérőszalag – és biztosan a jó méretet rendeled.</p>
