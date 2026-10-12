@@ -68,20 +68,20 @@ function GloveCalc() {
       </div>
 
       <div className="mt-6 overflow-x-auto rounded-2xl border border-line">
-        <table className="w-full min-w-[420px] text-sm">
+        <table className="w-full text-xs sm:text-sm">
           <thead><tr className="border-b border-line bg-bg text-left">
-            <th className="px-4 py-3 font-bold">Méret</th>
-            <th className="px-4 py-3 font-bold">Tenyérkörméret</th>
-            <th className="px-4 py-3 font-bold">Tenyérszélesség</th>
+            <th className="px-3 py-3 sm:px-4 font-bold">Méret</th>
+            <th className="px-3 py-3 sm:px-4 font-bold">Tenyérkörméret</th>
+            <th className="px-3 py-3 sm:px-4 font-bold">Tenyérszélesség</th>
           </tr></thead>
           <tbody>
             {GLOVE_SIZES.map((g) => {
               const on = g.size === size;
               return (
                 <tr key={g.size} onClick={() => set((g.palm[0] + g.palm[1]) / 2)} className={`cursor-pointer border-b border-line transition-colors last:border-0 ${on ? 'bg-signal-soft' : 'hover:bg-bg'}`}>
-                  <td className={`px-4 py-3 font-extrabold ${on ? 'text-signal-text' : ''}`}>{g.size}</td>
-                  <td className="px-4 py-3 tabular-nums">{fmt(g.palm[0])}–{fmt(g.palm[1])} cm</td>
-                  <td className="px-4 py-3 tabular-nums text-text-muted">{fmt(g.width[0])}–{fmt(g.width[1])} cm</td>
+                  <td className={`px-3 py-3 sm:px-4 font-extrabold ${on ? 'text-signal-text' : ''}`}>{g.size}</td>
+                  <td className="px-3 py-3 sm:px-4 tabular-nums">{fmt(g.palm[0])}–{fmt(g.palm[1])} cm</td>
+                  <td className="px-3 py-3 sm:px-4 tabular-nums text-text-muted">{fmt(g.width[0])}–{fmt(g.width[1])} cm</td>
                 </tr>
               );
             })}
