@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Lock, Truck, RefreshCcw, Ruler } from 'lucide-react';
+import { Lock, Truck, Ruler } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getCatalog,getQuote } from '@/lib/shopify.functions';
 import { copyFirstSize,money } from '@/lib/commerce';
@@ -39,7 +39,7 @@ export function BundleSelector(){
   <Button className="mt-6 h-16 w-full rounded-full text-lg font-extrabold tracking-wide" disabled={!glove||busy} onClick={submit}>{busy?'FRISSÍTÉS…':'KOSÁRBA TESZEM'}{total!=='–'&&!busy?<span className="font-semibold opacity-80">· {total}</span>:null}</Button>
   <p aria-live="polite" className="mt-2 min-h-5 text-center text-sm text-signal-text">{glove&&!allSizes?'Válaszd ki minden pár méretét'+(bundle===3?' és a zokni méretét.':'.'):''}</p>
   {!glove&&<p className="text-center text-sm text-text-muted">{isPending?'A termékek betöltése…':isError?'A termékek betöltése nem sikerült.':'Még nincs elérhető termék az áruházban.'}</p>}
-  <div className="mt-2 flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-text-muted">{[[Lock,'Utánvét a futárnál'],[Truck,'GLS, 1–2 munkanap'],[RefreshCcw,'Ingyenes méretcsere']].map(([Icon,l])=>{const I=Icon as typeof Lock;return <span key={String(l)} className="flex items-center gap-1.5"><I size={15} className="text-signal-text"/>{String(l)}</span>})}</div>
+  <div className="mt-2 flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-text-muted">{[[Lock,'Utánvét a futárnál'],[Truck,'GLS, 1–2 munkanap']].map(([Icon,l])=>{const I=Icon as typeof Lock;return <span key={String(l)} className="flex items-center gap-1.5"><I size={15} className="text-signal-text"/>{String(l)}</span>})}</div>
   {sticky&&<div className="fixed inset-x-0 bottom-0 z-30 flex items-center justify-between gap-3 border-t border-line bg-surface px-5 py-3 md:hidden"><div><p className="text-xs text-text-muted">{bundle} kesztyű{bundle===3?' + zokni':''}</p><strong className="text-signal-text">{total}</strong></div><Button className="rounded-full font-extrabold" onClick={submit} disabled={busy||!glove}>KOSÁRBA</Button></div>}
  </div>;
 }
