@@ -161,7 +161,7 @@ h1,h2,h3 { font-stretch: 112%; }
 h1 { font-weight: 800; font-stretch: 100%; }
 button { font-stretch: 112%; }
 .cw-container { width: min(1240px, calc(100% - 80px)); margin-inline: auto; }
-.cw-section { padding-block: 88px; border-top: 1px solid var(--border); }
+.cw-section { padding-block: 56px; border-top: 1px solid var(--border); }
 #size_chart { padding-bottom: 36px; }
 #care { padding-top: 44px; }
 .cw-label { font-family: var(--font-mono); font-weight: 500; font-size: 11px; text-transform: uppercase; }
