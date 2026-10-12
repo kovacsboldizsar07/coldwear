@@ -1,11 +1,12 @@
 # ColdWear phase 1
-- [ ] Refine cart layout, thin borders, sock-photo slot, and mobile checkout controls.
-- [ ] Configure and verify free shipping for 3 products OR 17 000 Ft, with automatic application and remaining-amount display.
+- [x] Refine cart layout, thin borders, sock-photo slot, and mobile checkout controls; verified add, sock upsell, removal, amount recalculation and checkout opening with real Shopify products.
+- [x] Show remaining forints and quantity for free shipping at 3 products OR 17 000 Ft; seven qualification tests passed.
+- [ ] Activate actual Shopify free shipping for 3 products OR 17 000 Ft and verify delivery cost: blocked by lack of Admin API access to quantity prerequisites and discount combination settings. Available price-rule tool ignored subtotal prerequisite, so the unsafe rule and code were deleted. No shipping discount is claimed as applied in the UI.
 - [x] Storefront, uploaded glove photography, bundles, size chart, FAQ and mobile controls.
 - [x] Information/legal pages and six-month cookie consent.
 - [x] Shopify catalog and Cart API integration with server-only token and cart attributes.
 - [x] Protected order/analytics schema, webhook and collection endpoint.
 - [x] Admin reporting, spend and cost editor, integration status.
 - [x] Rule tests, public pages, consent, size copying, image loading and collection verified.
-- [ ] Live cart/checkout and admin-write verification: blocked by empty read-only catalog and absence of an authorized admin account.
-- [ ] External prerequisites: read-only new Shopify store is empty; product setup/discounts, sock specifications, verified measurements, company details, webhook/CAPI credentials and admin account required.
+- [ ] Final checkout delivery/payment and admin-write verification: shipping configuration and authorized admin account required; real catalog and cart are now available and verified.
+- [ ] External prerequisites: sock photo/specifications, verified measurements, company details, final shipping/payment setup, webhook/CAPI credentials and admin account required.
