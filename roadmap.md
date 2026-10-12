@@ -1,4 +1,6 @@
 # ColdWear phase 1
+- [ ] Refine cart layout, thin borders, sock-photo slot, and mobile checkout controls.
+- [ ] Configure and verify free shipping for 3 products OR 17 000 Ft, with automatic application and remaining-amount display.
 - [x] Storefront, uploaded glove photography, bundles, size chart, FAQ and mobile controls.
 - [x] Information/legal pages and six-month cookie consent.
 - [x] Shopify catalog and Cart API integration with server-only token and cart attributes.
