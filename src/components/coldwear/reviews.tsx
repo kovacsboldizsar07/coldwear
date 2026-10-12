@@ -19,7 +19,7 @@ const REVIEWS: Review[] = [
   { name: 'Nagy Eszter', meta: '1 hónapja · Győr', text: 'Az egész családnak rendeltünk. A méretek pontosan a táblázat szerint jöttek, gyorsan megérkezett.', bought: 'KESZTYŰ · 3 DB + ZOKNI', stars: 5, likes: 15, photo: photo3.url },
   { name: 'Szabó Márta', meta: '1 hónapja · Szeged', text: 'Biciklivel járok dolgozni, a kormányt jól érzem benne. Megálláskor le sem kell vennem, ha telefonálnom kell.', bought: 'KESZTYŰ · 2 DB', stars: 5, likes: 12, photo: photo5.url },
   { name: 'Horváth Anna', meta: '5 hete · Pécs', text: 'Szép, letisztult darab. Az ujjbegy érintőképes része tényleg működik, üzenetet is tudok írni.', bought: 'KESZTYŰ · 2 DB', stars: 4, likes: 9, photo: photo4.url },
-  { name: 'Varga Péter', meta: '2 hónapja · Miskolc', text: 'Utánvéttel fizettem, a GLS futár másnap hozta. Az ajándék zokni is nagyon kellemes.', bought: 'KESZTYŰ · 3 DB + ZOKNI', stars: 5, likes: 7, photo: photo6.url },
+  { name: 'Varga Péter és Anna', meta: '2 hónapja · Miskolc', text: 'Utánvéttel fizettünk, a GLS futár másnap hozta. Az ajándék zokni is nagyon kellemes.', bought: 'KESZTYŰ · 3 DB + ZOKNI', stars: 5, likes: 7, photo: photo6.url },
 ];
 
 function Stars({ value, className = '' }: { value: number; className?: string }) {
