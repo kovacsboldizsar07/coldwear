@@ -10,33 +10,167 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdatvedelemRouteImport } from './routes/adatvedelem'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AszfRouteImport } from './routes/aszf'
+import { Route as KapcsolatRouteImport } from './routes/kapcsolat'
+import { Route as SutikRouteImport } from './routes/sutik'
+import { Route as SzallitasRouteImport } from './routes/szallitas'
+import { Route as VisszakuldesRouteImport } from './routes/visszakuldes'
+import { Route as ProductHandleRouteImport } from './routes/product.$handle'
+import { Route as ApiPublicCollectRouteImport } from './routes/api.public.collect'
+import { Route as ApiPublicShopifyWebhookRouteImport } from './routes/api.public.shopify-webhook'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdatvedelemRoute = AdatvedelemRouteImport.update({
+  id: '/adatvedelem',
+  path: '/adatvedelem',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AszfRoute = AszfRouteImport.update({
+  id: '/aszf',
+  path: '/aszf',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KapcsolatRoute = KapcsolatRouteImport.update({
+  id: '/kapcsolat',
+  path: '/kapcsolat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SutikRoute = SutikRouteImport.update({
+  id: '/sutik',
+  path: '/sutik',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SzallitasRoute = SzallitasRouteImport.update({
+  id: '/szallitas',
+  path: '/szallitas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VisszakuldesRoute = VisszakuldesRouteImport.update({
+  id: '/visszakuldes',
+  path: '/visszakuldes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductHandleRoute = ProductHandleRouteImport.update({
+  id: '/product/$handle',
+  path: '/product/$handle',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicCollectRoute = ApiPublicCollectRouteImport.update({
+  id: '/api/public/collect',
+  path: '/api/public/collect',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicShopifyWebhookRoute = ApiPublicShopifyWebhookRouteImport.update({
+  id: '/api/public/shopify-webhook',
+  path: '/api/public/shopify-webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/adatvedelem': typeof AdatvedelemRoute
+  '/admin': typeof AdminRoute
+  '/aszf': typeof AszfRoute
+  '/kapcsolat': typeof KapcsolatRoute
+  '/sutik': typeof SutikRoute
+  '/szallitas': typeof SzallitasRoute
+  '/visszakuldes': typeof VisszakuldesRoute
+  '/product/$handle': typeof ProductHandleRoute
+  '/api/public/collect': typeof ApiPublicCollectRoute
+  '/api/public/shopify-webhook': typeof ApiPublicShopifyWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/adatvedelem': typeof AdatvedelemRoute
+  '/admin': typeof AdminRoute
+  '/aszf': typeof AszfRoute
+  '/kapcsolat': typeof KapcsolatRoute
+  '/sutik': typeof SutikRoute
+  '/szallitas': typeof SzallitasRoute
+  '/visszakuldes': typeof VisszakuldesRoute
+  '/product/$handle': typeof ProductHandleRoute
+  '/api/public/collect': typeof ApiPublicCollectRoute
+  '/api/public/shopify-webhook': typeof ApiPublicShopifyWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/adatvedelem': typeof AdatvedelemRoute
+  '/admin': typeof AdminRoute
+  '/aszf': typeof AszfRoute
+  '/kapcsolat': typeof KapcsolatRoute
+  '/sutik': typeof SutikRoute
+  '/szallitas': typeof SzallitasRoute
+  '/visszakuldes': typeof VisszakuldesRoute
+  '/product/$handle': typeof ProductHandleRoute
+  '/api/public/collect': typeof ApiPublicCollectRoute
+  '/api/public/shopify-webhook': typeof ApiPublicShopifyWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/adatvedelem'
+    | '/admin'
+    | '/aszf'
+    | '/kapcsolat'
+    | '/sutik'
+    | '/szallitas'
+    | '/visszakuldes'
+    | '/product/$handle'
+    | '/api/public/collect'
+    | '/api/public/shopify-webhook'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/adatvedelem'
+    | '/admin'
+    | '/aszf'
+    | '/kapcsolat'
+    | '/sutik'
+    | '/szallitas'
+    | '/visszakuldes'
+    | '/product/$handle'
+    | '/api/public/collect'
+    | '/api/public/shopify-webhook'
+  id:
+    | '__root__'
+    | '/'
+    | '/adatvedelem'
+    | '/admin'
+    | '/aszf'
+    | '/kapcsolat'
+    | '/sutik'
+    | '/szallitas'
+    | '/visszakuldes'
+    | '/product/$handle'
+    | '/api/public/collect'
+    | '/api/public/shopify-webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdatvedelemRoute: typeof AdatvedelemRoute
+  AdminRoute: typeof AdminRoute
+  AszfRoute: typeof AszfRoute
+  KapcsolatRoute: typeof KapcsolatRoute
+  SutikRoute: typeof SutikRoute
+  SzallitasRoute: typeof SzallitasRoute
+  VisszakuldesRoute: typeof VisszakuldesRoute
+  ProductHandleRoute: typeof ProductHandleRoute
+  ApiPublicCollectRoute: typeof ApiPublicCollectRoute
+  ApiPublicShopifyWebhookRoute: typeof ApiPublicShopifyWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +182,91 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/adatvedelem': {
+      id: '/adatvedelem'
+      path: '/adatvedelem'
+      fullPath: '/adatvedelem'
+      preLoaderRoute: typeof AdatvedelemRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/aszf': {
+      id: '/aszf'
+      path: '/aszf'
+      fullPath: '/aszf'
+      preLoaderRoute: typeof AszfRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/kapcsolat': {
+      id: '/kapcsolat'
+      path: '/kapcsolat'
+      fullPath: '/kapcsolat'
+      preLoaderRoute: typeof KapcsolatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sutik': {
+      id: '/sutik'
+      path: '/sutik'
+      fullPath: '/sutik'
+      preLoaderRoute: typeof SutikRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/szallitas': {
+      id: '/szallitas'
+      path: '/szallitas'
+      fullPath: '/szallitas'
+      preLoaderRoute: typeof SzallitasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/visszakuldes': {
+      id: '/visszakuldes'
+      path: '/visszakuldes'
+      fullPath: '/visszakuldes'
+      preLoaderRoute: typeof VisszakuldesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/product/$handle': {
+      id: '/product/$handle'
+      path: '/product/$handle'
+      fullPath: '/product/$handle'
+      preLoaderRoute: typeof ProductHandleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/collect': {
+      id: '/api/public/collect'
+      path: '/api/public/collect'
+      fullPath: '/api/public/collect'
+      preLoaderRoute: typeof ApiPublicCollectRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/shopify-webhook': {
+      id: '/api/public/shopify-webhook'
+      path: '/api/public/shopify-webhook'
+      fullPath: '/api/public/shopify-webhook'
+      preLoaderRoute: typeof ApiPublicShopifyWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdatvedelemRoute: AdatvedelemRoute,
+  AdminRoute: AdminRoute,
+  AszfRoute: AszfRoute,
+  KapcsolatRoute: KapcsolatRoute,
+  SutikRoute: SutikRoute,
+  SzallitasRoute: SzallitasRoute,
+  VisszakuldesRoute: VisszakuldesRoute,
+  ProductHandleRoute: ProductHandleRoute,
+  ApiPublicCollectRoute: ApiPublicCollectRoute,
+  ApiPublicShopifyWebhookRoute: ApiPublicShopifyWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,0 +1,21 @@
+import { describe,it,expect } from 'vitest';
+import { createHmac } from 'node:crypto';
+import { shippingRemaining,copyFirstSize,consentExpiry } from '@/lib/commerce';
+import { dispatchMessage } from '@/lib/dispatch';
+import { verifyShopify,telemetryToken,verifyTelemetry } from '@/lib/telemetry.server';
+import { summary } from '@/lib/reporting';
+describe('ColdWear business rules',()=>{
+ it('requires two more products after one',()=>expect(shippingRemaining(1)).toBe(2));
+ it('requires one more product after two',()=>expect(shippingRemaining(2)).toBe(1));
+ it('grants free delivery for three products including socks',()=>expect(shippingRemaining(2+1)).toBe(0));
+ it('copies first glove size to unselected pairs',()=>expect(copyFirstSize(['','',''],0,'M')).toEqual(['M','M','M']));
+ it('keeps individual pair size edits',()=>expect(copyFirstSize(['M','L','M'],0,'XL')).toEqual(['XL','L','M']));
+ it('expires consent in six months',()=>expect(new Date(consentExpiry(new Date('2026-10-12T10:00:00Z'))).toISOString()).toBe('2027-04-12T10:00:00.000Z'));
+ it('uses Budapest 14:00 cutoff on weekdays',()=>expect(dispatchMessage(new Date('2026-10-12T11:30:00Z'))).toContain('0:30'));
+ it('selects next weekday after cutoff',()=>expect(dispatchMessage(new Date('2026-10-12T12:01:00Z'))).toBe('A következő feladás: kedd.'));
+ it('skips Hungarian public holiday and weekend',()=>expect(dispatchMessage(new Date('2026-10-23T09:00:00Z'))).toBe('A következő feladás: hétfő.'));
+ it('rejects invalid webhook signature',()=>expect(verifyShopify('{}','bad','test-secret')).toBe(false));
+ it('authenticates raw request body',()=>{const signature=createHmac('sha256','test-secret').update('{ "id": 123 }').digest('base64');expect(verifyShopify('{ "id": 123 }',signature,'test-secret')).toBe(true);expect(verifyShopify('{"id":123}',signature,'test-secret')).toBe(false)});
+ it('rejects expired collection credentials',()=>{const now=1000000;const token=telemetryToken('test-secret',now);expect(verifyTelemetry(token,'test-secret',now)).toBe(true);expect(verifyTelemetry(token,'test-secret',now+31*60000)).toBe(false)});
+ it('does not invent profit when product costs missing',()=>expect(summary([{id:'1',total_price:8990,total_tax:1911,shipping_price:1490,payment_gateway:'card',cancelled_at:null}],[{order_id:'1',quantity:1,sku:'glove-m',product_title:'Thermo kesztyű'}],1000,[]).profit).toBe(null));
+});
