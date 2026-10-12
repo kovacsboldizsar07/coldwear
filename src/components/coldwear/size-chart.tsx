@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import palmMeasure from '@/assets/palm-measure.png.asset.json';
+import handMeasure from '@/assets/hand-measure.png.asset.json';
 import { Check, Footprints, Hand, Minus, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { track } from '@/lib/track';
@@ -140,7 +140,7 @@ export function SizeChart() {
           <h2 className="cw-heading mb-5">Pont a kezedre.</h2>
           <p className="cw-body max-w-md">30 másodperc, egy mérőszalag – és biztosan a jó méretet rendeled.</p>
           <div className="mt-8 overflow-hidden rounded-3xl border border-line bg-block">
-            <img src={palmMeasure.url} alt="Jobb tenyér felülnézetben, a hüvelykujj tövénél végigfutó narancs mérővonallal" loading="lazy" className="aspect-square w-full object-cover" />
+            <img src={handMeasure.url} alt="Jobb tenyér belülnézetben, a tenyeret körbeölelő narancs mérővonyallal" loading="lazy" className="aspect-square w-full object-cover" />
           </div>
           <p className="mt-3 max-w-xs text-sm text-text-muted">A narancs vonalnál mérj, a hüvelykujj nélkül. A szalag simuljon, de ne szorítson.</p>
         </div>
