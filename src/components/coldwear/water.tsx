@@ -10,7 +10,6 @@ export function Water() {
             <p className="mt-4 max-w-md text-base leading-7 text-text-muted sm:text-lg sm:leading-8">
               A külső anyag vízlepergető felülettel készül. A csepp nem nyomódik át a szöveten, hanem a felszínén marad, majd lepereg. Havas esőben, latyakban és frissen hullott hóban is szárazon tartja a kezed.
             </p>
-            <p className="mt-6 max-w-md border-t border-signal/25 pt-5 text-sm leading-6 text-text-muted">A vízlepergető felület nem vízállóságot jelent: merülni nem való, és a mosásokkal idővel gyengül. Egy szövetimpregnáló spray visszahozza.</p>
           </div>
           <div className="flex aspect-[4/3] flex-col items-center justify-center gap-4 rounded-2xl border border-dashed border-signal/45 bg-surface p-6 text-center">
             <span className="flex size-14 items-center justify-center rounded-full bg-signal text-on-signal"><Droplets size={26} /></span>
