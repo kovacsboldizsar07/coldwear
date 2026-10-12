@@ -188,6 +188,7 @@ button { font-stretch: 112%; }
  .cw-hero h1 { font-size: 36px; line-height: 38px; }
  .cw-hero .cw-body { color: var(--color-on-block-muted); }
  .cw-hero-media .cw-photo { aspect-ratio: 4/5; }
+ .cw-hero .cw-label.flex { font-size: 9px; padding-inline: 6px; gap: 4px; }
  .cw-heading { font-size: 26px; line-height: 30px; }
 }
 @media(prefers-reduced-motion:reduce) { html {scroll-behavior:auto} *,*::before,*::after {animation:none!important;transition:none!important} }

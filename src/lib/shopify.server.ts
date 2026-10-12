@@ -1,6 +1,6 @@
 import type { Cart, Product } from './commerce';
 const productFields = 'id handle title description variants(first:20){nodes{id title availableForSale price{amount currencyCode}}}';
-const cartFields = `id checkoutUrl totalQuantity cost{totalAmount{amount currencyCode} subtotalAmount{amount currencyCode}} discountAllocations{discountedAmount{amount currencyCode}} lines(first:100){nodes{id quantity cost{totalAmount{amount currencyCode}} discountAllocations{discountedAmount{amount currencyCode}} merchandise{...on ProductVariant{id title availableForSale price{amount currencyCode} product{title handle}}}}}`;
+const cartFields = `id checkoutUrl totalQuantity cost{totalAmount{amount currencyCode} subtotalAmount{amount currencyCode}} discountAllocations{discountedAmount{amount currencyCode}} lines(first:100){nodes{id quantity cost{amountPerQuantity{amount currencyCode} totalAmount{amount currencyCode}} discountAllocations{discountedAmount{amount currencyCode}} merchandise{...on ProductVariant{id title availableForSale price{amount currencyCode} product{title handle}}}}}`;
 async function request<T>(query: string, variables: Record<string, unknown> = {}): Promise<T> {
  const token = process.env['SHOPIFY_STOREFRONT_ACCESS_TOKEN'];
  if (!token) throw new Error('A Shopify kapcsolat nincs beállítva.');

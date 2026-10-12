@@ -1,8 +1,9 @@
 # ColdWear phase 1
-- [ ] Storefront, uploaded glove photography, bundles, size chart, FAQ and mobile controls.
-- [ ] Information/legal pages and six-month cookie consent.
-- [ ] Shopify catalog and Cart API integration with server-only token and cart attributes.
-- [ ] Protected order/analytics schema, webhook and collection endpoint.
-- [ ] Admin reporting, spend and cost editor, integration status.
-- [ ] Tests and browser verification.
+- [x] Storefront, uploaded glove photography, bundles, size chart, FAQ and mobile controls.
+- [x] Information/legal pages and six-month cookie consent.
+- [x] Shopify catalog and Cart API integration with server-only token and cart attributes.
+- [x] Protected order/analytics schema, webhook and collection endpoint.
+- [x] Admin reporting, spend and cost editor, integration status.
+- [x] Rule tests, public pages, consent, size copying, image loading and collection verified.
+- [ ] Live cart/checkout and admin-write verification: blocked by empty read-only catalog and absence of an authorized admin account.
 - [ ] External prerequisites: read-only new Shopify store is empty; product setup/discounts, sock specifications, verified measurements, company details, webhook/CAPI credentials and admin account required.
