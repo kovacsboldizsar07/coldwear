@@ -12,5 +12,5 @@ export const changeCart = createServerFn({method:'POST'}).inputValidator(z.objec
  if(data.operation==='remove'&&!data.lineIds?.length) throw new Error('Hiányzó tétel.');
  let cart=await api.mutateCart(data.operation,data.operation==='create'?{input:{lines:data.lines,attributes:data.attributes,buyerIdentity:{countryCode:'HU'}}}:{cartId:data.cartId,lines:data.lines,lineIds:data.lineIds,attributes:data.attributes});
  if(cart && data.operation!=='create'&&data.operation!=='attributes') cart=await api.mutateCart('attributes',{cartId:cart.id,attributes:data.attributes});
- return cart;
+ return api.withBundle(cart);
 });
