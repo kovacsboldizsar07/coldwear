@@ -4,9 +4,9 @@ let collectToken='',pixelId='';
 let pending:{name:string;data:Record<string,unknown>}[]=[];
 let pixelLoaded=false;
 function loadPixel(){
- if(!consent?.marketing||!pixelId||pixelLoaded)return;
+ if(!consent?.marketing||!pixelId)return;if(pixelLoaded){const w=window as unknown as {fbq?:(...args:unknown[])=>void};w.fbq?.('consent','grant');return;}
  pixelLoaded=true;
- const w=window as unknown as {fbq?:((...args:unknown[])=>void)&{queue:unknown[][];loaded:boolean;version:string;callMethod?:(...args:unknown[])=>void}};
+ const w=window as unknown as {fbq?:((...args:unknown[])=>void)&{queue:unknown[][];loaded:boolean;version:string;callMethod:((...args:unknown[])=>void)|undefined}};
  const fbq=Object.assign((...args:unknown[])=>{if(fbq.callMethod)fbq.callMethod(...args);else fbq.queue.push(args)}, {queue:[] as unknown[][],loaded:true,version:'2.0',callMethod:undefined as ((...args:unknown[])=>void)|undefined});w.fbq=fbq;
  fbq('init',pixelId);const script=document.createElement('script');script.src='https://connect.facebook.net/en_US/fbevents.js';script.async=true;document.head.appendChild(script);
 }
@@ -24,7 +24,7 @@ export function initializeTracking(){
  try { const saved=JSON.parse(safeGet('cw_consent')||'null') as Consent|null; if(saved&&saved.expires>Date.now())consent=saved; }catch{/* invalid stored consent */}
  const params=new URLSearchParams(location.search); angle=params.get('angle')==='bike'?'bike':'default';
  names.forEach(name=>{source[name]=params.get(name)||''});
- applyConsent(); void telemetryConfig().then(config=>{collectToken=config.token;pixelId=config.pixelId;loadPixel();const events=pending;pending=[];events.forEach(e=>track(e.name,e.data));}); track('PageView');
+ applyConsent(); void telemetryConfig().then(config=>{collectToken=config.token;pixelId=config.pixelId;loadPixel();const events=pending;pending=[];events.forEach(e=>track(e.name,e.data));}).catch(()=>{pending=[];}); track('PageView');
  return consent;
 }
 function applyConsent(){
