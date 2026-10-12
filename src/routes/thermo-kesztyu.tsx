@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useEffect,useState } from 'react';
-import { Check,ChevronDown,ImageIcon } from 'lucide-react';
+import { Check,ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { BundleSelector } from '@/components/coldwear/bundle-selector';
 import { SizeChart } from '@/components/coldwear/size-chart';
@@ -10,18 +10,19 @@ import { dispatchMessage } from '@/lib/dispatch';
 import { observeBlocks } from '@/lib/track';
 import palm from '@/assets/glove-palm.png.asset.json';
 import zip from '@/assets/glove-zip.png.asset.json';
+import pair from '@/assets/glove-pair.png.asset.json';
 export const Route=createFileRoute('/thermo-kesztyu')({head:()=>({meta:[{title:'ColdWear Thermo kesztyű | Szélálló, érintőképes, vízlepergető'},{name:'description',content:'ColdWear szélálló, vízlepergető thermo kesztyű érintőképes ujjbegyekkel. 14 napos pénzvisszafizetési garancia.'},{property:'og:title',content:'ColdWear Thermo kesztyű'},{property:'og:description',content:'Thermo kesztyű és zokni a téli hétköznapokhoz. Válaszd ki a méreted.'},...(zip.url.startsWith('https://')?[{property:'og:image',content:zip.url},{name:'twitter:image',content:zip.url}]:[]),{property:'og:type',content:'website'},{name:'twitter:card',content:'summary_large_image'}]}),component:Home});
 const BENEFITS=['Szélálló külső','Vízlepergető felület','Érintőképes ujjbegy','Csúszásgátló tenyér','Cipzáras csukló','Polár belső'];
 function Home(){
  const [photo,setPhoto]=useState(0),[bike,setBike]=useState(false),[dispatch,setDispatch]=useState(''),[faq,setFaq]=useState<number|null>(0);
  useEffect(()=>{setBike(new URLSearchParams(location.search).get('angle')==='bike');setDispatch(dispatchMessage(new Date()));const interval=setInterval(()=>setDispatch(dispatchMessage(new Date())),60_000);const cleanup=observeBlocks();return()=>{clearInterval(interval);cleanup()}},[]);
- const photos=[{src:zip.url,alt:'ColdWear thermo kesztyű felülnézet, cipzáras csukló'},{src:palm.url,alt:'ColdWear thermo kesztyű elölnézet, csúszásgátló tenyér'}];
+ const photos=[{src:pair.url,alt:'ColdWear thermo kesztyűpár felülnézetben, cipzáras csukló és csúszásgátló tenyér'},{src:zip.url,alt:'ColdWear thermo kesztyű felülnézet, cipzáras csukló'},{src:palm.url,alt:'ColdWear thermo kesztyű elölnézet, csúszásgátló tenyér'}];
  const faqs=[['Mosható a kesztyű?','[Mosási útmutató a gyártói adatok alapján.]'],['Milyen hidegre ajánlott?','[Őszinte válasz a saját teszt alapján. Nincs hőmérséklet ígéret.]'],['Mikor érkezik meg a rendelésem?','GLS házhozszállítással vagy csomagpontra, 1–2 munkanap alatt.'],['Lehet utánvéttel fizetni?','Igen. Átvételkor készpénzzel vagy kártyával is fizethetsz a GLS futárnál. [utánvét díja]']];
  return <>
  <section id="hero" className="py-8 md:py-12"><div className="cw-container grid gap-10 md:grid-cols-[1.05fr_1fr] md:gap-14">
   <div className="min-w-0 md:sticky md:top-24 md:self-start">
     <div className="relative aspect-square overflow-hidden rounded-3xl border border-line bg-surface"><img src={photos[photo]?.src} alt={photos[photo]?.alt} fetchPriority="high" className="h-full w-full object-contain p-6"/></div>
-    <div className="mt-3 flex gap-3">{photos.map((p,i)=><button type="button" key={p.src} aria-label={p.alt} aria-pressed={photo===i} onClick={()=>setPhoto(i)} className={`size-24 overflow-hidden rounded-xl border bg-surface p-1.5 transition-colors ${photo===i?'border-signal ring-1 ring-signal':'border-line hover:border-signal/50'}`}><img src={p.src} alt="" className="h-full w-full object-contain"/></button>)}<div className="flex size-24 flex-col items-center justify-center gap-1 rounded-xl border border-dashed border-line text-center text-[10px] text-text-muted"><ImageIcon size={16}/>[ujjbegy fotó]</div></div>
+    <div className="mt-3 flex gap-3">{photos.map((p,i)=><button type="button" key={p.src} aria-label={p.alt} aria-pressed={photo===i} onClick={()=>setPhoto(i)} className={`size-24 overflow-hidden rounded-xl border bg-surface p-1.5 transition-colors ${photo===i?'border-signal ring-1 ring-signal':'border-line hover:border-signal/50'}`}><img src={p.src} alt="" className="h-full w-full object-contain"/></button>)}</div>
   </div>
   <div className="min-w-0">
    <p className="text-sm font-semibold text-signal-text">{dispatch||'Feladás még ma, ha 14:00 előtt rendelsz.'}</p>
