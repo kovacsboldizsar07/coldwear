@@ -7,6 +7,7 @@ import { SizeChart } from '@/components/coldwear/size-chart';
 import { Reviews } from '@/components/coldwear/reviews';
 import { Guarantee } from '@/components/coldwear/guarantee';
 import { Care } from '@/components/coldwear/care';
+import { Water } from '@/components/coldwear/water';
 import { dispatchMessage } from '@/lib/dispatch';
 import { observeBlocks } from '@/lib/track';
 import palm from '@/assets/glove-palm.png.asset.json';
@@ -34,12 +35,13 @@ function Home(){
    <div className="mt-7"><BundleSelector/></div>
    <div className="mt-8 rounded-2xl bg-signal-soft p-5"><p className="font-bold">Vékony, mégis meleg.</p><p className="mt-1.5 text-sm leading-6 text-text-muted">Vezetés közben érzed benne a kormányt. Ha megállsz és csörög a telefon, nem kell levenned. A kötött kesztyűn átfúj a szél, a síkesztyűben semmit nem tudsz csinálni. Ez a kettő között van.</p></div>
    <div className="mt-6 divide-y divide-line border-y border-line">{faqs.map(([q,a],i)=><div key={q}><button type="button" aria-expanded={faq===i} onClick={()=>setFaq(faq===i?null:i)} className="flex w-full items-center justify-between gap-4 py-5 text-left text-lg font-bold">{q}<ChevronDown size={20} className={`shrink-0 text-signal-text transition-transform ${faq===i?'rotate-180':''}`}/></button>{faq===i&&<p className="pb-5 leading-7 text-text-muted">{a}</p>}</div>)}</div>
-   <div className="mt-8"><h2 className="mb-3 text-lg font-bold">Jól működik együtt</h2><div className="flex items-center gap-4 rounded-2xl border border-line bg-signal-soft p-4"><div className="flex size-20 shrink-0 items-center justify-center rounded-xl border border-dashed border-line bg-surface text-center text-[10px] text-text-muted">[zokni fotó]</div><div className="flex-1"><p className="font-extrabold">COLDWEAR THERMO ZOKNI</p><p className="text-sm text-text-muted">Elvezeti a párát, erősített sarok és orr.</p></div><Button className="rounded-full font-bold" onClick={()=>document.getElementById('bundle_selector')?.scrollIntoView({behavior:'smooth'})}>Hozzáadom</Button></div><p className="mt-2 text-sm text-text-muted">3 kesztyű mellé 1 zokni ajándék.</p></div>
+   <div className="mt-8"><h2 className="mb-3 text-lg font-bold">Jól működik együtt</h2><div className="flex items-center gap-4 rounded-2xl border border-line bg-signal-soft p-4"><div className="flex size-20 shrink-0 items-center justify-center rounded-xl border border-dashed border-line bg-surface text-center text-[10px] text-text-muted">[zokni fotó]</div><div className="min-w-0 flex-1"><p className="font-extrabold">COLDWEAR THERMO ZOKNI</p><p className="text-sm text-text-muted">Elvezeti a párát, erősített sarok és orr.</p></div><Button className="shrink-0 rounded-full font-bold" onClick={()=>document.getElementById('bundle_selector')?.scrollIntoView({behavior:'smooth'})}>Hozzáadom</Button></div><p className="mt-2 text-sm text-text-muted">3 kesztyű mellé 1 zokni ajándék.</p></div>
   </div>
  </div></section>
  <section id="features" className="bg-surface py-12 md:py-14"><div className="cw-container"><h2 className="max-w-xl text-3xl font-extrabold leading-tight md:text-4xl">Arra készült, amit naponta csinálsz.</h2><div className="mt-10 grid gap-6 md:grid-cols-3">{[{t:'Érintőképes ujjbegyek',b:'A [hüvelyk- és mutatóujj] hegye vezeti a kijelzőt, nem kell levenned.',img:null,alt:'ColdWear thermo kesztyű érintőképes ujjbegy közeli fotó'},{t:'Csúszásgátló tenyér',b:'Szilikon minta az egész tenyéren: a telefon nem csúszik ki, a kormányt stabilan fogod.',img:grip.url,alt:'ColdWear thermo kesztyű csúszásgátló tenyér közeli fotó, szilikon mintázattal'},{t:'Cipzáras csukló',b:'Széthúzod, könnyen belebújsz, összehúzod, és szorosan ül.',img:zipClose.url,alt:'ColdWear thermo kesztyű cipzáras csukló közeli fotó, kihúzott cipzárral'}].map(f=><article key={f.t} className="overflow-hidden rounded-2xl border border-line bg-bg"><div className="aspect-[4/3] bg-surface">{f.img?<img src={f.img} alt={f.alt} loading="lazy" className="h-full w-full object-contain p-6"/>:<div className="flex h-full items-center justify-center text-sm text-text-muted">[Közeli fotó: ujjbegyek]</div>}</div><div className="border-t border-signal p-6"><h3 className="text-xl font-extrabold">{f.t}</h3><p className="mt-2 leading-7 text-text-muted">{f.b}</p></div></article>)}</div></div></section>
  <Reviews/>
  <Guarantee/>
+  <Water/>
   <SizeChart/>
   <Care/>
  </>;
