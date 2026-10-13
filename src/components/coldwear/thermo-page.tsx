@@ -38,10 +38,10 @@ export function ThermoProductPage(){
   </div>
  </div></section>
  <section id="features" className="bg-surface py-12 md:py-14"><div className="cw-container"><h2 className="max-w-xl text-3xl font-extrabold leading-tight md:text-4xl">Arra készült, amit naponta csinálsz.</h2><div className="mt-10 grid gap-6 md:grid-cols-3">{[{t:'Érintőképes ujjbegyek',b:'A [hüvelyk- és mutatóujj] hegye vezeti a kijelzőt, nem kell levenned.',img:touch.url,alt:'Fekete téli kesztyűt viselő kéz okostelefont tart, az érintőképes ujjbegy közelről'},{t:'Csúszásgátló tenyér',b:'Szilikon minta az egész tenyéren: a telefon nem csúszik ki, a kormányt stabilan fogod.',img:grip.url,alt:'ColdWear thermo kesztyű csúszásgátló tenyér közeli fotó, szilikon mintázattal'},{t:'Cipzáras csukló',b:'Széthúzod, könnyen belebújsz, összehúzod, és szorosan ül.',img:zipClose.url,alt:'ColdWear thermo kesztyű cipzáras csukló közeli fotó, kihúzott cipzárral'}].map(f=><article key={f.t} className="overflow-hidden rounded-2xl border border-line bg-bg"><div className="aspect-[4/3] bg-surface">{f.img?<img src={f.img} alt={f.alt} loading="lazy" className="h-full w-full object-contain p-6"/>:<div className="flex h-full items-center justify-center text-sm text-text-muted">[Közeli fotó: ujjbegyek]</div>}</div><div className="border-t border-signal p-6"><h3 className="text-xl font-extrabold">{f.t}</h3><p className="mt-2 leading-7 text-text-muted">{f.b}</p></div></article>)}</div></div></section>
- <Reviews/>
  <Guarantee/>
   <Water/>
   <SizeChart/>
+  <Reviews/>
   <Care/>
  </>;
 }
