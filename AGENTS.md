@@ -19,3 +19,5 @@
 - Record marketing acceptance separately from revocation and synchronize refusal across browser tabs and Shopify cart attributes; pending withdrawal receipts are retried before checkout synchronization so checkout snapshots do not override current server permission.
 - Keep the storefront shell shared and each information page as its own TanStack content route for navigation and metadata.
 - Keep the glove FAQ in a dedicated presentation component using the shared accessible accordion; this keeps long-form answers out of the purchase panel without duplicating controls.
+
+- Keep storefront two-column purchase/calculator layouts at the large-screen breakpoint, and use shrinkable grid tracks for mixed text and controls; tablet widths need the same uncramped flow as phones.

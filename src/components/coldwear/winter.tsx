@@ -12,18 +12,18 @@ export function Winter() {
   return (
     <section className="cw-section" id="winter">
       <div className="cw-container">
-        <div className="grid items-center gap-10 rounded-3xl border border-line bg-surface p-6 sm:p-8 md:grid-cols-[1.05fr_1fr] md:gap-14 md:p-12 [&>*]:min-w-0">
+        <div className="grid items-center gap-6 rounded-3xl border border-line bg-surface p-5 sm:p-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:gap-8 lg:p-8 [&>*]:min-w-0">
           <div>
             <p className="cw-label text-signal-text">Gondolkodj előre</p>
-            <h2 className="mt-4 text-3xl font-extrabold leading-tight md:text-4xl">
+            <h2 className="mt-4 text-2xl font-extrabold leading-tight sm:text-3xl">
               Ne akkor vegyél kesztyűt, amikor már lefagyott a kezed.
             </h2>
-            <p className="mt-4 max-w-md text-base leading-7 text-text-muted sm:text-lg sm:leading-8">
+            <p className="mt-4 max-w-md text-sm leading-6 text-text-muted sm:text-base sm:leading-7">
               A tél nem kérdez rá, hogy készültél-e. Az első fagyos reggel csak úgy jön, és akkor már késő kesztyűt keresni.
             </p>
             <Button
               type="button"
-              className="mt-7 h-14 rounded-full px-8 font-extrabold"
+              className="mt-5 h-12 w-full rounded-full px-6 sm:w-auto font-extrabold"
               onClick={() => {
                 track('cta_click', { location: 'winter' });
                 document.getElementById('bundle_selector')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -34,7 +34,7 @@ export function Winter() {
           </div>
           <ol className="grid gap-3">
             {STEPS.map((s) => (
-              <li key={s.t} className="flex gap-4 rounded-2xl border border-line bg-bg p-5">
+              <li key={s.t} className="flex gap-3 rounded-2xl border border-line bg-bg p-4">
                 <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-signal-soft text-signal-text">
                   <s.icon size={18} strokeWidth={1.75} />
                 </span>

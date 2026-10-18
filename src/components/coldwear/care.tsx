@@ -14,8 +14,8 @@ export function Care() {
   return (
     <section className="cw-section" id="care">
       <div className="cw-container">
-        <div className="rounded-3xl border border-line bg-surface p-5 sm:p-8 md:p-10">
-          <div className="grid gap-10 md:grid-cols-[1.15fr_0.85fr] [&>*]:min-w-0">
+        <div className="rounded-3xl border border-line bg-surface p-5 sm:p-6 lg:p-8">
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] [&>*]:min-w-0">
             <div>
               <h2 className="cw-heading mb-4">Mosási útmutató.</h2>
               <p className="cw-body max-w-md">A kesztyű mosható. Így csináld, hogy a forma, a szilikon minta és a vízlepergető felület ne sérüljön.</p>
