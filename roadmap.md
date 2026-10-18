@@ -1,4 +1,5 @@
 # ColdWear phase 1
+- [ ] Audit launch readiness and collect missing business data, hosted configuration checks and verified purchase/tracking evidence.
 - [x] Refine cart layout, thin borders, sock-photo slot, and mobile checkout controls; verified add, sock upsell, removal, amount recalculation and checkout opening with real Shopify products.
 - [x] Show remaining forints and quantity for free shipping at 3 products OR 17 000 Ft; seven qualification tests passed.
 - [ ] Activate actual Shopify free shipping for 3 products OR 17 000 Ft and verify delivery cost: blocked by lack of Admin API access to quantity prerequisites and discount combination settings. Available price-rule tool ignored subtotal prerequisite, so the unsafe rule and code were deleted. No shipping discount is claimed as applied in the UI.
