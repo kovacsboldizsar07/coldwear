@@ -1,5 +1,5 @@
 # ColdWear phase 1
-- [ ] Repair expired Shopify cart recovery and verify sync, add, quantity changes, removal and checkout preparation with real products.
+- [x] Repair expired Shopify cart recovery: reproduced the exact Shopify error, verified stale identity clearing and automatic replacement on add with real products, quantity changes, removal and Shopify checkout opening at 14 990 HUF; 17 regression tests passed and build OK. No order submitted. Live site requires publication.
 - [x] Refresh cookie bar with compact responsive layout, equally accessible acceptance/refusal, linked disclosures and category switches. Verified refusal and settings reopening at 375/1280 px; 19 measurement regression tests pass. Higher acceptance rate is not yet measured. Publication and a new consented Shopify test-order Purchase check remain pending.
 - [x] Configure route-specific titles/descriptions, leaf canonicals, sitemap, crawler rules and structured product data; verified server-rendered metadata, 301 redirects, admin noindex and supplied-photo 1200×630 share image (53 KB, HTTP 200). Live changes require publication.
 - [x] Audit launch readiness and collect missing business data, hosted configuration checks and verified purchase/tracking evidence; report delivered on 2026-10-18.
