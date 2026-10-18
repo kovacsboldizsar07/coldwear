@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { permissionAllows, retryDelaySeconds, retryableResponse, purchaseEventId, webhookNeedsRetry } from '@/lib/marketing-rules';
 describe('marketing permission and durable retries', () => {
   it('refusal suppresses sending even when checkout previously accepted', () => expect(permissionAllows({ revoked_at: '2026-10-18T10:00:00Z', expires_at: '2027-04-18T10:00:00Z' }, Date.parse('2026-10-18T11:00:00Z'))).toBe(false));
@@ -16,6 +16,7 @@ vi.mock('@/integrations/supabase/client.server', () => ({ supabaseAdmin: mocks }
 import { deliverCapi } from '@/lib/capi-delivery.server';
 describe('leased delivery', () => {
   beforeEach(() => { vi.clearAllMocks(); vi.stubGlobal('fetch', mocks.fetch); });
+  afterEach(()=>{vi.unstubAllEnvs();vi.unstubAllGlobals();});
   it('does not send when another worker owns the event lease', async () => { mocks.rpc.mockResolvedValue({ data: [], error: null }); await deliverCapi('shopify_order_12345'); expect(mocks.fetch).not.toHaveBeenCalled(); });
   it('does not send after permission was withdrawn between claim and send', async () => {
     mocks.rpc.mockResolvedValue({ data: [{ event_id: 'shopify_order_12345', consent_id: 'permission', lease_token: 'lease' }], error: null });
@@ -24,5 +25,17 @@ describe('leased delivery', () => {
     await deliverCapi('shopify_order_12345');
     expect(mocks.fetch).not.toHaveBeenCalled();
     expect(query.update).toHaveBeenCalledWith(expect.objectContaining({ status: 'suppressed' }));
+  });
+  it('stores a retry after a temporary provider failure without changing Purchase identity or time',async()=>{
+    vi.stubEnv('META_CAPI_TOKEN','test-only-credential');vi.stubEnv('META_PIXEL_ID','test-only-pixel');
+    const payload={event_name:'Purchase',event_id:'shopify_order_12345',event_time:1792314000,custom_data:{value:18990,currency:'HUF'}};
+    mocks.rpc.mockResolvedValue({data:[{event_id:'shopify_order_12345',event_name:'Purchase',event_time:1792314000,event_payload:payload,consent_id:'permission',lease_token:'lease',attempts:2}],error:null});
+    const query={select:vi.fn().mockReturnThis(),eq:vi.fn().mockReturnThis(),maybeSingle:vi.fn().mockResolvedValue({data:{revoked_at:null,expires_at:new Date(Date.now()+86400000).toISOString()},error:null}),insert:vi.fn().mockResolvedValue({error:null}),update:vi.fn().mockReturnThis(),then:(resolve:(value:unknown)=>void)=>resolve({error:null})};mocks.from.mockReturnValue(query);
+    mocks.fetch.mockResolvedValue({status:503,ok:false,json:async()=>({error:{code:2}})});
+    await deliverCapi('shopify_order_12345');
+    expect(query.update).toHaveBeenCalledWith(expect.objectContaining({status:'retry',last_error:'meta_status_503_code_2'}));
+    const submitted=JSON.parse(mocks.fetch.mock.calls[0]?.[1]?.body);
+    expect(submitted.data).toEqual([payload]);
+    expect(query.update.mock.calls.some(([value])=>'event_time' in value||'event_id' in value)).toBe(false);
   });
 });
