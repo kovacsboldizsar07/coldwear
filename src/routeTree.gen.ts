@@ -19,7 +19,6 @@ import { Route as SzallitasRouteImport } from './routes/szallitas'
 import { Route as ThermoKesztyuRouteImport } from './routes/thermo-kesztyu'
 import { Route as VisszakuldesRouteImport } from './routes/visszakuldes'
 import { Route as ProductHandleRouteImport } from './routes/product.$handle'
-import { Route as ApiPublicCapiRetryRouteImport } from './routes/api.public.capi-retry'
 import { Route as ApiPublicCollectRouteImport } from './routes/api.public.collect'
 import { Route as ApiPublicShopifyWebhookRouteImport } from './routes/api.public.shopify-webhook'
 
@@ -73,11 +72,6 @@ const ProductHandleRoute = ProductHandleRouteImport.update({
   path: '/product/$handle',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicCapiRetryRoute = ApiPublicCapiRetryRouteImport.update({
-  id: '/api/public/capi-retry',
-  path: '/api/public/capi-retry',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiPublicCollectRoute = ApiPublicCollectRouteImport.update({
   id: '/api/public/collect',
   path: '/api/public/collect',
@@ -100,7 +94,6 @@ export interface FileRoutesByFullPath {
   '/thermo-kesztyu': typeof ThermoKesztyuRoute
   '/visszakuldes': typeof VisszakuldesRoute
   '/product/$handle': typeof ProductHandleRoute
-  '/api/public/capi-retry': typeof ApiPublicCapiRetryRoute
   '/api/public/collect': typeof ApiPublicCollectRoute
   '/api/public/shopify-webhook': typeof ApiPublicShopifyWebhookRoute
 }
@@ -115,7 +108,6 @@ export interface FileRoutesByTo {
   '/thermo-kesztyu': typeof ThermoKesztyuRoute
   '/visszakuldes': typeof VisszakuldesRoute
   '/product/$handle': typeof ProductHandleRoute
-  '/api/public/capi-retry': typeof ApiPublicCapiRetryRoute
   '/api/public/collect': typeof ApiPublicCollectRoute
   '/api/public/shopify-webhook': typeof ApiPublicShopifyWebhookRoute
 }
@@ -131,7 +123,6 @@ export interface FileRoutesById {
   '/thermo-kesztyu': typeof ThermoKesztyuRoute
   '/visszakuldes': typeof VisszakuldesRoute
   '/product/$handle': typeof ProductHandleRoute
-  '/api/public/capi-retry': typeof ApiPublicCapiRetryRoute
   '/api/public/collect': typeof ApiPublicCollectRoute
   '/api/public/shopify-webhook': typeof ApiPublicShopifyWebhookRoute
 }
@@ -148,7 +139,6 @@ export interface FileRouteTypes {
     | '/thermo-kesztyu'
     | '/visszakuldes'
     | '/product/$handle'
-    | '/api/public/capi-retry'
     | '/api/public/collect'
     | '/api/public/shopify-webhook'
   fileRoutesByTo: FileRoutesByTo
@@ -163,7 +153,6 @@ export interface FileRouteTypes {
     | '/thermo-kesztyu'
     | '/visszakuldes'
     | '/product/$handle'
-    | '/api/public/capi-retry'
     | '/api/public/collect'
     | '/api/public/shopify-webhook'
   id:
@@ -178,7 +167,6 @@ export interface FileRouteTypes {
     | '/thermo-kesztyu'
     | '/visszakuldes'
     | '/product/$handle'
-    | '/api/public/capi-retry'
     | '/api/public/collect'
     | '/api/public/shopify-webhook'
   fileRoutesById: FileRoutesById
@@ -194,7 +182,6 @@ export interface RootRouteChildren {
   ThermoKesztyuRoute: typeof ThermoKesztyuRoute
   VisszakuldesRoute: typeof VisszakuldesRoute
   ProductHandleRoute: typeof ProductHandleRoute
-  ApiPublicCapiRetryRoute: typeof ApiPublicCapiRetryRoute
   ApiPublicCollectRoute: typeof ApiPublicCollectRoute
   ApiPublicShopifyWebhookRoute: typeof ApiPublicShopifyWebhookRoute
 }
@@ -271,13 +258,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductHandleRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/capi-retry': {
-      id: '/api/public/capi-retry'
-      path: '/api/public/capi-retry'
-      fullPath: '/api/public/capi-retry'
-      preLoaderRoute: typeof ApiPublicCapiRetryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/public/collect': {
       id: '/api/public/collect'
       path: '/api/public/collect'
@@ -306,7 +286,6 @@ const rootRouteChildren: RootRouteChildren = {
   ThermoKesztyuRoute: ThermoKesztyuRoute,
   VisszakuldesRoute: VisszakuldesRoute,
   ProductHandleRoute: ProductHandleRoute,
-  ApiPublicCapiRetryRoute: ApiPublicCapiRetryRoute,
   ApiPublicCollectRoute: ApiPublicCollectRoute,
   ApiPublicShopifyWebhookRoute: ApiPublicShopifyWebhookRoute,
 }
