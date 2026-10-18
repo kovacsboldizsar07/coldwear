@@ -1,7 +1,8 @@
 import { useEffect,useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { BundleSelector } from '@/components/coldwear/bundle-selector';
+import { BundleSelector,catalogOptions } from '@/components/coldwear/bundle-selector';
 import { SizeChart } from '@/components/coldwear/size-chart';
 import { Reviews } from '@/components/coldwear/reviews';
 import { Guarantee } from '@/components/coldwear/guarantee';
@@ -20,7 +21,10 @@ const BENEFITS=['Szélálló külső','Vízlepergető felület','Érintőképes 
 export function ThermoProductPage(){
  const [photo,setPhoto]=useState(0),[bike,setBike]=useState(false),[dispatch,setDispatch]=useState('');
  useEffect(()=>{setBike(new URLSearchParams(location.search).get('angle')==='bike');setDispatch(dispatchMessage(new Date()));const interval=setInterval(()=>setDispatch(dispatchMessage(new Date())),60_000);const cleanup=observeBlocks();return()=>{clearInterval(interval);cleanup()}},[]);
- const photos=[{src:pair.url,alt:'ColdWear thermo kesztyűpár felülnézetben, cipzáras csukló és csúszásgátló tenyér'},{src:zip.url,alt:'ColdWear thermo kesztyű felülnézet, cipzáras csukló'},{src:palm.url,alt:'ColdWear thermo kesztyű elölnézet, csúszásgátló tenyér'}];
+ const {data:products=[]}=useQuery({...catalogOptions});
+ const glove=products.find(p=>p.title.toLowerCase().includes('kesztyű'));
+ const sock=products.find(p=>p.title.toLowerCase().includes('zokni'));
+ const photos=glove?.images?.nodes.length?glove.images.nodes.map(n=>({src:n.url,alt:n.altText||glove.title})):[{src:pair.url,alt:'ColdWear thermo kesztyűpár felülnézetben, cipzáras csukló és csúszásgátló tenyér'},{src:zip.url,alt:'ColdWear thermo kesztyű felülnézet, cipzáras csukló'},{src:palm.url,alt:'ColdWear thermo kesztyű elölnézet, csúszásgátló tenyér'}];
  return <>
  <section id="hero" className="py-8 md:py-12"><div className="cw-container grid gap-10 md:grid-cols-[1.05fr_1fr] md:gap-14">
   <div className="min-w-0 md:sticky md:top-24 md:self-start">
