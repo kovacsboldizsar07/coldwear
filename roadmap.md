@@ -1,15 +1,17 @@
 # ColdWear phase 1
 - [x] Audit launch readiness and collect missing business data, hosted configuration checks and verified purchase/tracking evidence; report delivered on 2026-10-18.
+- [x] Renew Shopify chat access and inspect a real checkout on 2026-10-18: 3 gloves + sock merchandise total is 18 990 HUF, but delivery to a Hungarian test address costs 1 767 HUF and checkout says it cannot accept payments. No order submitted.
+- [ ] Restore server Admin API access and verify real inventory: saved SHOPIFY_ACCESS_TOKEN returns 401 although chat tools work; Storefront quantityAvailable requires an absent inventory scope. All eight variants report availableForSale=true and currentlyNotInStock=true, indicating out-of-stock ordering, not verified physical stock.
 - [x] Refine cart layout, thin borders, sock-photo slot, and mobile checkout controls; verified add, sock upsell, removal, amount recalculation and checkout opening with real Shopify products.
 - [x] Show remaining forints and quantity for free shipping at 3 products OR 17 000 Ft; seven qualification tests passed.
-- [ ] Activate actual Shopify free shipping for 3 products OR 17 000 Ft and verify delivery cost: blocked by lack of Admin API access to quantity prerequisites and discount combination settings. Available price-rule tool ignored subtotal prerequisite, so the unsafe rule and code were deleted. No shipping discount is claimed as applied in the UI.
+- [ ] Activate actual Shopify free shipping for 3 products OR 17 000 Ft and verify delivery cost: 2026-10-18 checkout confirms it is NOT applied (1 767 HUF on qualifying 18 990 HUF / 4-item cart). Blocked by invalid server Admin token and chat tools lacking quantity prerequisites and discount-combination settings. Available price-rule tool previously ignored subtotal prerequisite, so the unsafe rule and code were deleted. No shipping discount is claimed as applied in the UI.
 - [x] Storefront, uploaded glove photography, bundles, size chart, FAQ and mobile controls.
 - [x] Information/legal pages and six-month cookie consent.
 - [x] Shopify catalog and Cart API integration with server-only token and cart attributes.
 - [x] Protected order/analytics schema, webhook and collection endpoint.
 - [x] Admin reporting, spend and cost editor, integration status.
 - [x] Rule tests, public pages, consent, size copying, image loading and collection verified.
-- [ ] Final checkout delivery/payment and admin-write verification: Shopify access renewal and shipping/payment configuration required; admin account exists, but fresh write verification remains pending.
+- [ ] Complete an explicitly permitted test order and verify payment and webhook: 2026-10-18 checkout displays "This store can’t accept payments right now." User must configure a test payment method or authorize the necessary Shopify settings access; no live charge or fulfillment was attempted. Admin-write verification remains pending separately.
 - [ ] External prerequisites: sock photo/specifications, verified measurements, authentic reviews, company/returns/privacy details, final shipping/payment/invoicing setup and custom-domain completion required. Meta/webhook credentials and admin account are already configured.
 - [ ] Repair and test failed-webhook recovery, durable CAPI retries and consent withdrawal propagation; requires a separately approved implementation task.
 - [ ] Verify a consented test-order Purchase in Meta Test Events; requires completed test checkout and Meta receipt evidence.
