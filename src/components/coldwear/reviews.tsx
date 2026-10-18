@@ -27,18 +27,18 @@ function Stars({ value, className = '' }: { value: number; className?: string })
 }
 
 export function Reviews() {
-  return <section id="reviews" className="bg-signal-soft py-12 md:py-14"><div className="cw-container">
-    <div className="mb-8 flex flex-col gap-6 md:mb-12 md:flex-row md:items-center md:justify-between">
-      <h2 className="text-4xl font-black uppercase leading-none tracking-tight sm:text-5xl md:text-7xl">Amit mások <span className="text-signal">mondanak.</span></h2>
-      <div className="flex w-fit items-center gap-5 rounded-2xl border border-line bg-surface px-5 py-4 sm:px-6"><div className="text-center"><p className="text-4xl font-medium">4,8</p><Stars value={5} className="mt-1" /></div><span className="h-14 w-px bg-line" /><p className="font-semibold">6 értékelés</p></div>
+  return <section id="reviews" className="bg-signal-soft py-8 lg:py-10"><div className="cw-container">
+    <div className="mb-6 grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+      <h2 className="min-w-0 text-3xl font-black uppercase leading-tight sm:text-4xl lg:text-5xl">Amit mások <span className="text-signal">mondanak.</span></h2>
+      <div className="flex w-fit items-center gap-4 rounded-2xl border border-line bg-surface px-4 py-3"><div className="text-center"><p className="text-3xl font-medium">4,8</p><Stars value={5} className="mt-1" /></div><span className="h-14 w-px bg-line" /><p className="font-semibold">6 értékelés</p></div>
     </div>
-    <div className="grid gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">{REVIEWS.map((r, i) => <article key={i} className="flex min-w-0 flex-col rounded-2xl border border-line bg-surface p-5 sm:p-7">
+    <div className="grid gap-4 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">{REVIEWS.map((r, i) => <article key={i} className="flex min-w-0 flex-col rounded-2xl border border-line bg-surface p-4 lg:p-5">
       <div className="flex items-start gap-4">
         {r.photo ? <img src={r.photo} alt={r.name} className="size-12 shrink-0 rounded-full border border-line object-cover sm:size-14" loading="lazy" /> : <span className="flex size-12 shrink-0 sm:size-14 items-center justify-center rounded-full bg-signal-soft text-signal-text"><UserRound /></span>}
         <div className="min-w-0 flex-1"><p className="truncate text-base font-semibold sm:text-lg">{r.name}</p><p className="truncate text-sm text-text-muted">{r.meta}</p><Stars value={r.stars} className="mt-1.5" /></div>
       </div>
-      <p className="mt-5 flex-1 text-base leading-7 sm:text-lg sm:leading-8">{r.text}</p>
-      <div className="mt-5 flex items-center justify-between gap-3 border-t border-line pt-5 text-sm text-text-muted"><span>Vásárolt: <strong className="font-bold text-text">{r.bought}</strong></span><span className="flex items-center gap-1.5"><ThumbsUp size={16} />{r.likes}</span></div>
+      <p className="mt-4 flex-1 text-sm leading-6 sm:text-base sm:leading-7">{r.text}</p>
+      <div className="mt-4 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-t border-line pt-4 text-xs text-text-muted"><span>Vásárolt: <strong className="font-bold text-text">{r.bought}</strong></span><span className="flex shrink-0 items-center gap-1.5"><ThumbsUp size={16} />{r.likes}</span></div>
     </article>)}</div>
   </div></section>;
 }

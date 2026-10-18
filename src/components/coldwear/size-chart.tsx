@@ -36,10 +36,10 @@ function GloveCalc() {
         ))}
       </ol>
 
-      <div className="rounded-2xl border border-line bg-bg p-5">
-        <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="rounded-2xl border border-line bg-bg p-3 sm:p-4">
+        <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-center">
           <span className="text-sm font-medium text-text-muted">Tenyérkörméreted</span>
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center justify-between gap-2">
             <button type="button" aria-label="Csökkentés" onClick={() => set(cm - 0.5)} className="flex size-9 items-center justify-center rounded-full border border-line hover:border-signal"><Minus size={16} /></button>
             <span className="w-24 text-center text-2xl font-extrabold tabular-nums">{fmt(cm)} cm</span>
             <button type="button" aria-label="Növelés" onClick={() => set(cm + 0.5)} className="flex size-9 items-center justify-center rounded-full border border-line hover:border-signal"><Plus size={16} /></button>
@@ -54,22 +54,22 @@ function GloveCalc() {
         />
         <div className="mt-2 flex justify-between text-xs text-text-muted"><span>16 cm</span><span>25 cm</span></div>
 
-        <div className="mt-5 flex flex-col items-center gap-4 rounded-2xl bg-signal-soft p-5 text-center sm:flex-row sm:text-left">
-          <span className="flex size-20 shrink-0 items-center justify-center rounded-2xl bg-signal text-3xl font-extrabold text-on-signal">{size}</span>
-          <div className="flex-1">
+        <div className="mt-5 grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3 rounded-2xl bg-signal-soft p-3 text-left sm:p-4">
+          <span className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-signal text-3xl font-extrabold text-on-signal">{size}</span>
+          <div className="min-w-0">
             <p className="text-lg font-extrabold">A te méreted: {size}</p>
             <p className="mt-1 text-sm text-text-muted">
               {cm < 17 ? 'Kisebb a tartománynál – az S lesz a legszorosabb.' : cm > 24 ? 'Nagyobb a tartománynál – az XXL a legbővebb méretünk.' : 'Két méret határán mindig a nagyobbat ajánljuk.'}
             </p>
           </div>
-          <Button type="button" onClick={() => pick('glove', size)} className="h-12 rounded-full px-6 font-extrabold">
+          <Button type="button" onClick={() => pick('glove', size)} className="col-span-2 h-12 w-full rounded-full px-4 font-extrabold">
             <Check /> {size} kiválasztása
           </Button>
         </div>
       </div>
 
       <div className="mt-6 overflow-x-auto rounded-2xl border border-line">
-        <table className="w-full text-xs sm:text-sm">
+        <table className="w-full min-w-[360px] text-xs sm:text-sm">
           <thead><tr className="border-b border-line bg-bg text-left">
             <th className="px-3 py-3 sm:px-4 font-bold">Méret</th>
             <th className="px-3 py-3 sm:px-4 font-bold">Tenyérkörméret</th>
@@ -99,7 +99,7 @@ function SockCalc() {
   return (
     <div>
       <p className="mb-4 text-sm leading-6">Koppints a cipőméretedre – megmutatjuk, melyik zokni illik rád.</p>
-      <div className="grid grid-cols-6 gap-2">
+      <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
         {Array.from({ length: 12 }, (_, i) => 35 + i).map((n) => {
           const group = sockSizeFor(n) === size && size;
           return (
@@ -135,17 +135,17 @@ export function SizeChart() {
   const [tab, setTab] = useState<'glove' | 'sock'>('glove');
   return (
     <section className="cw-section" id="size_chart">
-      <div className="cw-container grid gap-10 md:grid-cols-[0.8fr_1.2fr] [&>*]:min-w-0">
+      <div className="cw-container grid gap-6 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] [&>*]:min-w-0">
         <div>
           <h2 className="cw-heading mb-5">Pont a kezedre.</h2>
           <p className="cw-body max-w-md">30 másodperc, egy mérőszalag – és biztosan a jó méretet rendeled.</p>
-          <div className="mt-8 overflow-hidden rounded-3xl border border-line bg-block">
+          <div className="mx-auto mt-6 max-w-sm overflow-hidden lg:max-w-none rounded-3xl border border-line bg-block">
             <img src={handMeasure.url} alt="Jobb tenyér belülnézetben, a tenyeret körbeölelő narancs mérővonyallal" loading="lazy" className="aspect-[1219/1290] w-full object-cover" />
           </div>
           <p className="mt-3 max-w-xs text-sm text-text-muted">A narancs vonalnál mérj, a hüvelykujj nélkül. A szalag simuljon, de ne szorítson.</p>
         </div>
 
-        <div className="rounded-3xl border border-line bg-surface p-5 sm:p-8">
+        <div className="rounded-3xl border border-line bg-surface p-3 sm:p-5 lg:p-6">
           <div className="mb-6 grid grid-cols-2 gap-1 rounded-full border border-line bg-bg p-1" role="tablist">
             {([['glove', 'Kesztyű', Hand], ['sock', 'Zokni', Footprints]] as const).map(([key, label, Icon]) => (
               <button key={key} type="button" role="tab" aria-selected={tab === key}
@@ -159,10 +159,10 @@ export function SizeChart() {
         </div>
       </div>
 
-      <div className="cw-container mt-12">
-        <div className="flex flex-col items-center gap-5 rounded-3xl bg-signal px-6 py-8 text-center text-on-signal sm:px-10 md:flex-row md:justify-between md:text-left">
+      <div className="cw-container mt-6">
+        <div className="flex flex-col items-center gap-4 rounded-3xl bg-signal px-4 py-5 text-center text-on-signal sm:px-6 lg:flex-row lg:justify-between lg:text-left">
           <p className="text-xl font-extrabold leading-tight md:text-2xl">Megvan a méreted? Válaszd ki a csomagod.</p>
-          <Button type="button" onClick={() => { track('cta_click', { location: 'size_chart' }); goBundle(); }} className="h-14 shrink-0 rounded-full border border-bg/40 bg-bg px-8 text-base font-extrabold tracking-wide text-text hover:bg-bg/90">CSOMAG KIVÁLASZTÁSA</Button>
+          <Button type="button" onClick={() => { track('cta_click', { location: 'size_chart' }); goBundle(); }} className="h-12 w-full shrink-0 rounded-full sm:w-auto border border-bg/40 bg-bg px-8 text-base font-extrabold tracking-wide text-text hover:bg-bg/90">CSOMAG KIVÁLASZTÁSA</Button>
         </div>
       </div>
     </section>
