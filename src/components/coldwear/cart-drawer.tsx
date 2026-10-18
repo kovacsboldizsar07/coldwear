@@ -7,8 +7,9 @@ import { Button } from '@/components/ui/button';
 import { useCart } from '@/stores/cart';
 import { money } from '@/lib/commerce';
 import { shippingStatus } from '@/lib/shipping';
-import { track } from '@/lib/track';
-import { getQuote } from '@/lib/shopify.functions';
+import { track, cartAttributes, waitForConsentSync } from '@/lib/track';
+import { getQuote, changeCart } from '@/lib/shopify.functions';
+import { toast } from 'sonner';
 import { catalogOptions } from './bundle-selector';
 import glovePhoto from '@/assets/glove-pair.png.asset.json';
 
@@ -30,6 +31,20 @@ export function CartDrawer(){
  const upsellQuote=useQuery({queryKey:['sock-upsell-quote',cart?.id,sockVariant?.id,lines.map(l=>`${l.merchandise.id}:${l.quantity}`).join(',')],enabled:open&&hasGlove&&!hasSock&&Boolean(sockVariant)&&lines.length<4,queryFn:()=>getQuote({data:[...lines.map(l=>({merchandiseId:l.merchandise.id,quantity:l.quantity})),{merchandiseId:sockVariant?.id||'',quantity:1}]}),staleTime:30000});
  const sockPrice=upsellQuote.data?.lines.nodes.find(l=>l.merchandise.id===sockVariant?.id)?.cost.totalAmount;
  const discountApplied=cart?.discountCodes?.some(d=>d.applicable&&d.code.startsWith('CW-CSOMAG'));
+ async function checkout(){
+  if(busy||!cart?.id)return;
+  const tab=window.open('about:blank','_blank');if(tab)tab.opener=null;
+  useCart.setState({busy:true});
+  try{
+   await waitForConsentSync();
+   const fresh=await changeCart({data:{operation:'attributes',cartId:cart.id,attributes:cartAttributes()}});
+   if(!fresh?.checkoutUrl)throw new Error('checkout_unavailable');
+   useCart.setState({cart:fresh,cartId:fresh.id});
+   track('InitiateCheckout',{value:Number(fresh.cost.totalAmount.amount),currency:fresh.cost.totalAmount.currencyCode});
+   const url=new URL(fresh.checkoutUrl);url.searchParams.set('channel','online_store');
+   if(tab)tab.location.replace(url.toString());else window.open(url.toString(),'_blank','noopener,noreferrer');
+  }catch{tab?.close();toast.error('A pénztár előkészítése nem sikerült. Próbáld újra.');}finally{useCart.setState({busy:false});}
+ }
  return <Sheet open={open} onOpenChange={setOpen}><SheetContent className="flex h-dvh w-full flex-col gap-0 overflow-hidden border-l border-line bg-surface p-0 sm:max-w-[480px]">
   <div className="shrink-0 border-b border-line px-5 pb-5 pt-6 sm:px-6"><div className="flex items-center gap-3"><ShoppingBag className="size-6" strokeWidth={1.5}/><SheetTitle className="text-2xl font-extrabold">A kosarad</SheetTitle><span className="flex size-7 items-center justify-center rounded-full border border-line bg-bg text-xs font-bold">{count}</span></div><SheetDescription className="mt-1.5">{count?'Már csak egy lépés a téli kényelem.':'A kosarad még üres.'}</SheetDescription></div>
   {count>0&&<div className="shrink-0 px-5 pt-4 sm:px-6"><div className="rounded-2xl border border-signal/25 bg-signal-soft p-4"><div className="flex items-start gap-3"><Truck className="mt-0.5 size-5 shrink-0 text-signal-text" strokeWidth={1.5}/><div className="min-w-0"><p className="text-sm font-bold">{shipping.eligible?'Elérted az ingyenes szállítás feltételét!':`Még ${shipping.amountRemaining===null?'egy kis összeg':money({amount:String(shipping.amountRemaining),currencyCode:'HUF'})} az ingyenes szállításig`}</p><p className="mt-1 text-xs leading-5 text-text-muted">{shipping.eligible?'3 termék vagy 17 000 Ft kosárérték.':`Vagy adj hozzá még ${shipping.itemsRemaining} terméket. A zokni is beleszámít.`}</p></div></div><progress aria-label="Ingyenes szállítás felé haladás" value={shipping.progress} max={1} className="cw-shipping-progress mt-3 block h-1.5 w-full overflow-hidden rounded-full"/></div></div>}
@@ -43,6 +58,6 @@ export function CartDrawer(){
    {hasGlove&&!hasSock&&socks&&<div className="mt-4 rounded-2xl border border-signal/25 bg-signal-soft p-4"><div className="flex gap-3"><div className="h-20 w-16 shrink-0 overflow-hidden rounded-xl border border-line"><SockPhoto/></div><div className="min-w-0 flex-1"><h3 className="text-base font-extrabold">A lábad se fázzon.</h3><p className="mt-1 text-xs leading-5 text-text-muted">ColdWear Thermo zokni</p><p className="mt-1 text-sm font-bold">{sockPrice?Number(sockPrice.amount)===0?'Ajándék a csomagodhoz':money(sockPrice):upsellQuote.isFetching?'Ár frissítése…':'Válassz méretet'}</p></div></div><div className="mt-3 flex gap-2"><select aria-label="Zokni méret" className="h-11 min-w-0 flex-1 rounded-xl border border-signal/25 bg-surface px-3 text-sm" value={sockSize} disabled={busy} onChange={e=>setSockSize(e.target.value)}><option value="">Zokniméret</option>{socks.variants.nodes.map(v=><option key={v.id} value={v.id} disabled={!v.availableForSale}>{v.title}</option>)}</select><Button className="h-11 shrink-0 rounded-xl px-4 normal-case" disabled={!sockSize||busy} onClick={()=>{track('upsell_add');void add([{merchandiseId:sockSize,quantity:1}])}}>Hozzáadom<Plus/></Button></div>{count===2&&<p className="mt-2 text-xs text-signal-text">Ezzel a 3 termékes szállítási feltételt is eléred.</p>}</div>}
    {hasSock&&<p className="mt-4 flex items-center gap-2 text-xs text-go"><Check className="size-4"/>Thermo zokni a kosaradban</p>}
   </div>
-  {count>0&&<div className="shrink-0 border-t border-line bg-surface px-5 pb-[max(20px,env(safe-area-inset-bottom))] pt-4 sm:px-6">{discountApplied&&<p className="mb-3 flex items-center gap-2 text-xs font-semibold text-go"><Check className="size-4"/>Csomagkedvezmény automatikusan érvényesítve</p>}<div className="mb-1 flex items-center justify-between gap-3"><span className="font-semibold">Termékek összesen</span><strong className="text-2xl font-extrabold">{money(cart?.cost.totalAmount)}</strong></div><p className="mb-4 text-xs leading-5 text-text-muted">A szállítás végleges díja a pénztárban jelenik meg.</p><Button className="h-14 w-full rounded-full text-sm" disabled={busy||!cart?.checkoutUrl} onClick={()=>{if(!cart?.checkoutUrl)return;track('InitiateCheckout',{value:cart.cost.totalAmount.amount,currency:cart.cost.totalAmount.currencyCode});const url=new URL(cart.checkoutUrl);url.searchParams.set('channel','online_store');window.open(url.toString(),'_blank','noopener,noreferrer')}}>{busy?<><Loader2 className="animate-spin"/>Kosár frissítése</>:<>Tovább a pénztárhoz<ArrowRight/></>}</Button><div className="mt-3 flex items-center justify-center gap-2 text-xs text-text-muted"><ShieldCheck className="size-4 shrink-0" strokeWidth={1.5}/><span>14 napos pénzvisszafizetési garancia</span></div></div>}
+  {count>0&&<div className="shrink-0 border-t border-line bg-surface px-5 pb-[max(20px,env(safe-area-inset-bottom))] pt-4 sm:px-6">{discountApplied&&<p className="mb-3 flex items-center gap-2 text-xs font-semibold text-go"><Check className="size-4"/>Csomagkedvezmény automatikusan érvényesítve</p>}<div className="mb-1 flex items-center justify-between gap-3"><span className="font-semibold">Termékek összesen</span><strong className="text-2xl font-extrabold">{money(cart?.cost.totalAmount)}</strong></div><p className="mb-4 text-xs leading-5 text-text-muted">A szállítás végleges díja a pénztárban jelenik meg.</p><Button className="h-14 w-full rounded-full text-sm" disabled={busy||!cart?.checkoutUrl} onClick={()=>void checkout()}>{busy?<><Loader2 className="animate-spin"/>Kosár frissítése</>:<>Tovább a pénztárhoz<ArrowRight/></>}</Button><div className="mt-3 flex items-center justify-center gap-2 text-xs text-text-muted"><ShieldCheck className="size-4 shrink-0" strokeWidth={1.5}/><span>14 napos pénzvisszafizetési garancia</span></div></div>}
  </SheetContent></Sheet>;
 }
