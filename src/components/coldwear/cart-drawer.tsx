@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Link } from '@tanstack/react-router';
-import { Minus, Plus, Trash2, ArrowRight, ShoppingBag, Check, Truck, ShieldCheck, ImageIcon, Loader2 } from 'lucide-react';
+import { Minus, Plus, Trash2, ArrowRight, ShoppingBag, Check, Truck, ShieldCheck, Loader2 } from 'lucide-react';
 import { Sheet, SheetContent, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/stores/cart';
