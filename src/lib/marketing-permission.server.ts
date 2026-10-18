@@ -23,7 +23,7 @@ export async function readPermission(receipt: string) {
 export async function grantPermission(visitorId: string, userAgent: string, ip: string | null) {
   const id = crypto.randomUUID();
   const expires = new Date(); expires.setMonth(expires.getMonth() + 6);
-  const { error } = await db.from('marketing_permissions').insert({ id, visitor_id: visitorId, expires_at: expires.toISOString(), notice_version: MARKETING_NOTICE_VERSION, user_agent: userAgent, client_ip: ip });
+  const { error } = await db.rpc('grant_marketing_permission',{p_id:id,p_visitor:visitorId,p_expires:expires.toISOString(),p_notice:MARKETING_NOTICE_VERSION,p_agent:userAgent,p_ip:ip||''});
   if (error) throw error;
   return { receipt: permissionReceipt(id), expires: expires.getTime() };
 }

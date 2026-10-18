@@ -7,7 +7,7 @@ export const Route=createFileRoute('/api/public/collect')({server:{handlers:{POS
  let parsed:unknown;try{parsed=JSON.parse(raw)}catch{return new Response(null,{status:400})}
  const result=schema.safeParse(parsed);if(!result.success)return new Response(null,{status:400});
  const secret=process.env['CW_COLLECT_SIGNING_SECRET'];if(!secret)return new Response(null,{status:503});const {verifyTelemetry}=await import('@/lib/telemetry.server');if(!verifyTelemetry(result.data.token,secret))return new Response(null,{status:401});
- const data=result.data;const {supabaseAdmin:db}=await import('@/integrations/supabase/client.server');
+ const data=result.data;if(data.consent_level==='necessary')return new Response(null,{status:204});const {supabaseAdmin:db}=await import('@/integrations/supabase/client.server');
  const {readPermission}=await import('@/lib/marketing-permission.server');
  const permission=data.consent_level==='marketing'?await readPermission(data.permission||''):null;
  if(data.consent_level==='marketing'&&!permission)return new Response(null,{status:204});

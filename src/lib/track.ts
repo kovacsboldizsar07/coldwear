@@ -6,10 +6,10 @@ let collectToken='',pixelId='';
 let pending:{name:string;data:Record<string,unknown>}[]=[];
 let pixelLoaded=false;
 function loadPixel(){
- if(!consent?.marketing||!pixelId)return;if(pixelLoaded){const w=window as unknown as {fbq?:(...args:unknown[])=>void};w.fbq?.('consent','grant');return;}
+ expiredConsent();if(!consent?.marketing||!consent.receipt||!pixelId)return;if(pixelLoaded){const w=window as unknown as {fbq?:(...args:unknown[])=>void};w.fbq?.('consent','grant');return;}
  pixelLoaded=true;
- const w=window as unknown as {fbq?:((...args:unknown[])=>void)&{queue:unknown[][];loaded:boolean;version:string;callMethod:((...args:unknown[])=>void)|undefined}};
- const fbq=Object.assign((...args:unknown[])=>{if(fbq.callMethod)fbq.callMethod(...args);else fbq.queue.push(args)}, {queue:[] as unknown[][],loaded:true,version:'2.0',callMethod:undefined as ((...args:unknown[])=>void)|undefined});w.fbq=fbq;
+ const w=window as unknown as {fbq?:((...args:unknown[])=>void)&{queue:unknown[][];loaded:boolean;version:string;callMethod:((...args:unknown[])=>void)|undefined};_fbq?:unknown};
+ const fbq=Object.assign((...args:unknown[])=>{if(fbq.callMethod)fbq.callMethod.apply(fbq,args);else fbq.queue.push(args)}, {queue:[] as unknown[][],loaded:true,version:'2.0',callMethod:undefined as ((...args:unknown[])=>void)|undefined});Object.assign(fbq,{push:fbq});w.fbq=fbq;w._fbq=fbq;
  fbq('init',pixelId);const script=document.createElement('script');script.src='https://connect.facebook.net/en_US/fbevents.js';script.async=true;document.head.appendChild(script);
 }
 

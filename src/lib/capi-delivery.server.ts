@@ -45,7 +45,7 @@ export async function enqueueCapi(input: { name: string; id: string; consentId: 
   await deliverCapi(input.id);
   const result = await db.from('capi_deliveries').select('status').eq('event_id', input.id).single();
   if (result.error) throw result.error;
-  if (['pending', 'retry', 'sending'].includes(result.data.status)) throw new Error('CAPI delivery pending retry');
+  if (['pending', 'retry', 'sending', 'failed'].includes(result.data.status)) throw new Error('CAPI delivery pending retry');
 }
 export async function retryCapiBatch() {
   // Sequential claims keep outbound concurrency bounded and each job independently leased.
