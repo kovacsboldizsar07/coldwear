@@ -20,11 +20,11 @@ import zipClose from '@/assets/glove-zip-close.png.asset.json';
 import touch from '@/assets/touchscreen-fingertips.png.asset.json';
 const BENEFITS=['Szélálló külső','Vízlepergető felület','Érintőképes ujjbegy','Csúszásgátló tenyér','Cipzáras csukló','Polár belső'];
 export function ThermoProductPage(){
- const [photo,setPhoto]=useState(0),[bike,setBike]=useState(false),[dispatch,setDispatch]=useState('');
- useEffect(()=>{setBike(new URLSearchParams(location.search).get('angle')==='bike');setDispatch(dispatchMessage(new Date()));const interval=setInterval(()=>setDispatch(dispatchMessage(new Date())),60_000);const cleanup=observeBlocks();return()=>{clearInterval(interval);cleanup()}},[]);
+ const [photo,setPhoto]=useState(0),[bike,setBike]=useState(false),[dispatch,setDispatch]=useState(''),[ready,setReady]=useState(false);
+ useEffect(()=>{setReady(true);setBike(new URLSearchParams(location.search).get('angle')==='bike');setDispatch(dispatchMessage(new Date()));const interval=setInterval(()=>setDispatch(dispatchMessage(new Date())),60_000);const cleanup=observeBlocks();return()=>{clearInterval(interval);cleanup()}},[]);
  const {data:products=[]}=useQuery({...catalogOptions});
- const glove=products.find(p=>p.title.toLowerCase().includes('kesztyű'));
- const sock=products.find(p=>p.title.toLowerCase().includes('zokni'));
+ const glove=ready?products.find(p=>p.title.toLowerCase().includes('kesztyű')):undefined;
+ const sock=ready?products.find(p=>p.title.toLowerCase().includes('zokni')):undefined;
  const photos=glove?.images?.nodes.length?glove.images.nodes.map(n=>({src:n.url,alt:n.altText||glove.title})):[{src:pair.url,alt:'ColdWear thermo kesztyűpár felülnézetben, cipzáras csukló és csúszásgátló tenyér'},{src:zip.url,alt:'ColdWear thermo kesztyű felülnézet, cipzáras csukló'},{src:palm.url,alt:'ColdWear thermo kesztyű elölnézet, csúszásgátló tenyér'}];
  return <>
  <section id="hero" className="py-6 lg:py-9"><div className="cw-container grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-9">
