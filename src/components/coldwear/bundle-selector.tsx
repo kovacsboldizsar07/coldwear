@@ -40,7 +40,7 @@ export function BundleSelector(){
   </div>
   <Button className="mt-5 h-14 w-full flex-col gap-0.5 rounded-full text-base font-extrabold sm:flex-row sm:gap-2" disabled={!glove||busy} onClick={submit}>{busy?'FRISSÍTÉS…':'KOSÁRBA TESZEM'}{total!=='–'&&!busy?<span className="text-sm font-semibold opacity-80">· {total}</span>:null}</Button>
   <p aria-live="polite" className="mt-2 min-h-5 text-center text-sm text-signal-text">{glove&&!allSizes?'Válaszd ki minden pár méretét'+(bundle===3?' és a zokni méretét.':'.'):''}</p>
-  {!glove&&<p className="text-center text-sm text-text-muted">{isPending?'A termékek betöltése…':isError?'A termékek betöltése nem sikerült.':'Még nincs elérhető termék az áruházban.'}</p>}
+  {!glove&&<p className="text-center text-sm text-text-muted">{!ready||isPending?'A termékek betöltése…':isError?'A termékek betöltése nem sikerült.':'Még nincs elérhető termék az áruházban.'}</p>}
   <div className="mt-2 flex flex-wrap justify-center gap-x-4 gap-y-2 text-xs text-text-muted sm:text-sm">{[[Lock,'Utánvét a futárnál'],[Truck,'GLS, 1–2 munkanap']].map(([Icon,l])=>{const I=Icon as typeof Lock;return <span key={String(l)} className="flex items-center gap-1.5"><I size={15} className="shrink-0 text-signal-text"/>{String(l)}</span>})}</div>
   {sticky&&<div className="fixed inset-x-0 bottom-0 z-30 flex items-center justify-between gap-3 border-t border-line bg-surface px-4 py-2.5 pb-[max(0.625rem,env(safe-area-inset-bottom))] lg:hidden"><div><p className="text-xs text-text-muted">{bundle} kesztyű{bundle===3?' + zokni':''}</p><strong className="text-signal-text">{total}</strong></div><Button className="rounded-full font-extrabold" onClick={submit} disabled={busy||!glove}>KOSÁRBA</Button></div>}
  </div>;
