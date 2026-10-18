@@ -101,6 +101,65 @@ export type Database = {
         }
         Relationships: []
       }
+      capi_deliveries: {
+        Row: {
+          attempts: number
+          consent_id: string
+          created_at: string
+          event_id: string
+          event_name: string
+          event_payload: Json
+          event_time: number
+          last_error: string | null
+          lease_token: string | null
+          lease_until: string | null
+          next_attempt_at: string
+          order_id: string | null
+          sent_at: string | null
+          status: string
+        }
+        Insert: {
+          attempts?: number
+          consent_id: string
+          created_at?: string
+          event_id: string
+          event_name: string
+          event_payload: Json
+          event_time: number
+          last_error?: string | null
+          lease_token?: string | null
+          lease_until?: string | null
+          next_attempt_at?: string
+          order_id?: string | null
+          sent_at?: string | null
+          status?: string
+        }
+        Update: {
+          attempts?: number
+          consent_id?: string
+          created_at?: string
+          event_id?: string
+          event_name?: string
+          event_payload?: Json
+          event_time?: number
+          last_error?: string | null
+          lease_token?: string | null
+          lease_until?: string | null
+          next_attempt_at?: string
+          order_id?: string | null
+          sent_at?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "capi_deliveries_consent_id_fkey"
+            columns: ["consent_id"]
+            isOneToOne: false
+            referencedRelation: "marketing_permissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       capi_log: {
         Row: {
           created_at: string | null
@@ -179,6 +238,39 @@ export type Database = {
           last_event_at?: string | null
           message?: string | null
           status?: string | null
+        }
+        Relationships: []
+      }
+      marketing_permissions: {
+        Row: {
+          accepted_at: string
+          client_ip: string | null
+          expires_at: string
+          id: string
+          notice_version: string
+          revoked_at: string | null
+          user_agent: string | null
+          visitor_id: string
+        }
+        Insert: {
+          accepted_at?: string
+          client_ip?: string | null
+          expires_at: string
+          id: string
+          notice_version?: string
+          revoked_at?: string | null
+          user_agent?: string | null
+          visitor_id: string
+        }
+        Update: {
+          accepted_at?: string
+          client_ip?: string | null
+          expires_at?: string
+          id?: string
+          notice_version?: string
+          revoked_at?: string | null
+          user_agent?: string | null
+          visitor_id?: string
         }
         Relationships: []
       }
@@ -448,6 +540,8 @@ export type Database = {
       webhook_events: {
         Row: {
           error: string | null
+          lease_token: string | null
+          lease_until: string | null
           received_at: string | null
           status: string | null
           topic: string | null
@@ -455,6 +549,8 @@ export type Database = {
         }
         Insert: {
           error?: string | null
+          lease_token?: string | null
+          lease_until?: string | null
           received_at?: string | null
           status?: string | null
           topic?: string | null
@@ -462,6 +558,8 @@ export type Database = {
         }
         Update: {
           error?: string | null
+          lease_token?: string | null
+          lease_until?: string | null
           received_at?: string | null
           status?: string | null
           topic?: string | null
@@ -474,12 +572,45 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      claim_capi_delivery: {
+        Args: { p_event_id?: string }
+        Returns: {
+          attempts: number
+          consent_id: string
+          created_at: string
+          event_id: string
+          event_name: string
+          event_payload: Json
+          event_time: number
+          last_error: string | null
+          lease_token: string | null
+          lease_until: string | null
+          next_attempt_at: string
+          order_id: string | null
+          sent_at: string | null
+          status: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "capi_deliveries"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      claim_shopify_webhook: {
+        Args: { p_id: string; p_topic: string }
+        Returns: string
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      revoke_marketing_permission: {
+        Args: { p_id: string }
+        Returns: undefined
       }
     }
     Enums: {

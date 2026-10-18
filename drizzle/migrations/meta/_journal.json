@@ -8,6 +8,13 @@
       "when": 1791830244438,
       "tag": "0000_coldwear_phase_one",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792316930550,
+      "tag": "0001_durable_marketing_delivery_and_consent",
+      "breakpoints": true
     }
   ]
 }
