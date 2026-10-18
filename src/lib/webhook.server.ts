@@ -1,13 +1,8 @@
 import { z } from 'zod';
-import { createHash } from 'node:crypto';
+import { hash, enqueueCapi } from './capi-delivery.server';
+import { readPermission } from './marketing-permission.server';
+import { purchaseEventId } from './marketing-rules';
 import { supabaseAdmin as db } from '@/integrations/supabase/client.server';
-export async function hash(value:string){return createHash('sha256').update(value.trim().toLowerCase()).digest('hex')}
-export async function sendCapi(name:string,id:string,user:Record<string,unknown>,custom:Record<string,unknown>,url?:string){
- const token=process.env['META_CAPI_TOKEN'],pixel=process.env['META_PIXEL_ID'];if(!token||!pixel)return false;
- try{const response=await fetch(`https://graph.facebook.com/v23.0/${encodeURIComponent(pixel)}/events`,{method:'POST',signal:AbortSignal.timeout(1500),headers:{'Content-Type':'application/json'},body:JSON.stringify({access_token:token,data:[{event_name:name,event_id:id,event_time:Math.floor(Date.now()/1000),action_source:'website',event_source_url:url,user_data:user,custom_data:custom}]})});const result=await response.json() as {events_received?:number;error?:{code?:number}};
- await db.from('capi_log').insert({event_name:name,event_id:id,status_code:response.status,response:{events_received:result.events_received||0,error_code:result.error?.code||null}});return response.ok&&Boolean(result.events_received);
- }catch{await db.from('capi_log').insert({event_name:name,event_id:id,status_code:0,response:{error:'network'}});return false}
-}
 const id=z.union([z.string().min(1).max(100),z.number().int()]).transform(String);
 const amount=z.union([z.string().max(30),z.number()]).transform(Number).refine(Number.isFinite);
 const item=z.object({title:z.string().max(500),variant_title:z.string().max(200).nullable().optional(),sku:z.string().max(200).nullable().optional(),quantity:z.number().int().min(0).max(10000),price:amount,total_discount:amount.optional()});
@@ -17,14 +12,15 @@ const orderSchema=z.object({id,order_number:z.union([z.string(),z.number()]).opt
 export async function processWebhook(topic:string,payload:unknown){
  if(topic==='orders/create'){
  const order=orderSchema.parse(payload);const attrs=Object.fromEntries((order.note_attributes||[]).map(x=>[x.name,x.value]));
- const consent=attrs['cw_consent']==='1';
- const existing=await db.from('orders').select('capi_sent_at').eq('id',order.id).maybeSingle();
- const result=await db.from('orders').upsert({id:order.id,order_number:String(order.order_number||''),created_at:order.created_at,total_price:order.total_price,subtotal_price:order.subtotal_price,total_discounts:order.total_discounts||0,total_tax:order.total_tax||0,shipping_price:order.shipping_lines?.reduce((sum,l)=>sum+l.price,0)||0,financial_status:order.financial_status??null,fulfillment_status:order.fulfillment_status??null,cancelled_at:order.cancelled_at??null,payment_gateway:order.payment_gateway_names?.join(', ')||null,currency:order.currency,customer_email:order.email||order.customer?.email||null,customer_phone:order.phone||order.customer?.phone||null,angle:attrs['cw_angle']||'default',marketing_consent:consent,utm_source:attrs['cw_utm_source']||null,utm_medium:attrs['cw_utm_medium']||null,utm_campaign:attrs['cw_utm_campaign']||null,utm_content:attrs['cw_utm_content']||null,fbclid:attrs['cw_fbclid']||null,gclid:attrs['cw_gclid']||null,ttclid:attrs['cw_ttclid']||null,fbp:attrs['cw_fbp']||null,fbc:attrs['cw_fbc']||null});if(result.error)throw result.error;
+ const permission=attrs['cw_consent']==='1'?await readPermission(attrs['cw_permission']||''):null;
+ const consent=Boolean(permission);
+
+ const result=await db.from('orders').upsert({id:order.id,order_number:String(order.order_number||''),created_at:order.created_at,total_price:order.total_price,subtotal_price:order.subtotal_price,total_discounts:order.total_discounts||0,total_tax:order.total_tax||0,shipping_price:order.shipping_lines?.reduce((sum,l)=>sum+l.price,0)||0,financial_status:order.financial_status??null,fulfillment_status:order.fulfillment_status??null,cancelled_at:order.cancelled_at??null,payment_gateway:order.payment_gateway_names?.join(', ')||null,currency:order.currency,customer_email:order.email||order.customer?.email||null,customer_phone:order.phone||order.customer?.phone||null,angle:attrs['cw_angle']||'default',marketing_consent:consent,utm_source:consent?attrs['cw_utm_source']||null:null,utm_medium:consent?attrs['cw_utm_medium']||null:null,utm_campaign:consent?attrs['cw_utm_campaign']||null:null,utm_content:consent?attrs['cw_utm_content']||null:null,fbclid:consent?attrs['cw_fbclid']||null:null,gclid:consent?attrs['cw_gclid']||null:null,ttclid:consent?attrs['cw_ttclid']||null:null,fbp:consent?attrs['cw_fbp']||null:null,fbc:consent?attrs['cw_fbc']||null:null});if(result.error)throw result.error;
  const deleted=await db.from('order_items').delete().eq('order_id',order.id);if(deleted.error)throw deleted.error;
  if(order.line_items.length){const result=await db.from('order_items').insert(order.line_items.map(l=>({order_id:order.id,product_title:l.title,variant_title:l.variant_title??null,sku:l.sku??null,quantity:l.quantity,price:l.price,discount:l.total_discount||0})));if(result.error)throw result.error;}
- if(consent&&!existing.data?.capi_sent_at){const c=order.customer,a=order.shipping_address;const user:Record<string,unknown>={};for(const [key,value] of Object.entries({em:order.email||c?.email,ph:(order.phone||c?.phone)?.replace(/\D/g,''),fn:a?.first_name||c?.first_name,ln:a?.last_name||c?.last_name,zp:a?.zip,ct:a?.city,country:a?.country_code})){if(value)user[key]=[await hash(value)]}if(attrs['cw_fbp'])user['fbp']=attrs['cw_fbp'];if(attrs['cw_fbc'])user['fbc']=attrs['cw_fbc'];
- const sent=await sendCapi('Purchase',`shopify_order_${order.id}`,user,{value:order.total_price,currency:order.currency,contents:order.line_items.map(l=>({id:l.sku||l.title,quantity:l.quantity,item_price:l.price})),content_type:'product'});
- if(sent)await db.from('orders').update({capi_sent_at:new Date().toISOString()}).eq('id',order.id);
+ if(permission){const c=order.customer,a=order.shipping_address;const user:Record<string,unknown>={};for(const [key,value] of Object.entries({em:order.email||c?.email,ph:(order.phone||c?.phone)?.replace(/\D/g,''),fn:a?.first_name||c?.first_name,ln:a?.last_name||c?.last_name,zp:a?.zip,ct:a?.city,country:a?.country_code})){if(value)user[key]=[await hash(value)]}if(attrs['cw_fbp'])user['fbp']=attrs['cw_fbp'];if(attrs['cw_fbc'])user['fbc']=attrs['cw_fbc'];
+ user['external_id']=[await hash(permission.visitor_id)];user['client_user_agent']=permission.user_agent||'';if(permission.client_ip)user['client_ip_address']=permission.client_ip;
+ await enqueueCapi({name:'Purchase',id:purchaseEventId(order.id),consentId:permission.id,time:Math.floor(Date.parse(order.created_at)/1000),user,custom:{value:order.total_price,currency:order.currency,contents:order.line_items.map(l=>({id:l.sku||l.title,quantity:l.quantity,item_price:l.price})),content_type:'product'},url:'https://coldwear.lovable.app/',orderId:order.id});
  }return;
  }
  if(topic==='orders/updated'){const order=z.object({id,financial_status:z.string().max(100).nullable().optional(),fulfillment_status:z.string().max(100).nullable().optional(),cancelled_at:z.string().datetime({offset:true}).nullable().optional()}).parse(payload);const result=await db.from('orders').update({financial_status:order.financial_status??null,fulfillment_status:order.fulfillment_status??null,cancelled_at:order.cancelled_at??null}).eq('id',order.id);if(result.error)throw result.error;return}
