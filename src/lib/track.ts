@@ -16,7 +16,7 @@ function loadPixel(){
 export type Consent = { statistics:boolean; marketing:boolean; expires:number; receipt?:string };
 let withdrawal:Promise<void>=Promise.resolve();
 let consentRevision=0;
-function expiredConsent(){if(consent&&consent.expires<=Date.now()){void saveConsent(consent.statistics,false).catch(()=>{});}}
+function expiredConsent(){if(consent&&consent.expires<=Date.now()){void saveConsent(false,false).catch(()=>{});}}
 let consent:Consent|null=null;
 let sessionId='', visitorId:string|null=null, angle='default';
 let source:Record<string,string>={};
@@ -26,7 +26,7 @@ function safeSet(key:string,value:string){try{localStorage.setItem(key,value)}ca
 export function currentConsent(){expiredConsent();return consent}
 export function initializeTracking(){
  sessionId=crypto.randomUUID();
- try { const saved=JSON.parse(safeGet('cw_consent')||'null') as Consent|null; if(saved&&saved.expires>Date.now())consent={...saved,marketing:Boolean(saved.marketing&&saved.receipt)}; }catch{/* invalid stored consent */}
+ try { const saved=JSON.parse(safeGet('cw_consent')||'null') as Consent|null; if(saved&&saved.expires>Date.now())consent={...saved,marketing:Boolean(saved.marketing&&saved.receipt)};else if(saved?.receipt){const receipts=JSON.parse(safeGet('cw_withdrawals')||'[]') as string[];safeSet('cw_withdrawals',JSON.stringify([...new Set([...receipts,saved.receipt])])) ;clearMarketingCookies();} }catch{/* invalid stored consent */}
  const params=new URLSearchParams(location.search); angle=params.get('angle')==='bike'?'bike':'default';
  names.forEach(name=>{source[name]=params.get(name)||''});
  applyConsent();void flushWithdrawals().catch(()=>{});
@@ -73,7 +73,7 @@ export function track(event_name:string,event_data:Record<string,unknown>={}){
  if(!consent?.marketing&&!consent?.statistics)return;
  if(!collectToken){if(pending.length<100)pending.push({name:event_name,data:event_data});return;}
  const event_id=crypto.randomUUID();
- const payload={token:collectToken,permission:consent?.marketing?consent.receipt:undefined,session_id:sessionId,visitor_id:visitorId,event_name,event_id,page_path:location.pathname,event_data,angle,consent_level:consent?.marketing?'marketing':consent?.statistics?'statistics':'necessary',source:consent?.marketing?source:{}};
+ const payload={token:collectToken,permission:consent?.marketing?consent.receipt:undefined,session_id:sessionId,visitor_id:visitorId,event_name,event_id,page_path:location.pathname,event_data,angle,consent_level:consent?.marketing?'marketing':consent?.statistics?'statistics':'necessary',source:consent?.marketing?source:{},event_data};
  navigator.sendBeacon('/api/public/collect',new Blob([JSON.stringify(payload)],{type:'application/json'}));
  const pixel=(window as unknown as {fbq?:(...args:unknown[])=>void}).fbq;
  if(consent?.marketing&&pixel&&['PageView','ViewContent','AddToCart','InitiateCheckout'].includes(event_name))pixel('track',event_name,event_data,{eventID:event_id});
