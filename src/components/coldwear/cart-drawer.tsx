@@ -38,7 +38,12 @@ export function CartDrawer(){
   try{
     await waitForConsentSync();
     const fresh=await changeCart({data:{operation:'attributes',cartId:cart.id,attributes:cartAttributes()}});
-    if(!fresh?.checkoutUrl)throw new Error('checkout_unavailable');
+    if(!fresh){
+      useCart.setState({cart:null,cartId:null});
+      toast.info('A korábbi kosarad lejárt. Kérjük, válaszd ki újra a termékeket.');
+      return;
+    }
+    if(!fresh.checkoutUrl)throw new Error('checkout_unavailable');
     useCart.setState({cart:fresh,cartId:fresh.id});
     track('InitiateCheckout',{value:Number(fresh.cost.totalAmount.amount),currency:fresh.cost.totalAmount.currencyCode});
     const url=new URL(fresh.checkoutUrl);url.searchParams.set('channel','online_store');
