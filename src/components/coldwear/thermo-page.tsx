@@ -1,5 +1,5 @@
 import { useEffect,useState } from 'react';
-import { Check,ChevronDown } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { BundleSelector } from '@/components/coldwear/bundle-selector';
 import { SizeChart } from '@/components/coldwear/size-chart';
@@ -7,6 +7,7 @@ import { Reviews } from '@/components/coldwear/reviews';
 import { Guarantee } from '@/components/coldwear/guarantee';
 import { Care } from '@/components/coldwear/care';
 import { Water } from '@/components/coldwear/water';
+import { ProductFaq } from '@/components/coldwear/faq';
 import { dispatchMessage } from '@/lib/dispatch';
 import { observeBlocks } from '@/lib/track';
 import palm from '@/assets/glove-palm.png.asset.json';
@@ -17,10 +18,9 @@ import zipClose from '@/assets/glove-zip-close.png.asset.json';
 import touch from '@/assets/touchscreen-fingertips.png.asset.json';
 const BENEFITS=['Szélálló külső','Vízlepergető felület','Érintőképes ujjbegy','Csúszásgátló tenyér','Cipzáras csukló','Polár belső'];
 export function ThermoProductPage(){
- const [photo,setPhoto]=useState(0),[bike,setBike]=useState(false),[dispatch,setDispatch]=useState(''),[faq,setFaq]=useState<number|null>(0);
+ const [photo,setPhoto]=useState(0),[bike,setBike]=useState(false),[dispatch,setDispatch]=useState('');
  useEffect(()=>{setBike(new URLSearchParams(location.search).get('angle')==='bike');setDispatch(dispatchMessage(new Date()));const interval=setInterval(()=>setDispatch(dispatchMessage(new Date())),60_000);const cleanup=observeBlocks();return()=>{clearInterval(interval);cleanup()}},[]);
  const photos=[{src:pair.url,alt:'ColdWear thermo kesztyűpár felülnézetben, cipzáras csukló és csúszásgátló tenyér'},{src:zip.url,alt:'ColdWear thermo kesztyű felülnézet, cipzáras csukló'},{src:palm.url,alt:'ColdWear thermo kesztyű elölnézet, csúszásgátló tenyér'}];
- const faqs=[['Mosható a kesztyű?','Igen. Mosógépben 30 fokon, kímélő programon, becsukott cipzárral, mosózsákban. Kímélő mosószert használj, öblítőt és fehérítőt ne. Ne csavard ki, ne szárítsd gépben vagy radiátoron: fektetve, szobahőmérsékleten szárítsd. Lent részletes útmutatót találsz.'],['Milyen hidegre ajánlott?','A -10 °C-ig ajánlott. A magyar téli időre a legjobb: szeles, párás, fagypont körüli napokra.'],['Mikor érkezik meg a rendelésem?','GLS házhozszállítással vagy csomagpontra, 1–2 munkanap alatt.'],['Lehet utánvéttel fizetni?','Igen. Átvételkor készpénzzel vagy kártyával is fizethetsz a GLS futárnál. [utánvét díja]']];
  return <>
  <section id="hero" className="py-8 md:py-12"><div className="cw-container grid gap-10 md:grid-cols-[1.05fr_1fr] md:gap-14">
   <div className="min-w-0 md:sticky md:top-24 md:self-start">
@@ -33,7 +33,6 @@ export function ThermoProductPage(){
    <div className="mt-6 grid grid-cols-1 gap-2.5 sm:grid-cols-2">{BENEFITS.map(b=><span key={b} className="flex items-center gap-2.5 rounded-full bg-signal-soft px-3.5 py-2.5 text-sm font-semibold"><span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-signal text-on-signal"><Check size={12} strokeWidth={3}/></span>{b}</span>)}</div>
    <div className="mt-7"><BundleSelector/></div>
    <div className="mt-8 rounded-2xl bg-signal-soft p-5"><p className="font-bold">Vékony, mégis meleg.</p><p className="mt-1.5 text-sm leading-6 text-text-muted">Vezetés közben érzed benne a kormányt. Ha megállsz és csörög a telefon, nem kell levenned. A kötött kesztyűn átfúj a szél, a síkesztyűben semmit nem tudsz csinálni. Ez a kettő között van.</p></div>
-   <div className="mt-6 divide-y divide-line border-y border-line">{faqs.map(([q,a],i)=><div key={q}><button type="button" aria-expanded={faq===i} onClick={()=>setFaq(faq===i?null:i)} className="flex w-full items-center justify-between gap-4 py-5 text-left text-lg font-bold">{q}<ChevronDown size={20} className={`shrink-0 text-signal-text transition-transform ${faq===i?'rotate-180':''}`}/></button>{faq===i&&<p className="pb-5 leading-7 text-text-muted">{a}</p>}</div>)}</div>
    <div className="mt-8"><h2 className="mb-3 text-lg font-bold">Jól működik együtt</h2><div className="flex items-center gap-3 rounded-2xl border border-line bg-signal-soft p-4 sm:gap-4"><div className="flex size-16 shrink-0 items-center justify-center rounded-xl border border-dashed border-line bg-surface text-center text-[10px] leading-4 text-text-muted sm:size-20">[zokni fotó]</div><div className="min-w-0 flex-1"><p className="font-extrabold leading-tight">COLDWEAR THERMO ZOKNI</p><p className="mt-1 text-sm leading-5 text-text-muted">Elvezeti a párát, erősített sarok és orr.</p><div className="mt-3 sm:mt-4 sm:text-right"><Button className="h-11 w-full rounded-full font-bold sm:w-auto sm:px-7" onClick={()=>document.getElementById('bundle_selector')?.scrollIntoView({behavior:'smooth'})}>Hozzáadom</Button></div></div></div><p className="mt-2 text-sm text-text-muted">3 kesztyű mellé 1 zokni ajándék.</p></div>
   </div>
  </div></section>
@@ -43,5 +42,6 @@ export function ThermoProductPage(){
   <SizeChart/>
   <Reviews/>
   <Care/>
+  <ProductFaq/>
  </>;
 }

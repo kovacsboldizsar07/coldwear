@@ -15,3 +15,4 @@
 - Keep shipping eligibility in a shared pure module using Shopify's discounted merchandise total; eligibility is not proof of an applied delivery discount.
 - Store analytics and mirrored commerce records in Cloud with admin-only reads and validated server-only writes.
 - Keep the storefront shell shared and each information page as its own TanStack content route for navigation and metadata.
+- Keep the glove FAQ in a dedicated presentation component using the shared accessible accordion; this keeps long-form answers out of the purchase panel without duplicating controls.
