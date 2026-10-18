@@ -1,4 +1,5 @@
 # ColdWear phase 1
+- [x] Refresh cookie bar with compact responsive layout, equally accessible acceptance/refusal, linked disclosures and category switches. Verified refusal and settings reopening at 375/1280 px; 19 measurement regression tests pass. Higher acceptance rate is not yet measured. Publication and a new consented Shopify test-order Purchase check remain pending.
 - [x] Configure route-specific titles/descriptions, leaf canonicals, sitemap, crawler rules and structured product data; verified server-rendered metadata, 301 redirects, admin noindex and supplied-photo 1200×630 share image (53 KB, HTTP 200). Live changes require publication.
 - [x] Audit launch readiness and collect missing business data, hosted configuration checks and verified purchase/tracking evidence; report delivered on 2026-10-18.
 - [x] Renew Shopify chat access and inspect a real checkout on 2026-10-18: 3 gloves + sock merchandise total is 18 990 HUF, but delivery to a Hungarian test address costs 1 767 HUF and checkout says it cannot accept payments. No order submitted.
