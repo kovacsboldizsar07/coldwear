@@ -15,6 +15,17 @@ const mocks = vi.hoisted(() => ({ rpc: vi.fn(), from: vi.fn(), fetch: vi.fn() })
 vi.mock('@/integrations/supabase/client.server', () => ({ supabaseAdmin: mocks }));
 import { deliverCapi } from '@/lib/capi-delivery.server';
 describe('leased delivery', () => {
+  it.each([true,false])('uses TEST136 only for a Shopify test order (%s)',async(testOrder)=>{
+    vi.stubEnv('META_CAPI_TOKEN','test-only-credential');vi.stubEnv('META_PIXEL_ID','test-only-pixel');vi.stubEnv('META_CAPI_TEST_EVENT_CODE','TEST136');
+    const payload={event_name:'Purchase',event_id:'shopify_order_test',event_time:1792314000,...(testOrder?{_shopify_test_order:true}:{})};
+    mocks.rpc.mockResolvedValue({data:[{event_id:'shopify_order_test',event_name:'Purchase',event_payload:payload,consent_id:'permission',lease_token:'lease',attempts:1}],error:null});
+    const query={select:vi.fn().mockReturnThis(),eq:vi.fn().mockReturnThis(),maybeSingle:vi.fn().mockResolvedValue({data:{revoked_at:null,expires_at:new Date(Date.now()+86400000).toISOString()},error:null}),insert:vi.fn().mockResolvedValue({error:null}),update:vi.fn().mockReturnThis(),then:(resolve:(value:unknown)=>void)=>resolve({error:null})};mocks.from.mockReturnValue(query);
+    mocks.fetch.mockResolvedValue({status:200,ok:true,json:async()=>({events_received:1})});
+    await deliverCapi('shopify_order_test');
+    const submitted=JSON.parse(mocks.fetch.mock.calls[0]?.[1]?.body);
+    expect(submitted.test_event_code).toBe(testOrder?'TEST136':undefined);
+    expect(submitted.data[0]).not.toHaveProperty('_shopify_test_order');
+  });
   beforeEach(() => { vi.clearAllMocks(); vi.stubGlobal('fetch', mocks.fetch); });
   afterEach(()=>{vi.unstubAllEnvs();vi.unstubAllGlobals();});
   it('does not send when another worker owns the event lease', async () => { mocks.rpc.mockResolvedValue({ data: [], error: null }); await deliverCapi('shopify_order_12345'); expect(mocks.fetch).not.toHaveBeenCalled(); });

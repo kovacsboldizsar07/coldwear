@@ -17,6 +17,7 @@
 - Store analytics and mirrored commerce records in Cloud with admin-only reads and validated server-only writes.
 - Persist CAPI events with stable event identity and occurrence time, atomically lease delivery/webhook retries, and check signed server-recorded marketing permission before each send; this prevents failed delivery loss and stale checkout consent from authorizing uploads.
 - Recover Purchase delivery through Shopify's signed webhook redelivery by returning a retryable failure while delivery is pending; do not run a permanent polling schedule for an otherwise idle queue.
+- Attach the server-configured Meta test code only to signed Shopify orders marked test; keep the internal test marker out of Meta event data so ordinary orders remain production events.
 - Record marketing acceptance separately from revocation and synchronize refusal across browser tabs and Shopify cart attributes; pending withdrawal receipts are retried before checkout synchronization so checkout snapshots do not override current server permission.
 - Keep the storefront shell shared and each information page as its own TanStack content route for navigation and metadata.
 - Keep the glove FAQ in a dedicated presentation component using the shared accessible accordion; this keeps long-form answers out of the purchase panel without duplicating controls.
