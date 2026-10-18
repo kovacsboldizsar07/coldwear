@@ -601,12 +601,27 @@ export type Database = {
         Args: { p_id: string; p_topic: string }
         Returns: string
       }
+      grant_marketing_permission: {
+        Args: {
+          p_agent: string
+          p_expires: string
+          p_id: string
+          p_ip: string
+          p_notice: string
+          p_visitor: string
+        }
+        Returns: undefined
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      replace_mirrored_order_items: {
+        Args: { p_items: Json; p_order: string }
+        Returns: undefined
       }
       revoke_marketing_permission: {
         Args: { p_id: string }

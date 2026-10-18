@@ -15,6 +15,13 @@
       "when": 1792316930550,
       "tag": "0001_durable_marketing_delivery_and_consent",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792317241733,
+      "tag": "0002_fence_marketing_permissions_and_order_items",
+      "breakpoints": true
     }
   ]
 }
