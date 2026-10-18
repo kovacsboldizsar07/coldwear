@@ -17,4 +17,4 @@
 - [ ] Publish the measurement repair and verify a signed redelivery against the updated live endpoint; publication requires the user's go-ahead. Existing live deployment has not been verified as containing this repair.
 - [ ] Verify a consented test-order Purchase in Meta Test Events; requires completed test checkout and Meta receipt evidence.
 - [ ] Finalize statutory disclosures and assess/implement the 2026 online withdrawal function; requires verified seller details and legal review.
-- [ ] Refine all storefront layouts for compact desktop proportions and stable phone/tablet controls; verify galleries, bundles, calculator, reviews, cart and information pages.
+- [x] Refine all storefront layouts for compact desktop proportions and stable phone/tablet controls; verified 320–1440 px widths, real Shopify cart addition, bundle/calculator selection, cookie controls and information pages. Short-screen checkout button remains visible; no runtime errors in final checks and 23 regression tests passed.
