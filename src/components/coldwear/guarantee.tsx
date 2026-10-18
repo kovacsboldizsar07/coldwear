@@ -8,7 +8,7 @@ export function Guarantee() {
       <div>
         <p className="text-sm font-bold uppercase tracking-wider text-signal">14 napos pénzvisszafizetési garancia</p>
         <h2 className="mt-3 text-3xl font-extrabold leading-tight md:text-4xl">Hordd két hétig. Ha nem válik be, visszaadjuk a pénzed.</h2>
-        <p className="mt-4 max-w-2xl leading-7 text-on-block-muted">Az átvételtől számított 14 napon belül jelezd nekünk, és visszautaljuk a vételárat. [A visszaküldés pontos feltételei]</p>
+        <p className="mt-4 max-w-2xl leading-7 text-on-block-muted">Az átvételtől számított 14 napon belül jelezd nekünk, és visszautaljuk a vételárat.</p>
       </div>
     </div>
   </div></section>;
