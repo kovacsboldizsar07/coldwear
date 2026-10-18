@@ -35,5 +35,7 @@ export async function revokePermission(receipt: string) {
 }
 export async function sanitizeMarketingAttributes(attributes: { key: string; value: string }[]) {
   const permission = await readPermission(attributes.find(a => a.key === 'cw_permission')?.value ?? '');
-  return attributes.map(a => a.key === 'cw_consent' ? { ...a, value: permission ? '1' : '0' } : !permission && a.key !== 'cw_angle' ? { ...a, value: '' } : a);
+  const keys=['cw_consent','cw_permission','cw_fbp','cw_fbc','cw_fbclid','cw_gclid','cw_ttclid','cw_utm_source','cw_utm_medium','cw_utm_campaign','cw_utm_content'];
+  const complete=[...attributes,...keys.filter(key=>!attributes.some(a=>a.key===key)).map(key=>({key,value:''}))];
+  return complete.map(a => a.key === 'cw_consent' ? { ...a, value: permission ? '1' : '0' } : !permission && a.key !== 'cw_angle' ? { ...a, value: '' } : a);
 }
