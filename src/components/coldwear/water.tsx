@@ -1,4 +1,4 @@
-import { Droplets } from 'lucide-react';
+import waterGifAsset from '@/assets/water-gif.gif.asset.json';
 
 export function Water() {
   return (
@@ -11,12 +11,14 @@ export function Water() {
               A külső anyag vízlepergető felülettel készül. A csepp nem nyomódik át a szöveten, hanem a felszínén marad, majd lepereg. Havas esőben, latyakban és frissen hullott hóban is szárazon tartja a kezed.
             </p>
           </div>
-          <div className="flex aspect-[4/3] flex-col items-center justify-center gap-4 rounded-2xl border border-dashed border-signal/45 bg-surface p-6 text-center">
-            <span className="flex size-14 items-center justify-center rounded-full bg-signal text-on-signal"><Droplets size={26} /></span>
-            <div>
-              <p className="text-lg font-extrabold">GIF jön ide</p>
-              <p className="mt-1 max-w-xs text-sm leading-6 text-text-muted">A víz lefolyik a felületről. Töltsd fel, és a helyére tesszük.</p>
-            </div>
+          <div className="overflow-hidden rounded-2xl border border-signal/45 bg-surface">
+            <img
+              src={waterGifAsset.url}
+              alt="A víz lepereg a kesztyű felületéről"
+              className="block h-full w-full object-cover"
+              loading="lazy"
+              decoding="async"
+            />
           </div>
         </div>
       </div>
