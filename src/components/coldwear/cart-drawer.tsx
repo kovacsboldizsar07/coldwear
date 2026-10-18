@@ -34,17 +34,16 @@ export function CartDrawer(){
  const discountApplied=cart?.discountCodes?.some(d=>d.applicable&&d.code.startsWith('CW-CSOMAG'));
  async function checkout(){
   if(busy||!cart?.id)return;
-  const tab=window.open('about:blank','_blank');if(tab)tab.opener=null;
   useCart.setState({busy:true});
   try{
-   await waitForConsentSync();
-   const fresh=await changeCart({data:{operation:'attributes',cartId:cart.id,attributes:cartAttributes()}});
-   if(!fresh?.checkoutUrl)throw new Error('checkout_unavailable');
-   useCart.setState({cart:fresh,cartId:fresh.id});
-   track('InitiateCheckout',{value:Number(fresh.cost.totalAmount.amount),currency:fresh.cost.totalAmount.currencyCode});
-   const url=new URL(fresh.checkoutUrl);url.searchParams.set('channel','online_store');
-   if(tab)tab.location.replace(url.toString());else window.open(url.toString(),'_blank','noopener,noreferrer');
-  }catch{tab?.close();toast.error('A pénztár előkészítése nem sikerült. Próbáld újra.');}finally{useCart.setState({busy:false});}
+    await waitForConsentSync();
+    const fresh=await changeCart({data:{operation:'attributes',cartId:cart.id,attributes:cartAttributes()}});
+    if(!fresh?.checkoutUrl)throw new Error('checkout_unavailable');
+    useCart.setState({cart:fresh,cartId:fresh.id});
+    track('InitiateCheckout',{value:Number(fresh.cost.totalAmount.amount),currency:fresh.cost.totalAmount.currencyCode});
+    const url=new URL(fresh.checkoutUrl);url.searchParams.set('channel','online_store');
+    window.location.assign(url.toString());
+  }catch{toast.error('A pénztár előkészítése nem sikerült. Próbáld újra.');}finally{useCart.setState({busy:false});}
  }
  return <Sheet open={open} onOpenChange={setOpen}><SheetContent className="flex h-dvh w-full flex-col gap-0 overflow-hidden border-l border-line bg-surface p-0 sm:max-w-[480px]">
   <div className="shrink-0 border-b border-line px-5 pb-5 pt-6 sm:px-6"><div className="flex items-center gap-3"><ShoppingBag className="size-6" strokeWidth={1.5}/><SheetTitle className="text-2xl font-extrabold">A kosarad</SheetTitle><span className="flex size-7 items-center justify-center rounded-full border border-line bg-bg text-xs font-bold">{count}</span></div><SheetDescription className="mt-1.5">{count?'Már csak egy lépés a téli kényelem.':'A kosarad még üres.'}</SheetDescription></div>
