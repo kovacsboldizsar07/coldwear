@@ -23,6 +23,8 @@ export async function mutateCart(operation:'create'|'add'|'update'|'remove'|'att
  };
  const data = await request<Record<string,{cart:Cart|null;userErrors:{message:string}[]}>>(mutations[operation],variables);
  const result = Object.values(data)[0];
+ // A missing cart is recoverable, unlike an ambiguous network failure.
+ if(operation!=='create' && result?.userErrors.length && result.userErrors.every(x=>/the specified cart does not exist\.?|cart (?:does not exist|has expired|not found)/i.test(x.message))) return null;
  if(result?.userErrors.length) throw new Error(result.userErrors.map(x=>x.message).join(', '));
  return result?.cart ?? null;
 }

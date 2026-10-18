@@ -13,6 +13,8 @@ export const changeCart = createServerFn({method:'POST'}).inputValidator(z.objec
  if(['create','add','update'].includes(data.operation)&&!data.lines?.length) throw new Error('Hiányzó termék.');
  if(data.operation==='remove'&&!data.lineIds?.length) throw new Error('Hiányzó tétel.');
  let cart=await api.mutateCart(data.operation,data.operation==='create'?{input:{lines:data.lines,attributes,buyerIdentity:{countryCode:'HU'}}}:{cartId:data.cartId,lines:data.lines,lineIds:data.lineIds,attributes});
+ // Retry only a confirmed missing cart. Never retry an ambiguous failed add.
+ if(!cart && data.operation==='add') cart=await api.mutateCart('create',{input:{lines:data.lines?.map(({merchandiseId,quantity})=>({merchandiseId,quantity})),attributes,buyerIdentity:{countryCode:'HU'}}});
  if(cart && data.operation!=='create'&&data.operation!=='attributes') cart=await api.mutateCart('attributes',{cartId:cart.id,attributes});
  return api.withBundle(cart);
 });

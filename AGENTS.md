@@ -13,6 +13,7 @@
 - Keep canonical URLs and share metadata in a browser-safe SEO helper used by leaf routes only; product offers must come from Shopify data, never estimated stock or invented reviews.
 - Use a server-only Shopify module with fixed GraphQL operations and validated server functions; credentials must not enter browser bundles.
 - Keep all cart totals and discounts as Shopify response data; Zustand persists only cart identity and refreshes server state.
+- Treat confirmed missing Shopify carts as null, recreate only on explicit add, and clear stale state on other actions; never retry ambiguous mutation failures because they may duplicate items.
 - Keep shipping eligibility in a shared pure module using Shopify's discounted merchandise total; eligibility is not proof of an applied delivery discount.
 - Store analytics and mirrored commerce records in Cloud with admin-only reads and validated server-only writes.
 - Persist CAPI events with stable event identity and occurrence time, atomically lease delivery/webhook retries, and check signed server-recorded marketing permission before each send; this prevents failed delivery loss and stale checkout consent from authorizing uploads.
