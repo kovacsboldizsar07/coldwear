@@ -1,5 +1,5 @@
 # ColdWear phase 1
-- [ ] Configure and verify route-specific SEO, sitemap, structured product data and an optimized supplied-photo share image; live changes require publication.
+- [x] Configure route-specific titles/descriptions, leaf canonicals, sitemap, crawler rules and structured product data; verified server-rendered metadata, 301 redirects, admin noindex and supplied-photo 1200×630 share image (53 KB, HTTP 200). Live changes require publication.
 - [x] Audit launch readiness and collect missing business data, hosted configuration checks and verified purchase/tracking evidence; report delivered on 2026-10-18.
 - [x] Renew Shopify chat access and inspect a real checkout on 2026-10-18: 3 gloves + sock merchandise total is 18 990 HUF, but delivery to a Hungarian test address costs 1 767 HUF and checkout says it cannot accept payments. No order submitted.
 - [ ] Restore server Admin API access and verify real inventory: saved SHOPIFY_ACCESS_TOKEN returns 401 although chat tools work; Storefront quantityAvailable requires an absent inventory scope. All eight variants report availableForSale=true and currentlyNotInStock=true, indicating out-of-stock ordering, not verified physical stock.
