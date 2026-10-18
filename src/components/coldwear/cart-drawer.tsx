@@ -12,9 +12,10 @@ import { getQuote, changeCart } from '@/lib/shopify.functions';
 import { toast } from 'sonner';
 import { catalogOptions } from './bundle-selector';
 import glovePhoto from '@/assets/glove-pair.png.asset.json';
+import sockAsset from '@/assets/socks.png.asset.json';
 
 function SockPhoto() {
- return <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-bg px-2 text-center text-text-muted"><ImageIcon className="size-6" strokeWidth={1}/><span className="text-[10px] leading-4">Zokni fotó<br/>hamarosan</span></div>;
+ return <img src={sockAsset.url} alt="ColdWear Thermo zokni" className="h-full w-full bg-surface object-contain"/>;
 }
 
 export function CartDrawer(){
