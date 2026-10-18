@@ -38,7 +38,7 @@ const FAQ_GROUPS = [
       { question: 'Hogyan tisztítsam a kesztyűt?', answer: 'Elsőként mindig a termék kezelési címkéjét kövesd. Kisebb szennyeződést nedves szivaccsal tisztíts. Ha a címke engedi, kézzel, langyos, legfeljebb 30 °C-os vízben, kímélő mosószerrel mosd. Gépi mosást csak akkor válassz, ha a címke megengedi, kímélő programon, zárt cipzárral és mosózsákban.' },
       { question: 'Száríthatom radiátoron vagy szárítógépben?', answer: 'Ne tedd radiátorra vagy szárítógépbe, és ne vasald. Ne csavard ki: óvatosan nyomkodd ki a vizet, majd fektetve, szobahőmérsékleten hagyd teljesen megszáradni. Öblítőt és fehérítőt se használj.' },
       { question: 'Mit jelent a 14 napos pénzvisszafizetési garancia?', answer: 'Az átvételtől számított 14 napon belül jelezheted, ha nem vált be a kesztyű. A visszaküldés menetét, költségét és a visszatérítés feltételeit a Visszaküldés és elállás oldalon találod.' },
-      { question: 'Mit tegyek, ha gond van a rendeléssel?', answer: 'A Kapcsolat oldalon található elérhetőségen jelezd a problémát. Add meg a rendelési azonosítót, és írd le röviden, mi történt. Hibás vagy sérült terméknél egy fotó is segíthet az ügyintézésben.' },
+      { question: 'Mit tegyek, ha gond van a rendeléssel?', answer: 'Írd meg nekünk a problémát. Add meg a rendelési azonosítót, és írd le röviden, mi történt. Hibás vagy sérült terméknél egy fotó is segíthet az ügyintézésben.' },
     ],
   },
 ];
@@ -68,7 +68,6 @@ export function ProductFaq() {
         <div className="mt-8 flex flex-wrap gap-x-6 gap-y-3 border-t border-line pt-6 text-sm font-semibold">
           <Link to="/szallitas" className="text-signal-text underline underline-offset-4">Szállítás és fizetés</Link>
           <Link to="/visszakuldes" className="text-signal-text underline underline-offset-4">Visszaküldés és elállás</Link>
-          <Link to="/kapcsolat" className="text-signal-text underline underline-offset-4">Kapcsolat</Link>
         </div>
       </div>
     </section>
