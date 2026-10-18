@@ -1,10 +1,11 @@
 import { createHash } from 'node:crypto';
 import { supabaseAdmin as db } from '@/integrations/supabase/client.server';
+import type { Json } from '@/integrations/supabase/types';
 import { permissionAllows, retryDelaySeconds, retryableResponse } from './marketing-rules';
 export async function hash(value: string) { return createHash('sha256').update(value.trim().toLowerCase()).digest('hex'); }
 
 export async function deliverCapi(eventId?: string) {
-  const { data, error } = await db.rpc('claim_capi_delivery', { p_event_id: eventId });
+  const { data, error } = await db.rpc('claim_capi_delivery', eventId ? { p_event_id: eventId } : {});
   if (error) throw error;
   const job = data?.[0];
   if (!job) return;
@@ -38,7 +39,8 @@ export async function deliverCapi(eventId?: string) {
   }
 }
 export async function enqueueCapi(input: { name: string; id: string; consentId: string; time: number; user: Record<string, unknown>; custom: Record<string, unknown>; url: string; orderId?: string }) {
-  const { error } = await db.from('capi_deliveries').upsert({ event_id: input.id, event_name: input.name, order_id: input.orderId ?? null, consent_id: input.consentId, event_time: input.time, event_payload: { event_name: input.name, event_id: input.id, event_time: input.time, action_source: 'website', event_source_url: input.url, user_data: input.user, custom_data: input.custom } }, { onConflict: 'event_id', ignoreDuplicates: true });
+  const payload = JSON.parse(JSON.stringify({ event_name: input.name, event_id: input.id, event_time: input.time, action_source: 'website', event_source_url: input.url, user_data: input.user, custom_data: input.custom })) as Json;
+  const { error } = await db.from('capi_deliveries').upsert({ event_id: input.id, event_name: input.name, order_id: input.orderId ?? null, consent_id: input.consentId, event_time: input.time, event_payload: payload }, { onConflict: 'event_id', ignoreDuplicates: true });
   if (error) throw error;
   await deliverCapi(input.id);
   const result = await db.from('capi_deliveries').select('status').eq('event_id', input.id).single();
