@@ -1,5 +1,5 @@
 # ColdWear phase 1
-- [ ] Audit launch readiness and collect missing business data, hosted configuration checks and verified purchase/tracking evidence.
+- [x] Audit launch readiness and collect missing business data, hosted configuration checks and verified purchase/tracking evidence; report delivered on 2026-10-18.
 - [x] Refine cart layout, thin borders, sock-photo slot, and mobile checkout controls; verified add, sock upsell, removal, amount recalculation and checkout opening with real Shopify products.
 - [x] Show remaining forints and quantity for free shipping at 3 products OR 17 000 Ft; seven qualification tests passed.
 - [ ] Activate actual Shopify free shipping for 3 products OR 17 000 Ft and verify delivery cost: blocked by lack of Admin API access to quantity prerequisites and discount combination settings. Available price-rule tool ignored subtotal prerequisite, so the unsafe rule and code were deleted. No shipping discount is claimed as applied in the UI.
@@ -9,5 +9,8 @@
 - [x] Protected order/analytics schema, webhook and collection endpoint.
 - [x] Admin reporting, spend and cost editor, integration status.
 - [x] Rule tests, public pages, consent, size copying, image loading and collection verified.
-- [ ] Final checkout delivery/payment and admin-write verification: shipping configuration and authorized admin account required; real catalog and cart are now available and verified.
-- [ ] External prerequisites: sock photo/specifications, verified measurements, company details, final shipping/payment setup, webhook/CAPI credentials and admin account required.
+- [ ] Final checkout delivery/payment and admin-write verification: Shopify access renewal and shipping/payment configuration required; admin account exists, but fresh write verification remains pending.
+- [ ] External prerequisites: sock photo/specifications, verified measurements, authentic reviews, company/returns/privacy details, final shipping/payment/invoicing setup and custom-domain completion required. Meta/webhook credentials and admin account are already configured.
+- [ ] Repair and test failed-webhook recovery, durable CAPI retries and consent withdrawal propagation; requires a separately approved implementation task.
+- [ ] Verify a consented test-order Purchase in Meta Test Events; requires completed test checkout and Meta receipt evidence.
+- [ ] Finalize statutory disclosures and assess/implement the 2026 online withdrawal function; requires verified seller details and legal review.
