@@ -33,7 +33,7 @@ export function ThermoProductPage(){
   </div>
   <div className="min-w-0">
    <p className="text-sm font-semibold text-signal-text">{dispatch||'Feladás még ma, ha 14:00 előtt rendelsz.'}</p>
-   <h1 className="mt-3 text-3xl sm:text-4xl font-extrabold leading-[1.05] tracking-tight md:text-[52px]">{bike?'ColdWear thermo kesztyű: biciklin sem fúj át rajta a szél':'ColdWear thermo kesztyű: telefonozz benne, ne vedd le'}</h1>
+   <h1 className="mt-3 text-3xl sm:text-4xl font-extrabold leading-[1.05] tracking-tight md:text-[52px]">{bike?'ColdWear kesztyű: biciklin sem fúj át rajta a szél':'ColdWear kesztyű: telefonozz benne, ne vedd le'}</h1>
    <div className="mt-6 grid grid-cols-1 gap-2.5 sm:grid-cols-2">{BENEFITS.map(b=><span key={b} className="flex items-center gap-2.5 rounded-full bg-signal-soft px-3.5 py-2.5 text-sm font-semibold"><span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-signal text-on-signal"><Check size={12} strokeWidth={3}/></span>{b}</span>)}</div>
    <div className="mt-7"><BundleSelector/></div>
    <div className="mt-8 rounded-2xl bg-signal-soft p-5"><p className="font-bold">Vékony, mégis meleg.</p><p className="mt-1.5 text-sm leading-6 text-text-muted">Vezetés közben érzed benne a kormányt. Ha megállsz és csörög a telefon, nem kell levenned. A kötött kesztyűn átfúj a szél, a síkesztyűben semmit nem tudsz csinálni. Ez a kettő között van.</p></div>
