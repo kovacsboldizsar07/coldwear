@@ -21,7 +21,7 @@ export async function deliverCapi(eventId?: string) {
   if (token && pixel) {
     try {
       const { _shopify_test_order: testOrder, ...eventPayload } = job.event_payload as Record<string, Json | undefined>;
-      const testCode = attachTestCode(eventPayload.event_name, testOrder) ? process.env['META_CAPI_TEST_EVENT_CODE'] : undefined;
+      const testCode = attachTestCode(eventPayload['event_name'], testOrder) ? process.env['META_CAPI_TEST_EVENT_CODE'] : undefined;
       const response = await fetch(`https://graph.facebook.com/v26.0/${encodeURIComponent(pixel)}/events`, { method: 'POST', signal: AbortSignal.timeout(10000), headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ access_token: token, data: [eventPayload], ...(testCode ? { test_event_code: testCode } : {}) }) });
       status = response.status;
       const result = await response.json() as { events_received?: number; error?: { code?: number; is_transient?: boolean } };
