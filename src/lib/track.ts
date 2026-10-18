@@ -73,7 +73,7 @@ export function track(event_name:string,event_data:Record<string,unknown>={}){
  if(!consent?.marketing&&!consent?.statistics)return;
  if(!collectToken){if(pending.length<100)pending.push({name:event_name,data:event_data});return;}
  const event_id=crypto.randomUUID();
- const payload={token:collectToken,permission:consent?.marketing?consent.receipt:undefined,session_id:sessionId,visitor_id:visitorId,event_name,event_id,page_path:location.pathname,event_data,angle,consent_level:consent?.marketing?'marketing':consent?.statistics?'statistics':'necessary',source:consent?.marketing?source:{},event_data};
+ const payload={token:collectToken,permission:consent?.marketing?consent.receipt:undefined,session_id:sessionId,visitor_id:visitorId,event_name,event_id,page_path:location.pathname,event_data,angle,consent_level:consent?.marketing?'marketing':consent?.statistics?'statistics':'necessary',source:consent?.marketing?source:{}};
  navigator.sendBeacon('/api/public/collect',new Blob([JSON.stringify(payload)],{type:'application/json'}));
  const pixel=(window as unknown as {fbq?:(...args:unknown[])=>void}).fbq;
  if(consent?.marketing&&pixel&&['PageView','ViewContent','AddToCart','InitiateCheckout'].includes(event_name))pixel('track',event_name,event_data,{eventID:event_id});
