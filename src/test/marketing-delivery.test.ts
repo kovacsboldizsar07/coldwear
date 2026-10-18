@@ -16,6 +16,7 @@ vi.mock('@/integrations/supabase/client.server', () => ({ supabaseAdmin: mocks }
 import { deliverCapi } from '@/lib/capi-delivery.server';
 describe('leased delivery', () => {
   it.each([true,false])('uses TEST136 only for a Shopify test order (%s)',async(testOrder)=>{
+    vi.useFakeTimers({toFake:['Date']});vi.setSystemTime(new Date('2026-10-19T00:00:00Z'));
     vi.stubEnv('META_CAPI_TOKEN','test-only-credential');vi.stubEnv('META_PIXEL_ID','test-only-pixel');vi.stubEnv('META_CAPI_TEST_EVENT_CODE','TEST136');
     const payload={event_name:'Purchase',event_id:'shopify_order_test',event_time:1792314000,...(testOrder?{_shopify_test_order:true}:{})};
     mocks.rpc.mockResolvedValue({data:[{event_id:'shopify_order_test',event_name:'Purchase',event_payload:payload,consent_id:'permission',lease_token:'lease',attempts:1}],error:null});
@@ -27,7 +28,7 @@ describe('leased delivery', () => {
     expect(submitted.data[0]).not.toHaveProperty('_shopify_test_order');
   });
   beforeEach(() => { vi.clearAllMocks(); vi.stubGlobal('fetch', mocks.fetch); });
-  afterEach(()=>{vi.unstubAllEnvs();vi.unstubAllGlobals();});
+  afterEach(()=>{vi.useRealTimers();vi.unstubAllEnvs();vi.unstubAllGlobals();});
   it('does not send when another worker owns the event lease', async () => { mocks.rpc.mockResolvedValue({ data: [], error: null }); await deliverCapi('shopify_order_12345'); expect(mocks.fetch).not.toHaveBeenCalled(); });
   it('does not send after permission was withdrawn between claim and send', async () => {
     mocks.rpc.mockResolvedValue({ data: [{ event_id: 'shopify_order_12345', consent_id: 'permission', lease_token: 'lease' }], error: null });

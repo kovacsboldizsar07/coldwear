@@ -14,4 +14,8 @@ export function retryableResponse(status: number, code?: number) {
 export function webhookNeedsRetry(status: string | null) {
   return status !== 'completed';
 }
-export function purchaseEventId(orderId: string) { return `shopify_order_${orderId}`; }
+export function purchaseEventId(orderId: string) { return `shopify_order_${orderId}`; }// Temporary, self-expiring window requested by the owner: Purchase sends during it go to Meta Test Events.
+export const PURCHASE_TEST_WINDOW_END = Date.parse('2026-10-18T22:25:00Z');
+export function attachTestCode(eventName: unknown, shopifyTestOrder: unknown, now = Date.now()) {
+  return shopifyTestOrder === true || (eventName === 'Purchase' && now < PURCHASE_TEST_WINDOW_END);
+}
