@@ -1,4 +1,19 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { ThermoProductPage } from '@/components/coldwear/thermo-page';
-import zip from '@/assets/glove-zip.png.asset.json';
-export const Route=createFileRoute('/')({head:()=>({meta:[{title:'ColdWear Thermo kesztyű | Szélálló, érintőképes, vízlepergető'},{name:'description',content:'ColdWear szélálló, vízlepergető thermo kesztyű érintőképes ujjbegyekkel. 14 napos pénzvisszafizetési garancia.'},{property:'og:title',content:'ColdWear Thermo kesztyű'},{property:'og:description',content:'Thermo kesztyű és zokni a téli hétköznapokhoz. Válaszd ki a méreted.'},...(zip.url.startsWith('https://')?[{property:'og:image',content:zip.url},{name:'twitter:image',content:zip.url}]:[]),{property:'og:type',content:'website'},{name:'twitter:card',content:'summary_large_image'}]}),component:ThermoProductPage});
+import { pageHead, SHARE_IMAGE, SITE_URL, jsonLd } from '@/lib/seo';
+
+export const Route = createFileRoute('/')({
+  head: () => ({
+    ...pageHead('ColdWear kesztyű | Érintőképes, szélálló téli kesztyű', 'ColdWear téli kesztyű érintőképes ujjbegyekkel, csúszásgátló tenyérrel és vízlepergető felülettel. Méretválasztó és 14 napos pénzvisszafizetési garancia.', '/', SHARE_IMAGE),
+    scripts: [jsonLd({
+      '@context': 'https://schema.org',
+      '@type': 'Product',
+      name: 'ColdWear kesztyű',
+      description: 'Érintőképes, szélálló téli kesztyű csúszásgátló tenyérrel és vízlepergető felülettel.',
+      brand: { '@type': 'Brand', name: 'ColdWear' },
+      url: `${SITE_URL}/`,
+      image: SHARE_IMAGE,
+    })],
+  }),
+  component: ThermoProductPage,
+});

@@ -10,7 +10,7 @@ import { summary } from '@/lib/reporting';
 import { infoHead } from '@/components/coldwear/info-page';
 import { toast } from 'sonner';
 import { RefreshCcw,LogOut,Save,LockKeyhole } from 'lucide-react';
-export const Route=createFileRoute('/admin')({head:()=>({...infoHead('Adminisztráció','ColdWear védett rendelési és hirdetési kimutatások.'),meta:[...infoHead('Adminisztráció','ColdWear védett rendelési és hirdetési kimutatások.').meta,{name:'robots',content:'noindex,nofollow'}]}),component:Admin});
+export const Route=createFileRoute('/admin')({head:()=>({...infoHead('Adminisztráció','ColdWear védett rendelési és hirdetési kimutatások.','/admin'),meta:[...infoHead('Adminisztráció','ColdWear védett rendelési és hirdetési kimutatások.','/admin').meta,{name:'robots',content:'noindex,nofollow'}]}),component:Admin});
 const dateKey=(date:Date)=>new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Budapest',year:'numeric',month:'2-digit',day:'2-digit'}).format(date);
 const huf=(n:number)=>new Intl.NumberFormat('hu-HU',{style:'currency',currency:'HUF',maximumFractionDigits:0}).format(n);
 function Admin(){

@@ -79,14 +79,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "ColdWear | Téli kesztyű és zokni" },
-      { name: "description", content: "ColdWear thermo kesztyű és zokni. Szélálló külső, vízlepergető felület, 14 napos pénzvisszafizetési garancia." },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "ColdWear | Téli kesztyű és zokni" },
-      { property: "og:description", content: "ColdWear thermo kesztyű és zokni. Szélálló külső, vízlepergető felület, 14 napos pénzvisszafizetési garancia." },
+      { property: "og:site_name", content: "ColdWear" },
+      { property: "og:locale", content: "hu_HU" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=IBM+Plex+Mono:wght@400;500&display=swap" },
