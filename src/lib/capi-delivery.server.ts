@@ -20,7 +20,7 @@ export async function deliverCapi(eventId?: string) {
   const token = process.env['META_CAPI_TOKEN'], pixel = process.env['META_PIXEL_ID'];
   if (token && pixel) {
     try {
-      const response = await fetch(`https://graph.facebook.com/v23.0/${encodeURIComponent(pixel)}/events`, { method: 'POST', signal: AbortSignal.timeout(10000), headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ access_token: token, data: [job.event_payload] }) });
+      const response = await fetch(`https://graph.facebook.com/v26.0/${encodeURIComponent(pixel)}/events`, { method: 'POST', signal: AbortSignal.timeout(10000), headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ access_token: token, data: [job.event_payload] }) });
       status = response.status;
       const result = await response.json() as { events_received?: number; error?: { code?: number; is_transient?: boolean } };
       received = response.ok ? result.events_received ?? 0 : 0;

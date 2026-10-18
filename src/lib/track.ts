@@ -15,7 +15,8 @@ function loadPixel(){
 
 export type Consent = { statistics:boolean; marketing:boolean; expires:number; receipt?:string };
 let withdrawal:Promise<void>=Promise.resolve();
-function expiredConsent(){if(consent&&consent.expires<=Date.now()){saveConsent(consent.statistics,false);}}
+let consentRevision=0;
+function expiredConsent(){if(consent&&consent.expires<=Date.now()){void saveConsent(consent.statistics,false).catch(()=>{});}}
 let consent:Consent|null=null;
 let sessionId='', visitorId:string|null=null, angle='default';
 let source:Record<string,string>={};
@@ -29,8 +30,8 @@ export function initializeTracking(){
  const params=new URLSearchParams(location.search); angle=params.get('angle')==='bike'?'bike':'default';
  names.forEach(name=>{source[name]=params.get(name)||''});
  applyConsent();void flushWithdrawals().catch(()=>{});
- window.addEventListener('storage',e=>{if(e.key==='cw_consent'){const saved=JSON.parse(safeGet('cw_consent')||'null') as Consent|null;consent=saved&&saved.expires>Date.now()?saved:null;pending=[];applyConsent();window.dispatchEvent(new Event('cw-consent'));}});
- window.addEventListener('online',()=>{void flushWithdrawals()});
+ window.addEventListener('storage',e=>{if(e.key==='cw_consent'){consentRevision++;try{const saved=JSON.parse(safeGet('cw_consent')||'null') as Consent|null;consent=saved&&saved.expires>Date.now()?{...saved,marketing:Boolean(saved.marketing&&saved.receipt)}:null;}catch{consent=null;}pending=[];applyConsent();if(!consent?.marketing)clearMarketingCookies();window.dispatchEvent(new Event('cw-consent'));}});
+ window.addEventListener('online',()=>{void flushWithdrawals().catch(()=>{})});
  void telemetryConfig().then(config=>{collectToken=config.token;pixelId=config.pixelId;loadPixel();const events=pending;pending=[];events.forEach(e=>track(e.name,e.data));}).catch(()=>{pending=[];}); track('PageView');
  return consent;
 }
@@ -50,19 +51,21 @@ async function flushWithdrawals(){
  for(const receipt of receipts){await withdrawMarketing({data:receipt});const remaining=(JSON.parse(safeGet('cw_withdrawals')||'[]') as string[]).filter(r=>r!==receipt);safeSet('cw_withdrawals',JSON.stringify(remaining));}
 }
 export async function saveConsent(statistics:boolean,marketing:boolean){
+ const revision=++consentRevision;
  const previous=consent;
  if(!marketing){
-  consent={statistics,marketing:false,expires:consentExpiry(new Date())};safeSet('cw_consent',JSON.stringify(consent));pending=[];applyConsent();clearMarketingCookies();window.dispatchEvent(new Event('cw-consent'));
+  consent={statistics,marketing:false,expires:consentExpiry(new Date())};safeSet('cw_consent',JSON.stringify(consent));pending=[];applyConsent();clearMarketingCookies();
   if(previous?.receipt){const receipts=JSON.parse(safeGet('cw_withdrawals')||'[]') as string[];safeSet('cw_withdrawals',JSON.stringify([...new Set([...receipts,previous.receipt])]));}
-  withdrawal=flushWithdrawals();await withdrawal;
+  withdrawal=flushWithdrawals();window.dispatchEvent(new Event('cw-consent'));await withdrawal;
  }else{
   await flushWithdrawals();
   const id=safeGet('cw_visitor')||crypto.randomUUID();
   const granted=await grantMarketing({data:{visitorId:id,noticeVersion:MARKETING_NOTICE_VERSION}});
+  if(revision!==consentRevision){const receipts=JSON.parse(safeGet('cw_withdrawals')||'[]') as string[];safeSet('cw_withdrawals',JSON.stringify([...new Set([...receipts,granted.receipt])]));await flushWithdrawals();return;}
   consent={statistics,marketing:true,expires:granted.expires,receipt:granted.receipt};safeSet('cw_visitor',id);safeSet('cw_consent',JSON.stringify(consent));applyConsent();window.dispatchEvent(new Event('cw-consent'));
  }
 }
-export async function waitForConsentSync(){await withdrawal;await flushWithdrawals();}
+export async function waitForConsentSync(){await flushWithdrawals();withdrawal=Promise.resolve();}
 export function cartAttributes(){expiredConsent();return [...names.map(n=>({key:`cw_${n}`,value:consent?.marketing?source[n]||'':''})),{key:'cw_angle',value:angle},{key:'cw_permission',value:consent?.marketing?consent.receipt||'':''},{key:'cw_consent',value:consent?.marketing?'1':'0'},{key:'cw_fbp',value:consent?.marketing?cookie('_fbp'):''},{key:'cw_fbc',value:consent?.marketing?(cookie('_fbc')||(source['fbclid']?`fb.1.${Date.now()}.${source['fbclid']}`:'')):''}];}
 function cookie(name:string){return document.cookie.split('; ').find(x=>x.startsWith(`${name}=`))?.slice(name.length+1)||''}
 export function track(event_name:string,event_data:Record<string,unknown>={}){
