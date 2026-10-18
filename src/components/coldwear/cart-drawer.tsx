@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Link } from '@tanstack/react-router';
-import { Minus, Plus, Trash2, ArrowRight, ShoppingBag, Check, Truck, ShieldCheck, ImageIcon, Loader2 } from 'lucide-react';
+import { Minus, Plus, Trash2, ArrowRight, ShoppingBag, Check, Truck, ShieldCheck, Loader2 } from 'lucide-react';
 import { Sheet, SheetContent, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/stores/cart';
@@ -12,9 +12,10 @@ import { getQuote, changeCart } from '@/lib/shopify.functions';
 import { toast } from 'sonner';
 import { catalogOptions } from './bundle-selector';
 import glovePhoto from '@/assets/glove-pair.png.asset.json';
+import sockAsset from '@/assets/socks.png.asset.json';
 
 function SockPhoto() {
- return <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-bg px-2 text-center text-text-muted"><ImageIcon className="size-6" strokeWidth={1}/><span className="text-[10px] leading-4">Zokni fotó<br/>hamarosan</span></div>;
+ return <img src={sockAsset.url} alt="ColdWear Thermo zokni" className="h-full w-full bg-surface object-contain"/>;
 }
 
 export function CartDrawer(){
