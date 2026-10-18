@@ -20,7 +20,9 @@ export async function deliverCapi(eventId?: string) {
   const token = process.env['META_CAPI_TOKEN'], pixel = process.env['META_PIXEL_ID'];
   if (token && pixel) {
     try {
-      const response = await fetch(`https://graph.facebook.com/v26.0/${encodeURIComponent(pixel)}/events`, { method: 'POST', signal: AbortSignal.timeout(10000), headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ access_token: token, data: [job.event_payload] }) });
+      const { _shopify_test_order: testOrder, ...eventPayload } = job.event_payload as Record<string, Json | undefined>;
+      const testCode = testOrder === true ? process.env['META_CAPI_TEST_EVENT_CODE'] : undefined;
+      const response = await fetch(`https://graph.facebook.com/v26.0/${encodeURIComponent(pixel)}/events`, { method: 'POST', signal: AbortSignal.timeout(10000), headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ access_token: token, data: [eventPayload], ...(testCode ? { test_event_code: testCode } : {}) }) });
       status = response.status;
       const result = await response.json() as { events_received?: number; error?: { code?: number; is_transient?: boolean } };
       received = response.ok ? result.events_received ?? 0 : 0;
@@ -38,8 +40,8 @@ export async function deliverCapi(eventId?: string) {
     if (result.error) throw result.error;
   }
 }
-export async function enqueueCapi(input: { name: string; id: string; consentId: string; time: number; user: Record<string, unknown>; custom: Record<string, unknown>; url: string; orderId?: string }) {
-  const payload = JSON.parse(JSON.stringify({ event_name: input.name, event_id: input.id, event_time: input.time, action_source: 'website', event_source_url: input.url, user_data: input.user, custom_data: input.custom })) as Json;
+export async function enqueueCapi(input: { name: string; id: string; consentId: string; time: number; user: Record<string, unknown>; custom: Record<string, unknown>; url: string; orderId?: string; testOrder?: boolean }) {
+  const payload = JSON.parse(JSON.stringify({ event_name: input.name, event_id: input.id, event_time: input.time, action_source: 'website', event_source_url: input.url, user_data: input.user, custom_data: input.custom, ...(input.testOrder ? { _shopify_test_order: true } : {}) })) as Json;
   const { error } = await db.from('capi_deliveries').upsert({ event_id: input.id, event_name: input.name, order_id: input.orderId ?? null, consent_id: input.consentId, event_time: input.time, event_payload: payload }, { onConflict: 'event_id', ignoreDuplicates: true });
   if (error) throw error;
   await deliverCapi(input.id);
