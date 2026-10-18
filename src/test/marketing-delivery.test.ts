@@ -28,7 +28,7 @@ describe('leased delivery', () => {
     expect(submitted.data[0]).not.toHaveProperty('_shopify_test_order');
   });
   beforeEach(() => { vi.clearAllMocks(); vi.stubGlobal('fetch', mocks.fetch); });
-  afterEach(()=>{vi.unstubAllEnvs();vi.unstubAllGlobals();});
+  afterEach(()=>{vi.useRealTimers();vi.unstubAllEnvs();vi.unstubAllGlobals();});
   it('does not send when another worker owns the event lease', async () => { mocks.rpc.mockResolvedValue({ data: [], error: null }); await deliverCapi('shopify_order_12345'); expect(mocks.fetch).not.toHaveBeenCalled(); });
   it('does not send after permission was withdrawn between claim and send', async () => {
     mocks.rpc.mockResolvedValue({ data: [{ event_id: 'shopify_order_12345', consent_id: 'permission', lease_token: 'lease' }], error: null });
