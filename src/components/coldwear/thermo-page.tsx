@@ -1,4 +1,4 @@
-import { useEffect,useState } from 'react';
+import { useEffect,useRef,useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -12,6 +12,7 @@ import { Winter } from '@/components/coldwear/winter';
 import { ProductFaq } from '@/components/coldwear/faq';
 import { dispatchMessage } from '@/lib/dispatch';
 import { observeBlocks } from '@/lib/track';
+import type { Product } from '@/lib/commerce';
 import palm from '@/assets/glove-palm.png.asset.json';
 import zip from '@/assets/glove-zip.png.asset.json';
 import pair from '@/assets/glove-pair.png.asset.json';
@@ -21,9 +22,11 @@ import touch from '@/assets/touchscreen-fingertips.png.asset.json';
 const BENEFITS=['Szélálló külső','Vízlepergető felület','Érintőképes ujjbegy','Csúszásgátló tenyér','Cipzáras csukló','Polár belső'];
 export function ThermoProductPage(){
  const [photo,setPhoto]=useState(0),[bike,setBike]=useState(false),[dispatch,setDispatch]=useState(''),[ready,setReady]=useState(false);
- useEffect(()=>{setReady(true);setBike(new URLSearchParams(location.search).get('angle')==='bike');setDispatch(dispatchMessage(new Date()));const interval=setInterval(()=>setDispatch(dispatchMessage(new Date())),60_000);const cleanup=observeBlocks();return()=>{clearInterval(interval);cleanup()}},[]);
+ const gloveRef=useRef<Product|undefined>(undefined);
+ useEffect(()=>{setReady(true);setBike(new URLSearchParams(location.search).get('angle')==='bike');setDispatch(dispatchMessage(new Date()));const interval=setInterval(()=>setDispatch(dispatchMessage(new Date())),60_000);const cleanup=observeBlocks(()=>{const p=gloveRef.current;const price=p?.variants.nodes[0]?.price;return p?{content_type:'product',content_name:p.title,content_ids:p.variants.nodes.map(v=>v.id.split('/').pop()||v.id),...(price?{value:Number(price.amount),currency:price.currencyCode}:{})}:{content_type:'product',content_name:'ColdWear Thermo kesztyű'}});return()=>{clearInterval(interval);cleanup()}},[]);
  const {data:products=[]}=useQuery({...catalogOptions});
  const glove=ready?products.find(p=>p.title.toLowerCase().includes('kesztyű')):undefined;
+ gloveRef.current=glove;
  const sock=ready?products.find(p=>p.title.toLowerCase().includes('zokni')):undefined;
  const photos=glove?.images?.nodes.length?glove.images.nodes.map(n=>({src:n.url,alt:n.altText||glove.title})):[{src:pair.url,alt:'ColdWear thermo kesztyűpár felülnézetben, cipzáras csukló és csúszásgátló tenyér'},{src:zip.url,alt:'ColdWear thermo kesztyű felülnézet, cipzáras csukló'},{src:palm.url,alt:'ColdWear thermo kesztyű elölnézet, csúszásgátló tenyér'}];
  return <>

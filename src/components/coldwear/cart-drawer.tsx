@@ -45,7 +45,7 @@ export function CartDrawer(){
     }
     if(!fresh.checkoutUrl)throw new Error('checkout_unavailable');
     useCart.setState({cart:fresh,cartId:fresh.id});
-    track('InitiateCheckout',{value:Number(fresh.cost.totalAmount.amount),currency:fresh.cost.totalAmount.currencyCode});
+    track('InitiateCheckout',{value:Number(fresh.cost.totalAmount.amount),currency:fresh.cost.totalAmount.currencyCode,content_type:'product',content_ids:fresh.lines.nodes.map(l=>l.merchandise.id.split('/').pop()||l.merchandise.id),num_items:fresh.totalQuantity});
     const url=new URL(fresh.checkoutUrl);url.searchParams.set('channel','online_store');
     window.location.assign(url.toString());
   }catch{toast.error('A pénztár előkészítése nem sikerült. Próbáld újra.');}finally{useCart.setState({busy:false});}

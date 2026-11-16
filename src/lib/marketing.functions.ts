@@ -7,7 +7,7 @@ export const grantMarketing = createServerFn({ method: 'POST' })
     const request = getRequest();
     if (request.headers.get('origin') !== new URL(request.url).origin) throw new Error('Érvénytelen kérés.');
     const { grantPermission } = await import('./marketing-permission.server');
-    return grantPermission(data.visitorId, (request.headers.get('user-agent') ?? '').slice(0, 1024), request.headers.get('cf-connecting-ip'));
+    return grantPermission(data.visitorId, (request.headers.get('user-agent') ?? '').slice(0, 1024), request.headers.get('cf-connecting-ip')||request.headers.get('x-real-ip')||request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()||null);
   });
 export const withdrawMarketing = createServerFn({ method: 'POST' })
   .inputValidator(z.string().max(200))
