@@ -3,16 +3,26 @@ import { telemetryConfig } from './telemetry.functions';
 import { grantMarketing, withdrawMarketing } from './marketing.functions';
 import { MARKETING_NOTICE_VERSION } from './marketing-rules';
 let collectToken='',pixelId='';
-let pending:{name:string;data:Record<string,unknown>}[]=[];
+let pending:{name:string;data:Record<string,unknown>;path:string}[]=[];
 let pixelLoaded=false;
 function loadPixel(){
  expiredConsent();if(!consent?.marketing||!consent.receipt||!pixelId)return;if(pixelLoaded){const w=window as unknown as {fbq?:(...args:unknown[])=>void};w.fbq?.('consent','grant');return;}
  pixelLoaded=true;
- const w=window as unknown as {fbq?:((...args:unknown[])=>void)&{queue:unknown[][];loaded:boolean;version:string;callMethod:((...args:unknown[])=>void)|undefined};_fbq?:unknown};
- const fbq=Object.assign((...args:unknown[])=>{if(fbq.callMethod)fbq.callMethod.apply(fbq,args);else fbq.queue.push(args)}, {queue:[] as unknown[][],loaded:true,version:'2.0',callMethod:undefined as ((...args:unknown[])=>void)|undefined});Object.assign(fbq,{push:fbq});w.fbq=fbq;w._fbq=fbq;
- fbq('init',pixelId);const script=document.createElement('script');script.src='https://connect.facebook.net/en_US/fbevents.js';script.async=true;document.head.appendChild(script);
+ // Meta's official base-code stub: a classic function that queues the raw arguments until fbevents.js takes over via callMethod.
+ type Fbq=((...args:unknown[])=>void)&{callMethod?:(...args:unknown[])=>void;queue:unknown[];push:unknown;loaded:boolean;version:string};
+ const w=window as unknown as {fbq?:Fbq;_fbq?:Fbq};
+ if(!w.fbq){
+  const n=function(this:unknown,...args:unknown[]){if(n.callMethod)n.callMethod(...args);else n.queue.push(arguments)} as unknown as Fbq; // eslint-disable-line prefer-rest-params
+  if(!w._fbq)w._fbq=n;n.push=n;n.loaded=true;n.version='2.0';n.queue=[];w.fbq=n;
+  const script=document.createElement('script');script.async=true;script.src='https://connect.facebook.net/en_US/fbevents.js';document.head.appendChild(script);
+ }
+ w.fbq('consent','grant');w.fbq('init',pixelId);
 }
-
+// Events raised before the visitor made any cookie choice. Nothing leaves the browser until a choice is saved; on acceptance they are
+// replayed (so the landing PageView/ViewContent of a first visit is not lost), on refusal they are discarded.
+let preConsent:{name:string;data:Record<string,unknown>;path:string}[]=[];
+const viewContentSent=new Set<string>();
+let clickTime=Date.now();
 export type Consent = { statistics:boolean; marketing:boolean; expires:number; receipt?:string };
 let withdrawal:Promise<void>=Promise.resolve();
 let consentRevision=0;
@@ -32,16 +42,17 @@ export function initializeTracking(){
  applyConsent();void flushWithdrawals().catch(()=>{});
  window.addEventListener('storage',e=>{if(e.key==='cw_consent'){consentRevision++;try{const saved=JSON.parse(safeGet('cw_consent')||'null') as Consent|null;consent=saved&&saved.expires>Date.now()?{...saved,marketing:Boolean(saved.marketing&&saved.receipt)}:null;}catch{consent=null;}pending=[];applyConsent();if(!consent?.marketing)clearMarketingCookies();window.dispatchEvent(new Event('cw-consent'));}});
  window.addEventListener('online',()=>{void flushWithdrawals().catch(()=>{})});
- void telemetryConfig().then(config=>{collectToken=config.token;pixelId=config.pixelId;loadPixel();const events=pending;pending=[];events.forEach(e=>track(e.name,e.data));}).catch(()=>{pending=[];}); track('PageView');
+ void telemetryConfig().then(config=>{collectToken=config.token;pixelId=config.pixelId;loadPixel();const events=pending;pending=[];events.forEach(e=>send(e.name,e.data,e.path));}).catch(()=>{pending=[];}); track('PageView');
  return consent;
 }
 function applyConsent(){
  if(consent?.marketing){
  visitorId=safeGet('cw_visitor')||crypto.randomUUID();safeSet('cw_visitor',visitorId);
- const saved=safeGet('cw_session'); if(saved)try {const s=JSON.parse(saved);if(s.expires>Date.now()){sessionId=s.id;source={...s.source,...Object.fromEntries(Object.entries(source).filter(([,v])=>v))};if(!new URLSearchParams(location.search).has('angle'))angle=s.angle;}}catch{/* invalid session */}
- safeSet('cw_session',JSON.stringify({id:sessionId,angle,source,expires:Date.now()+30*60*1000}));
+ const saved=safeGet('cw_session'); if(saved)try {const s=JSON.parse(saved);if(s.expires>Date.now()){sessionId=s.id;const freshClick=Boolean(source['fbclid']);source={...s.source,...Object.fromEntries(Object.entries(source).filter(([,v])=>v))};if(!freshClick&&typeof s.clickTime==='number')clickTime=s.clickTime;if(!new URLSearchParams(location.search).has('angle'))angle=s.angle;}}catch{/* invalid session */}
+ safeSet('cw_session',JSON.stringify({id:sessionId,angle,source,clickTime,expires:Date.now()+30*60*1000}));
  loadPixel();
  } else {pending=[];if(pixelLoaded){const w=window as unknown as {fbq?:(...args:unknown[])=>void};w.fbq?.('consent','revoke');}visitorId=null;try{localStorage.removeItem('cw_visitor');localStorage.removeItem('cw_session')}catch{/* no storage */}}
+ if(consent){const queued=preConsent;preConsent=[];if(consent.marketing||consent.statistics)queued.forEach(e=>send(e.name,e.data,e.path));}
 }
 function clearMarketingCookies(){
  for(const name of ['_fbp','_fbc']){document.cookie=`${name}=; Max-Age=0; path=/`;const labels=location.hostname.split('.');for(let i=0;i<labels.length-1;i++)document.cookie=`${name}=; Max-Age=0; path=/; domain=.${labels.slice(i).join('.')}`;}
@@ -66,23 +77,32 @@ export async function saveConsent(statistics:boolean,marketing:boolean){
  }
 }
 export async function waitForConsentSync(){await flushWithdrawals();withdrawal=Promise.resolve();}
-export function cartAttributes(){expiredConsent();return [...names.map(n=>({key:`cw_${n}`,value:consent?.marketing?source[n]||'':''})),{key:'cw_angle',value:angle},{key:'cw_permission',value:consent?.marketing?consent.receipt||'':''},{key:'cw_consent',value:consent?.marketing?'1':'0'},{key:'cw_fbp',value:consent?.marketing?cookie('_fbp'):''},{key:'cw_fbc',value:consent?.marketing?(cookie('_fbc')||(source['fbclid']?`fb.1.${Date.now()}.${source['fbclid']}`:'')):''}];}
+export function cartAttributes(){expiredConsent();return [...names.map(n=>({key:`cw_${n}`,value:consent?.marketing?source[n]||'':''})),{key:'cw_angle',value:angle},{key:'cw_permission',value:consent?.marketing?consent.receipt||'':''},{key:'cw_consent',value:consent?.marketing?'1':'0'},{key:'cw_fbp',value:consent?.marketing?cookie('_fbp'):''},{key:'cw_fbc',value:consent?.marketing?fbc():''}];}
+// Meta click ID: the pixel's own _fbc cookie, or one built from the landing fbclid with a stable click time.
+function fbc(){return cookie('_fbc')||(source['fbclid']?`fb.1.${clickTime}.${source['fbclid']}`:'')}
 function cookie(name:string){return document.cookie.split('; ').find(x=>x.startsWith(`${name}=`))?.slice(name.length+1)||''}
 export function track(event_name:string,event_data:Record<string,unknown>={}){
  if(!sessionId||typeof navigator==='undefined')return;expiredConsent();
+ const path=location.pathname;
+ if(event_name==='ViewContent'){if(viewContentSent.has(path))return;viewContentSent.add(path);}
+ if(!consent){if(preConsent.length<50)preConsent.push({name:event_name,data:event_data,path});return;}
+ send(event_name,event_data,path);
+}
+function send(event_name:string,event_data:Record<string,unknown>,page_path:string){
  if(!consent?.marketing&&!consent?.statistics)return;
- if(!collectToken){if(pending.length<100)pending.push({name:event_name,data:event_data});return;}
+ if(!collectToken){if(pending.length<100)pending.push({name:event_name,data:event_data,path:page_path});return;}
  const event_id=crypto.randomUUID();
- const payload={token:collectToken,permission:consent?.marketing?consent.receipt:undefined,session_id:sessionId,visitor_id:visitorId,event_name,event_id,page_path:location.pathname,event_data,angle,consent_level:consent?.marketing?'marketing':consent?.statistics?'statistics':'necessary',source:consent?.marketing?source:{}};
+ const marketing=Boolean(consent?.marketing);
+ const payload={token:collectToken,permission:marketing?consent?.receipt:undefined,session_id:sessionId,visitor_id:visitorId,event_name,event_id,page_path,event_data,angle,consent_level:marketing?'marketing':consent?.statistics?'statistics':'necessary',source:marketing?source:{},fbp:marketing?cookie('_fbp')||undefined:undefined,fbc:marketing?fbc()||undefined:undefined};
  navigator.sendBeacon('/api/public/collect',new Blob([JSON.stringify(payload)],{type:'application/json'}));
  const pixel=(window as unknown as {fbq?:(...args:unknown[])=>void}).fbq;
- if(consent?.marketing&&pixel&&['PageView','ViewContent','AddToCart','InitiateCheckout'].includes(event_name))pixel('track',event_name,event_data,{eventID:event_id});
+ if(marketing&&pixel&&['PageView','ViewContent','AddToCart','InitiateCheckout'].includes(event_name))pixel('track',event_name,event_data,{eventID:event_id});
 }
-export function observeBlocks(){
+export function observeBlocks(viewContent?:()=>Record<string,unknown>){
  const seen=new Map<string,{start:number;time:number;scroll:number}>();
  const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{
   const id=entry.target.id; const item=seen.get(id)||{start:0,time:0,scroll:0};
-  if(entry.isIntersecting){if(!item.start)item.start=performance.now();item.scroll=Math.max(item.scroll,Math.round(entry.intersectionRatio*100));if(id==='features')track('ViewContent');}
+  if(entry.isIntersecting){if(!item.start)item.start=performance.now();item.scroll=Math.max(item.scroll,Math.round(entry.intersectionRatio*100));if(id==='features')track('ViewContent',viewContent?.()??{});}
   else if(item.start){item.time+=(performance.now()-item.start)/1000;item.start=0;}
   seen.set(id,item);
  }),{threshold:[0,.25,.5,.75,1]});
