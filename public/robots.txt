@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /api/
 
-Sitemap: https://coldwear.lovable.app/sitemap.xml
+Sitemap: https://coldwear.hu/sitemap.xml

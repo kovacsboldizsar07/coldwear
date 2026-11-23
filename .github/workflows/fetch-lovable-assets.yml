@@ -1,0 +1,59 @@
+name: One-off - copy images from Lovable CDN
+on:
+  push:
+    branches: [migrate/off-lovable]
+    paths: ['.github/workflows/fetch-lovable-assets.yml']
+permissions:
+  contents: write
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download images
+        run: |
+            set -e
+            curl -fsSL --retry 3 -o src/assets/coldwear-logo.png https://coldwear.hu/__l5e/assets-v1/840d4e21-217e-4635-969b-14f327a9b42d/coldwear-logo.png
+            test $(stat -c %s src/assets/coldwear-logo.png) -eq 138770
+            curl -fsSL --retry 3 -o src/assets/coldwear-share.jpg https://coldwear.hu/__l5e/assets-v1/76f7ddb8-8733-4a2a-958c-8522f0224a5b/coldwear-share.jpg
+            test $(stat -c %s src/assets/coldwear-share.jpg) -eq 52992
+            curl -fsSL --retry 3 -o src/assets/glove-pair.png https://coldwear.hu/__l5e/assets-v1/d92e2919-a8ed-4931-a3ca-847ac4644b62/glove-pair.png
+            test $(stat -c %s src/assets/glove-pair.png) -eq 2116475
+            curl -fsSL --retry 3 -o src/assets/glove-palm.png https://coldwear.hu/__l5e/assets-v1/10560d39-8e18-4432-822b-979cccb0eff9/glove-palm.png
+            test $(stat -c %s src/assets/glove-palm.png) -eq 1377102
+            curl -fsSL --retry 3 -o src/assets/glove-zip-close.png https://coldwear.hu/__l5e/assets-v1/31d2aa4e-35e7-4079-9464-cbf9e43d5db8/glove-zip-close.png
+            test $(stat -c %s src/assets/glove-zip-close.png) -eq 2437781
+            curl -fsSL --retry 3 -o src/assets/glove-zip.png https://coldwear.hu/__l5e/assets-v1/4b8e95ed-6395-4975-988f-0bc8238c8099/glove-zip.png
+            test $(stat -c %s src/assets/glove-zip.png) -eq 1073943
+            curl -fsSL --retry 3 -o src/assets/grip-palm.png https://coldwear.hu/__l5e/assets-v1/571c6730-b610-4575-924c-48e7842170a5/grip-palm.png
+            test $(stat -c %s src/assets/grip-palm.png) -eq 2301997
+            curl -fsSL --retry 3 -o src/assets/guarantee-badge.png https://coldwear.hu/__l5e/assets-v1/09573140-e4f8-4c39-a7e5-ae8ec69f6a61/guarantee-badge.png
+            test $(stat -c %s src/assets/guarantee-badge.png) -eq 1611106
+            curl -fsSL --retry 3 -o src/assets/hand-measure.png https://coldwear.hu/__l5e/assets-v1/43de1438-591c-4f9b-a85f-c30d919564da/hand-measure.png
+            test $(stat -c %s src/assets/hand-measure.png) -eq 169736
+            curl -fsSL --retry 3 -o src/assets/review-1.png https://coldwear.hu/__l5e/assets-v1/f5431a51-ad34-4dce-a082-a1bd77111f17/review-1.png
+            test $(stat -c %s src/assets/review-1.png) -eq 1116646
+            curl -fsSL --retry 3 -o src/assets/review-2.png https://coldwear.hu/__l5e/assets-v1/f22871d3-0df0-4f11-99fe-68981f1f9df9/review-2.png
+            test $(stat -c %s src/assets/review-2.png) -eq 915161
+            curl -fsSL --retry 3 -o src/assets/review-3.png https://coldwear.hu/__l5e/assets-v1/0f5937d5-30f5-4965-934a-5a328fcd2f7f/review-3.png
+            test $(stat -c %s src/assets/review-3.png) -eq 1651382
+            curl -fsSL --retry 3 -o src/assets/review-4.png https://coldwear.hu/__l5e/assets-v1/a4d1bb89-704f-454f-be6e-17e408181614/review-4.png
+            test $(stat -c %s src/assets/review-4.png) -eq 1644592
+            curl -fsSL --retry 3 -o src/assets/review-5.png https://coldwear.hu/__l5e/assets-v1/c65aa0a1-7a06-403c-acb9-d5327d515edf/review-5.png
+            test $(stat -c %s src/assets/review-5.png) -eq 1518417
+            curl -fsSL --retry 3 -o src/assets/review-6.png https://coldwear.hu/__l5e/assets-v1/a64a5d2b-539c-449a-9964-b30e7158e67b/review-6.png
+            test $(stat -c %s src/assets/review-6.png) -eq 1648337
+            curl -fsSL --retry 3 -o src/assets/socks.png https://coldwear.hu/__l5e/assets-v1/fc67cc6c-76fc-43a9-a4a1-c70b74573482/socks.png
+            test $(stat -c %s src/assets/socks.png) -eq 2272805
+            curl -fsSL --retry 3 -o src/assets/touchscreen-fingertips.png https://coldwear.hu/__l5e/assets-v1/31936c6d-a4e4-4a5e-b051-7191c9b5ca19/touchscreen-fingertips.png
+            test $(stat -c %s src/assets/touchscreen-fingertips.png) -eq 2260283
+            curl -fsSL --retry 3 -o src/assets/water-gif.gif https://coldwear.hu/__l5e/assets-v1/01c9353f-4e1e-44e3-b4e7-356c5c678084/water-gif.gif
+            test $(stat -c %s src/assets/water-gif.gif) -eq 3405106
+      - name: Commit
+        run: |
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git rm -q src/assets/*.asset.json .github/workflows/fetch-lovable-assets.yml
+            git add src/assets
+            git commit -m "Copy site images out of the Lovable CDN into the repo"
+            git push

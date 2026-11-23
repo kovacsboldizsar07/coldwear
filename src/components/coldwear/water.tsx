@@ -1,4 +1,4 @@
-import waterGifAsset from '@/assets/water-gif.gif.asset.json';
+import waterGifAsset from '@/assets/water-gif.gif';
 
 export function Water() {
   return (
@@ -13,7 +13,7 @@ export function Water() {
           </div>
           <div className="mx-auto aspect-square w-full max-w-[340px] overflow-hidden rounded-2xl border border-signal/45 bg-surface">
             <img
-              src={waterGifAsset.url}
+              src={waterGifAsset}
               alt="A víz lepereg a kesztyű felületéről"
               className="block h-full w-full object-cover"
               loading="lazy"
