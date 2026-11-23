@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import handMeasure from '@/assets/hand-measure.png';
+import handMeasure from '@/assets/hand-measure.webp';
 import { Check, Footprints, Hand, Minus, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { track } from '@/lib/track';
