@@ -2,9 +2,10 @@ import type { Cart, Product } from './commerce';
 const productFields = 'id handle title description images(first:5){nodes{url altText}} variants(first:20){nodes{id title availableForSale price{amount currencyCode}}}';
 const cartFields = `id checkoutUrl discountCodes{code applicable} totalQuantity cost{totalAmount{amount currencyCode} subtotalAmount{amount currencyCode}} discountAllocations{discountedAmount{amount currencyCode}} lines(first:100){nodes{id quantity cost{amountPerQuantity{amount currencyCode} totalAmount{amount currencyCode}} discountAllocations{discountedAmount{amount currencyCode}} merchandise{...on ProductVariant{id title availableForSale price{amount currencyCode} product{title handle}}}}}`;
 async function request<T>(query: string, variables: Record<string, unknown> = {}): Promise<T> {
+ // Server-side only: the Headless channel's private Storefront token.
  const token = process.env['SHOPIFY_STOREFRONT_ACCESS_TOKEN'];
  if (!token) throw new Error('A Shopify kapcsolat nincs beállítva.');
- const response = await fetch('https://coldwear-webshop-build-f7kqk-2ptaz8yb.myshopify.com/api/2025-07/graphql.json', { method:'POST', headers:{'Content-Type':'application/json','X-Shopify-Storefront-Access-Token':token}, body:JSON.stringify({query,variables}) });
+ const response = await fetch('https://coldwear-webshop-build-f7kqk-2ptaz8yb.myshopify.com/api/2025-07/graphql.json', { method:'POST', headers:{'Content-Type':'application/json','Shopify-Storefront-Private-Token':token}, body:JSON.stringify({query,variables}) });
  if (!response.ok) throw new Error('A Shopify jelenleg nem elérhető. Próbáld újra.');
  const result = await response.json() as { data:T; errors?:{message:string}[] };
  if (result.errors?.length) throw new Error(result.errors.map(x=>x.message).join(', '));
