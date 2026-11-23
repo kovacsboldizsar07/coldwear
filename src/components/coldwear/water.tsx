@@ -1,4 +1,5 @@
-import waterGifAsset from '@/assets/water-gif.gif';
+import waterVideo from '@/assets/water.mp4';
+import waterPoster from '@/assets/water-poster.webp';
 
 export function Water() {
   return (
@@ -12,12 +13,16 @@ export function Water() {
             </p>
           </div>
           <div className="mx-auto aspect-square w-full max-w-[340px] overflow-hidden rounded-2xl border border-signal/45 bg-surface">
-            <img
-              src={waterGifAsset}
-              alt="A víz lepereg a kesztyű felületéről"
+            <video
+              src={waterVideo}
+              poster={waterPoster}
+              aria-label="A víz lepereg a kesztyű felületéről"
               className="block h-full w-full object-cover"
-              loading="lazy"
-              decoding="async"
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="none"
             />
           </div>
         </div>

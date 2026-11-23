@@ -32,7 +32,7 @@ export function Winter() {
               Most rendeljem meg
             </Button>
           </div>
-          <ol className="grid gap-3">
+          <ol className="hidden gap-3 lg:grid">
             {STEPS.map((s) => (
               <li key={s.t} className="flex gap-3 rounded-2xl border border-line bg-bg p-4">
                 <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-signal-soft text-signal-text">
