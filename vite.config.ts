@@ -28,7 +28,14 @@ export default defineConfig(({ mode }) => {
         server: { entry: "server" },
         importProtection: { behavior: "error", client: { files: ["**/server/**"], specifiers: ["server-only"] } },
       }),
-      nitro({ preset: "cloudflare-module", cloudflare: { deployConfig: true, nodeCompat: true } }),
+      nitro({
+        preset: "cloudflare-module",
+        cloudflare: {
+          deployConfig: true,
+          nodeCompat: true,
+          wrangler: { name: "coldwear", compatibility_date: "2026-11-01", observability: { enabled: true } },
+        },
+      }),
       viteReact(),
     ],
   };

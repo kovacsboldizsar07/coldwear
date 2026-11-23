@@ -1,13 +1,5 @@
-<!-- LOVABLE:BEGIN -->
-> [!IMPORTANT]
-> This project is connected to [Lovable](https://lovable.dev). Avoid rewriting
-> published git history — force pushing, or rebasing/amending/squashing commits
-> that are already pushed — as it rewrites history on Lovable's side and the
-> user will likely lose their project history.
->
-> Commits you push to the connected branch sync back to Lovable and show up in
-> the editor, so keep the branch in a working state.
-<!-- LOVABLE:END -->
+## Hosting
+- The app runs on Cloudflare Workers (nitro `cloudflare-module` preset, see vite.config.ts) and uses the owner's own Supabase project. It no longer depends on Lovable; do not reintroduce `@lovable.dev/*` packages or `/__l5e/` asset URLs. Images live in `src/assets/` and are imported directly.
 
 ## Architecture
 - Keep canonical URLs and share metadata in a browser-safe SEO helper used by leaf routes only; product offers must come from Shopify data, never estimated stock or invented reviews.

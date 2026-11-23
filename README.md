@@ -1,26 +1,45 @@
-# Coldwear
+# ColdWear
 
-Építsd meg a ColdWear webshop 1. fázisát a csatolt COLDWEAR WEBSHOP LOVABLE PROMPT v3 specifikáció alapján. A feltöltött két termékfotót tedd be a thermo kesztyű képeiként (elölnézet / csúszásgátló tenyér és felülnézet / cipzáras rész).
+A ColdWear webshop (https://coldwear.hu) forráskódja. TanStack Start + React + Tailwind, a kosár és a fizetés Shopify Storefront API-n megy, az analitika és a Meta CAPI sor a saját Supabase projektben van. A szerver Cloudflare Workers-en fut.
 
-This project was built with [Lovable](https://lovable.dev).
-
-**Live app**: https://coldwear.lovable.app
-
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/10e19a5b-ef27-40ec-9367-37ef9b39f1ab).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
-
-## Development
-
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+## Helyi fejlesztés
 
 ```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
-npm run dev
+npm install
+cp .dev.vars.example .dev.vars   # töltsd ki a titkokat
+npm run dev                      # http://localhost:8080
+npm test
 ```
+
+A `.env` csak publikus értékeket tartalmaz (Supabase URL és publishable key), ezek bekerülnek a böngészős buildbe is.
+
+## Deploy
+
+A Cloudflare Workers a GitHub `main` ágából automatikusan buildel és deployol (Workers Builds):
+
+- Build parancs: `npm run build`
+- Deploy parancs: `npx wrangler deploy`
+
+A `vite build` a nitro `cloudflare-module` presettel a `.output/` mappába buildel, és generálja a wrangler konfigot is (worker neve: `coldwear`).
+
+Kézi deploy: `npm run deploy` (előtte `npx wrangler login`).
+
+## Környezeti változók (Cloudflare → Worker → Settings → Variables and Secrets)
+
+| Név | Mire kell |
+| --- | --- |
+| `SUPABASE_URL` | Supabase projekt URL (szerver oldal) |
+| `SUPABASE_PUBLISHABLE_KEY` | Supabase publishable key (szerver oldal) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase secret / service role key (titok) |
+| `SHOPIFY_STOREFRONT_ACCESS_TOKEN` | Shopify Storefront API token (titok) |
+| `SHOPIFY_WEBHOOK_SECRET` | Shopify webhook aláíró kulcs (titok) |
+| `META_PIXEL_ID` | Meta pixel azonosító |
+| `META_CAPI_TOKEN` | Meta Conversions API token (titok) |
+| `META_CAPI_TEST_EVENT_CODE` | opcionális, Meta Test Events kód |
+| `CW_COLLECT_SIGNING_SECRET` | véletlen, hosszú titok a hozzájárulás-aláíráshoz |
+
+## Adatbázis
+
+A séma a `drizzle/migrations/` mappában van (0000–0002). Új projektre: futtasd le őket sorrendben a Supabase SQL editorban, vagy `DATABASE_URL=... npx drizzle-kit migrate`.
+
+Admin felhasználó: hozd létre a Supabase Auth-ban, majd `insert into public.user_roles(user_id, role) values ('<user id>', 'admin');`
