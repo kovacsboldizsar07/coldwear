@@ -13,6 +13,7 @@ import { ProductFaq } from '@/components/coldwear/faq';
 import { dispatchMessage } from '@/lib/dispatch';
 import { observeBlocks } from '@/lib/track';
 import type { Product } from '@/lib/commerce';
+import type { BundlePrice } from '@/lib/commerce';
 import palm from '@/assets/glove-palm.png';
 import zip from '@/assets/glove-zip.png';
 import pair from '@/assets/glove-pair.png';
@@ -20,7 +21,7 @@ import grip from '@/assets/grip-palm.png';
 import zipClose from '@/assets/glove-zip-close.png';
 import touch from '@/assets/touchscreen-fingertips.png';
 const BENEFITS=['Szélálló külső','Vízlepergető felület','Érintőképes ujjbegy','Csúszásgátló tenyér','Cipzáras csukló','Polár belső'];
-export function ThermoProductPage(){
+export function ThermoProductPage({prices}:{prices?:BundlePrice[]|undefined}={}){
  const [photo,setPhoto]=useState(0),[bike,setBike]=useState(false),[dispatch,setDispatch]=useState(''),[ready,setReady]=useState(false);
  const gloveRef=useRef<Product|undefined>(undefined);
  useEffect(()=>{setReady(true);setBike(new URLSearchParams(location.search).get('angle')==='bike');setDispatch(dispatchMessage(new Date()));const interval=setInterval(()=>setDispatch(dispatchMessage(new Date())),60_000);const cleanup=observeBlocks(()=>{const p=gloveRef.current;const price=p?.variants.nodes[0]?.price;return p?{content_type:'product',content_name:p.title,content_ids:p.variants.nodes.map(v=>v.id.split('/').pop()||v.id),...(price?{value:Number(price.amount),currency:price.currencyCode}:{})}:{content_type:'product',content_name:'ColdWear Thermo kesztyű'}});return()=>{clearInterval(interval);cleanup()}},[]);
@@ -39,7 +40,7 @@ export function ThermoProductPage(){
    <p className="text-sm font-semibold text-signal-text">{dispatch||'Feladás még ma, ha 14:00 előtt rendelsz.'}</p>
    <h1 className="mt-3 text-3xl font-extrabold leading-[1.12] sm:text-4xl lg:text-[40px]">{bike?'ColdWear kesztyű: biciklin sem fúj át rajta a szél':'ColdWear kesztyű: telefonozz benne, ne vedd le'}</h1>
    <div className="mt-5 grid grid-cols-2 gap-2">{BENEFITS.map(b=><span key={b} className="flex items-center gap-2 rounded-full bg-signal-soft px-2.5 py-2 text-xs sm:px-3 sm:text-sm font-semibold"><span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-signal text-on-signal"><Check size={12} strokeWidth={3}/></span>{b}</span>)}</div>
-   <div className="mt-5"><BundleSelector/></div>
+   <div className="mt-5"><BundleSelector initialPrices={prices}/></div>
    <div className="mt-6 rounded-2xl bg-signal-soft p-4"><p className="font-bold">Vékony, mégis meleg.</p><p className="mt-1.5 text-sm leading-6 text-text-muted">Vezetés közben érzed benne a kormányt. Ha megállsz és csörög a telefon, nem kell levenned. A kötött kesztyűn átfúj a szél, a síkesztyűben semmit nem tudsz csinálni. Ez a kettő között van.</p></div>
    <div className="mt-6"><h2 className="mb-3 text-lg font-bold">Jól működik együtt</h2><div className="flex items-center gap-3 rounded-2xl border border-line bg-signal-soft p-4 sm:gap-4"><div className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-line bg-surface sm:size-20">{sock?.images?.nodes[0]?.url?<img src={sock.images.nodes[0].url} alt={sock.images.nodes[0].altText||'ColdWear thermo zokni'} loading="lazy" className="h-full w-full object-cover"/>:<span className="text-center text-[10px] leading-4 text-text-muted">[zokni fotó]</span>}</div><div className="min-w-0 flex-1"><p className="font-extrabold leading-tight">COLDWEAR THERMO ZOKNI</p><p className="mt-1 text-sm leading-5 text-text-muted">Elvezeti a párát, erősített sarok és orr.</p><div className="mt-3 sm:mt-4 sm:text-right"><Button className="h-11 w-full rounded-full font-bold sm:w-auto sm:px-7" onClick={()=>document.getElementById('bundle_selector')?.scrollIntoView({behavior:'smooth'})}>Hozzáadom</Button></div></div></div><p className="mt-2 text-sm text-text-muted">3 kesztyű mellé 1 zokni ajándék.</p></div>
   </div>

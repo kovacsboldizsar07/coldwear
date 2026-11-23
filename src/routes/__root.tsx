@@ -12,6 +12,7 @@ import type { ReactNode } from "react";
 
 import { StoreShell } from "@/components/coldwear/store-shell";
 import appCss from "../styles.css?url";
+import { getSiteConfig } from "@/lib/site-config.functions";
 
 function NotFoundComponent() {
   return (
@@ -71,7 +72,20 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  head: () => ({
+  // Loaded once per document; a failure must never block the page.
+  loader: async () => getSiteConfig().catch(() => ({ webAnalyticsToken: "" })),
+  staleTime: Infinity,
+  head: ({ loaderData }) => ({
+    // Cloudflare Web Analytics: cookieless visit counter, the denominator for conversion rate.
+    scripts: loaderData?.webAnalyticsToken
+      ? [
+          {
+            src: "https://static.cloudflareinsights.com/beacon.min.js",
+            defer: true,
+            "data-cf-beacon": JSON.stringify({ token: loaderData.webAnalyticsToken, spa: true }),
+          },
+        ]
+      : [],
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
@@ -81,7 +95,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=IBM+Plex+Mono:wght@400;500&display=swap" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=IBM+Plex+Mono:wght@400;500&display=swap",
+      },
       {
         rel: "stylesheet",
         href: appCss,
@@ -115,7 +132,9 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <StoreShell><Outlet /></StoreShell> breaks all child routes. */}
-      <StoreShell><Outlet /></StoreShell>
+      <StoreShell>
+        <Outlet />
+      </StoreShell>
     </QueryClientProvider>
   );
 }

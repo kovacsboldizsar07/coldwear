@@ -34,6 +34,7 @@ Kézi deploy: `npm run deploy` (előtte `npx wrangler login`).
 | `SHOPIFY_STOREFRONT_ACCESS_TOKEN` | Shopify Storefront API token (titok) |
 | `SHOPIFY_WEBHOOK_SECRET` | Shopify webhook aláíró kulcs (titok) |
 | `META_PIXEL_ID` | Meta pixel azonosító |
+| `CF_WEB_ANALYTICS_TOKEN` | Cloudflare Web Analytics site token (süti nélküli látogatásszámláló; üresen a beacon nem töltődik be) |
 | `META_CAPI_TOKEN` | Meta Conversions API token (titok) |
 | `META_CAPI_TEST_EVENT_CODE` | opcionális, Meta Test Events kód |
 | `CW_COLLECT_SIGNING_SECRET` | véletlen, hosszú titok a hozzájárulás-aláíráshoz |
