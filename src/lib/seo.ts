@@ -1,9 +1,9 @@
-import share from '@/assets/coldwear-share.jpg.asset.json';
+import share from '@/assets/coldwear-share.jpg';
 import type { Product } from '@/lib/commerce';
 
 // Keep the published origin in one place for self-referencing route metadata.
-export const SITE_URL = 'https://coldwear.lovable.app';
-export const SHARE_IMAGE = new URL(share.url, SITE_URL).href;
+export const SITE_URL = 'https://coldwear.hu';
+export const SHARE_IMAGE = new URL(share, SITE_URL).href;
 
 export function pageHead(title: string, description: string, path: string, image?: string) {
   const url = new URL(path, SITE_URL).href;

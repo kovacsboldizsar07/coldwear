@@ -18,3 +18,4 @@ export const changeCart = createServerFn({method:'POST'}).inputValidator(z.objec
  if(cart && data.operation!=='create'&&data.operation!=='attributes') cart=await api.mutateCart('attributes',{cartId:cart.id,attributes});
  return api.withBundle(cart);
 });
+export const getBundlePrices = createServerFn({method:'GET'}).handler(async()=>{ const api=await import('./shopify.server'); return api.bundlePrices(); });
