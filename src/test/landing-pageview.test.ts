@@ -8,6 +8,11 @@ vi.mock("@/lib/marketing.functions", () => ({
     .fn()
     .mockResolvedValue({ receipt: "receipt-1", expires: Date.now() + 86_400_000 }),
   withdrawMarketing: vi.fn().mockResolvedValue({ success: true }),
+  checkMarketing: vi
+    .fn()
+    .mockImplementation(async ({ data }: { data: string }) => ({
+      valid: data !== "stale-receipt",
+    })),
 }));
 
 type Sent = { event_name: string; page_path: string; consent_level: string; fbc?: string };
@@ -83,5 +88,41 @@ describe("first-visit landing measurement", () => {
     await new Promise((resolve) => setTimeout(resolve, 20));
     expect(sent.map((e) => [e.event_name, e.consent_level])).toEqual([["PageView", "statistics"]]);
     expect((window as { fbq?: unknown }).fbq).toBeUndefined();
+  });
+
+  it("drops a stored marketing choice the server no longer honours and asks again", async () => {
+    const stale = {
+      statistics: true,
+      marketing: true,
+      expires: Date.now() + 86_400_000,
+      receipt: "stale-receipt",
+    };
+    localStorage.setItem("cw_consent", JSON.stringify(stale));
+    let reopened = 0;
+    window.addEventListener("cw-consent", () => reopened++);
+    const track = await freshTracking();
+    expect(sent).toHaveLength(0);
+    expect((window as { fbq?: unknown }).fbq).toBeUndefined();
+    expect(localStorage.getItem("cw_consent")).toBeNull();
+    expect(track.currentConsent()).toBeNull();
+    expect(reopened).toBeGreaterThan(0);
+
+    await track.saveConsent(true, true);
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(sent.map((e) => [e.event_name, e.consent_level])).toEqual([["PageView", "marketing"]]);
+  });
+
+  it("keeps a stored marketing choice the server confirms", async () => {
+    const valid = {
+      statistics: true,
+      marketing: true,
+      expires: Date.now() + 86_400_000,
+      receipt: "receipt-1",
+    };
+    localStorage.setItem("cw_consent", JSON.stringify(valid));
+    const track = await freshTracking();
+    expect(track.currentConsent()?.marketing).toBe(true);
+    expect(sent.map((e) => [e.event_name, e.consent_level])).toEqual([["PageView", "marketing"]]);
+    expect((window as { fbq?: unknown }).fbq).toBeDefined();
   });
 });
