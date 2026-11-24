@@ -110,7 +110,7 @@ function send(event_name:string,event_data:Record<string,unknown>,page_path:stri
  const payload={token:collectToken,permission:marketing?consent?.receipt:undefined,session_id:sessionId,visitor_id:visitorId,event_name,event_id,page_path,event_data,angle,consent_level:marketing?'marketing':consent?.statistics?'statistics':'necessary',source:marketing?source:{},fbp:marketing?cookie('_fbp')||undefined:undefined,fbc:marketing?fbc()||undefined:undefined};
  navigator.sendBeacon('/api/public/collect',new Blob([JSON.stringify(payload)],{type:'application/json'}));
  const pixel=(window as unknown as {fbq?:(...args:unknown[])=>void}).fbq;
- if(marketing&&pixel&&['PageView','ViewContent','AddToCart','InitiateCheckout'].includes(event_name))pixel('track',event_name,event_data,{eventID:event_id});
+ if(marketing&&pixel&&['PageView','ViewContent','AddToCart','InitiateCheckout','Lead'].includes(event_name))pixel('track',event_name,event_data,{eventID:event_id});
  sendShopifyEvent(event_name,page_path,{statistics:Boolean(consent?.statistics),marketing},extra);
 }
 export function observeBlocks(viewContent?:()=>Record<string,unknown>,viewProducts?:()=>ShopifyExtra['products']){

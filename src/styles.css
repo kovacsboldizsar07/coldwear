@@ -198,3 +198,4 @@ progress.cw-shipping-progress::-moz-progress-bar { background: var(--primary); b
  .cw-heading { font-size: 26px; line-height: 30px; }
 }
 @media(prefers-reduced-motion:reduce) { html {scroll-behavior:auto} *,*::before,*::after {animation:none!important;transition:none!important} }
+@keyframes cw-wiggle { 0%,100% { transform: rotate(0) } 20% { transform: rotate(-14deg) scale(1.08) } 40% { transform: rotate(10deg) } 60% { transform: rotate(-6deg) } 80% { transform: rotate(3deg) } }

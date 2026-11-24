@@ -7,6 +7,7 @@ import { useCart } from '@/stores/cart';
 import { initializeTracking,track } from '@/lib/track';
 import { CartDrawer } from './cart-drawer';
 import { CookieConsent } from './cookie-consent';
+import { ExitPopup } from './exit-popup';
 import logo from '@/assets/coldwear-logo.webp';
 const TOP_MESSAGES=['Ingyenes szállítás 3 terméktől','Fizetés átvételkor · GLS 1–2 munkanap','14 napos pénzvisszafizetési garancia'];
 export function StoreShell({children}:{children:ReactNode}){
@@ -21,5 +22,5 @@ export function StoreShell({children}:{children:ReactNode}){
  {menu&&<nav className="cw-container flex flex-col border-t border-line py-2 text-base font-semibold" aria-label="Mobil menü">{([['/','Thermo kesztyű'],['/szallitas','Szállítás és fizetés'],['/visszakuldes','Visszaküldés és garancia'],['/kapcsolat','Kapcsolat']] as const).map(([to,label])=><Link key={to} to={to} className="flex min-h-12 items-center border-b border-line last:border-0">{label}</Link>)}<Link to="/" hash="size_chart" className="flex min-h-12 items-center">Mérettáblázat</Link></nav>}</header>
  <main>{children}</main>
  <footer className="border-t border-line pb-24 pt-10 lg:pb-8"><div className="cw-container"><div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr]"><div><Link to="/" className="inline-flex" aria-label="ColdWear főoldal"><img src={logo} alt="" width={480} height={105} className="h-6 w-auto"/></Link><p className="cw-body mt-3 max-w-xs text-sm">Kesztyű és zokni a téli hétköznapokhoz.<br/>A hideg maradjon kint.</p></div><div className="flex flex-col gap-3 text-sm"><p className="cw-label mb-1 text-text-muted">Segítünk</p><Link to="/szallitas">Szállítás és fizetés</Link><Link to="/visszakuldes">Visszaküldés</Link><Link to="/kapcsolat">Kapcsolat</Link></div><div className="flex flex-col gap-3 text-sm"><p className="cw-label mb-1 text-text-muted">Tudnivalók</p><Link to="/aszf">Általános szerződési feltételek</Link><Link to="/adatvedelem">Adatvédelem</Link><Link to="/sutik">Süti tájékoztató</Link><Button variant="link" className="h-auto justify-start p-0 text-text" onClick={()=>window.dispatchEvent(new Event('cw-cookie-settings'))}>Süti beállítások</Button></div></div><div className="mt-12 flex flex-wrap justify-between gap-4 border-t border-line pt-6 text-xs text-text-muted"><span>© 2026 ColdWear</span><span>GLS · Online bankkártya · Utánvét</span></div></div></footer>
- <CartDrawer/>{hydrated&&<CookieConsent/>}<Toaster position="top-center"/></>;
+ <CartDrawer/>{hydrated&&<CookieConsent/>}{hydrated&&<ExitPopup/>}<Toaster position="top-center"/></>;
 }
