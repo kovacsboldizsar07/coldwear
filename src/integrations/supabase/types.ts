@@ -241,6 +241,45 @@ export type Database = {
         }
         Relationships: []
       }
+      newsletter_subscribers: {
+        Row: {
+          client_ip: string | null
+          consent_text: string
+          consent_version: string
+          created_at: string
+          email: string
+          id: string
+          page_path: string | null
+          source: string
+          unsubscribed_at: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          client_ip?: string | null
+          consent_text: string
+          consent_version: string
+          created_at?: string
+          email: string
+          id?: string
+          page_path?: string | null
+          source?: string
+          unsubscribed_at?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          client_ip?: string | null
+          consent_text?: string
+          consent_version?: string
+          created_at?: string
+          email?: string
+          id?: string
+          page_path?: string | null
+          source?: string
+          unsubscribed_at?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       marketing_permissions: {
         Row: {
           accepted_at: string
