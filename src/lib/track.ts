@@ -1,6 +1,6 @@
 import { consentExpiry } from './commerce';
 import { telemetryConfig } from './telemetry.functions';
-import { grantMarketing, withdrawMarketing } from './marketing.functions';
+import { checkMarketing, grantMarketing, withdrawMarketing } from './marketing.functions';
 import { MARKETING_NOTICE_VERSION } from './marketing-rules';
 let collectToken='',pixelId='';
 let pending:{name:string;data:Record<string,unknown>;path:string}[]=[];
@@ -42,8 +42,17 @@ export function initializeTracking(){
  applyConsent();void flushWithdrawals().catch(()=>{});
  window.addEventListener('storage',e=>{if(e.key==='cw_consent'){consentRevision++;try{const saved=JSON.parse(safeGet('cw_consent')||'null') as Consent|null;consent=saved&&saved.expires>Date.now()?{...saved,marketing:Boolean(saved.marketing&&saved.receipt)}:null;}catch{consent=null;}pending=[];applyConsent();if(!consent?.marketing)clearMarketingCookies();window.dispatchEvent(new Event('cw-consent'));}});
  window.addEventListener('online',()=>{void flushWithdrawals().catch(()=>{})});
- void telemetryConfig().then(config=>{collectToken=config.token;pixelId=config.pixelId;loadPixel();const events=pending;pending=[];events.forEach(e=>send(e.name,e.data,e.path));}).catch(()=>{pending=[];}); track('PageView');
+ // A stored marketing choice is only trusted once the server confirms its receipt (a choice saved by the old site, or revoked
+ // server-side, is not). Until then nothing is sent and the pixel stays unloaded; an unconfirmed choice re-opens the cookie banner.
+ const stored=consent?.marketing&&consent.receipt?consent.receipt:'';
+ const permissionCheck=stored?checkMarketing({data:stored}).then(r=>r.valid).catch(()=>true):Promise.resolve(true);
+ void Promise.all([telemetryConfig(),permissionCheck]).then(([config,valid])=>{if(!valid&&consent?.receipt===stored)dropUnconfirmedConsent();collectToken=config.token;pixelId=config.pixelId;loadPixel();const events=pending;pending=[];events.forEach(e=>send(e.name,e.data,e.path));}).catch(()=>{pending=[];}); track('PageView');
  return consent;
+}
+function dropUnconfirmedConsent(){
+ preConsent=pending.slice(0,50);consent=null;consentRevision++;
+ try{localStorage.removeItem('cw_consent')}catch{/* no storage */}
+ applyConsent();clearMarketingCookies();window.dispatchEvent(new Event('cw-consent'));
 }
 function applyConsent(){
  if(consent?.marketing){
