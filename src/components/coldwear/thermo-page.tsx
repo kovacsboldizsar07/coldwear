@@ -23,6 +23,8 @@ import grip from '@/assets/grip-palm.webp';
 import zipClose from '@/assets/glove-zip-close.webp';
 import touch from '@/assets/touchscreen-fingertips.webp';
 import sockPhoto from '@/assets/socks.webp';
+import infographic from '@/assets/glove-infographic-1000.webp';
+import infographicSmall from '@/assets/glove-infographic-600.webp';
 // The first three are shown everywhere; the rest only on large screens (the feature cards repeat them below).
 const BENEFITS=['Érintőképes ujjbegy','Szélálló külső','Csúszásgátló tenyér','Vízlepergető felület','Cipzáras csukló','Polár belső'];
 type Photo={src:string;alt:string;srcSet?:string};
@@ -38,7 +40,9 @@ export function ThermoProductPage({prices}:{prices?:BundlePrice[]|undefined}={})
  const inUse:Photo={src:touch,alt:'Téli kesztyűt viselő kéz okostelefont tart, az érintőképes ujjbegy közelről'};
  const shopPhotos:Photo[]|undefined=glove?.images?.nodes.length?glove.images.nodes.map(n=>({src:n.url,alt:n.altText||glove.title,...(n.url.startsWith('https://cdn.shopify.com/')?{srcSet:`${n.url}${n.url.includes('?')?'&':'?'}width=600 600w, ${n.url}${n.url.includes('?')?'&':'?'}width=1200 1200w`}:{})})):undefined;
  // The in-use photo goes second: the touchscreen fingertip is the main promise, so it should not wait until the feature cards.
- const photos:Photo[]=shopPhotos?[shopPhotos[0]!,inUse,...shopPhotos.slice(1)]:[{src:pair,srcSet:`${pairSmall} 600w, ${pair} 1200w`,alt:'ColdWear thermo kesztyűpár felülnézetben, cipzáras csukló és csúszásgátló tenyér'},inUse,{src:zip,srcSet:`${zipSmall} 600w, ${zip} 1200w`,alt:'ColdWear thermo kesztyű felülnézet, cipzáras csukló'},{src:palm,srcSet:`${palmSmall} 600w, ${palm} 1200w`,alt:'ColdWear thermo kesztyű elölnézet, csúszásgátló tenyér'}];
+ // The feature infographic is always the first photo, both before and after the Shopify images load, so the hero never swaps.
+ const features:Photo={src:infographic,srcSet:`${infographicSmall} 600w, ${infographic} 1000w`,alt:'ColdWear thermo kesztyű: érintőképernyővel is használható, vízálló, csúszásgátló, hidegálló'};
+ const photos:Photo[]=shopPhotos?[features,shopPhotos[0]!,inUse,...shopPhotos.slice(1)]:[features,{src:pair,srcSet:`${pairSmall} 600w, ${pair} 1200w`,alt:'ColdWear thermo kesztyűpár felülnézetben, cipzáras csukló és csúszásgátló tenyér'},inUse,{src:zip,srcSet:`${zipSmall} 600w, ${zip} 1200w`,alt:'ColdWear thermo kesztyű felülnézet, cipzáras csukló'},{src:palm,srcSet:`${palmSmall} 600w, ${palm} 1200w`,alt:'ColdWear thermo kesztyű elölnézet, csúszásgátló tenyér'}];
  // Server-rendered bundle prices (from the route loader) so the price is in the first HTML; the variant price is the fallback.
  const single=prices?.find(p=>p.count===1)?.total??glove?.variants.nodes[0]?.price;
  const two=prices?.find(p=>p.count===2)?.total;
