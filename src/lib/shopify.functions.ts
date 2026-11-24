@@ -5,17 +5,18 @@ const attribute = z.object({key:z.string().startsWith('cw_').max(40),value:z.str
 export const getCatalog = createServerFn({method:'GET'}).handler(async()=>{ const api=await import('./shopify.server'); return api.catalog(); });
 export const getQuote = createServerFn({method:'POST'}).inputValidator(z.array(line).min(1).max(4)).handler(async({data})=>{ const api=await import('./shopify.server'); return api.quote(data); });
 export const getCart = createServerFn({method:'POST'}).inputValidator(z.string().min(1).max(500)).handler(async({data})=>{ const api=await import('./shopify.server'); return api.readCart(data); });
-export const changeCart = createServerFn({method:'POST'}).inputValidator(z.object({operation:z.enum(['create','add','update','remove','attributes']),cartId:z.string().max(500).optional(),lines:z.array(line.extend({id:z.string().max(500).optional()})).max(10).optional(),lineIds:z.array(z.string().max(500)).max(10).optional(),attributes:z.array(attribute).max(15)})).handler(async({data})=>{
+export const changeCart = createServerFn({method:'POST'}).inputValidator(z.object({operation:z.enum(['create','add','update','remove','attributes']),cartId:z.string().max(500).optional(),lines:z.array(line.extend({id:z.string().max(500).optional()})).max(10).optional(),lineIds:z.array(z.string().max(500)).max(10).optional(),attributes:z.array(attribute).max(15),tracking:z.object({uniqueToken:z.string().max(100),visitToken:z.string().max(100)}).optional()})).handler(async({data})=>{
  const api=await import('./shopify.server');
  const {sanitizeMarketingAttributes}=await import('./marketing-permission.server');
  const attributes=await sanitizeMarketingAttributes(data.attributes);
  if(data.operation!=='create'&&!data.cartId) throw new Error('Hiányzó kosár.');
  if(['create','add','update'].includes(data.operation)&&!data.lines?.length) throw new Error('Hiányzó termék.');
  if(data.operation==='remove'&&!data.lineIds?.length) throw new Error('Hiányzó tétel.');
- let cart=await api.mutateCart(data.operation,data.operation==='create'?{input:{lines:data.lines,attributes,buyerIdentity:{countryCode:'HU'}}}:{cartId:data.cartId,lines:data.lines,lineIds:data.lineIds,attributes});
+ const t=data.tracking;
+ let cart=await api.mutateCart(data.operation,data.operation==='create'?{input:{lines:data.lines,attributes,buyerIdentity:{countryCode:'HU'}}}:{cartId:data.cartId,lines:data.lines,lineIds:data.lineIds,attributes},t);
  // Retry only a confirmed missing cart. Never retry an ambiguous failed add.
- if(!cart && data.operation==='add') cart=await api.mutateCart('create',{input:{lines:data.lines?.map(({merchandiseId,quantity})=>({merchandiseId,quantity})),attributes,buyerIdentity:{countryCode:'HU'}}});
- if(cart && data.operation!=='create'&&data.operation!=='attributes') cart=await api.mutateCart('attributes',{cartId:cart.id,attributes});
+ if(!cart && data.operation==='add') cart=await api.mutateCart('create',{input:{lines:data.lines?.map(({merchandiseId,quantity})=>({merchandiseId,quantity})),attributes,buyerIdentity:{countryCode:'HU'}}},t);
+ if(cart && data.operation!=='create'&&data.operation!=='attributes') cart=await api.mutateCart('attributes',{cartId:cart.id,attributes},t);
  return api.withBundle(cart);
 });
 export const getBundlePrices = createServerFn({method:'GET'}).handler(async()=>{ const api=await import('./shopify.server'); return api.bundlePrices(); });

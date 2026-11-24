@@ -4,7 +4,7 @@ import { changeCart } from '@/lib/shopify.functions';
 import { track } from '@/lib/track';
 import type { Cart } from '@/lib/commerce';
 vi.mock('@/lib/shopify.functions',()=>({changeCart:vi.fn()}));
-vi.mock('@/lib/track',()=>({cartAttributes:()=>[],waitForConsentSync:vi.fn().mockResolvedValue(undefined),track:vi.fn()}));
+vi.mock('@/lib/track',()=>({cartAttributes:()=>[],waitForConsentSync:vi.fn().mockResolvedValue(undefined),track:vi.fn(),shopifyTokens:()=>undefined}));
 vi.mock('sonner',()=>({toast:{error:vi.fn(),info:vi.fn()}}));
 const stale={id:'expired'} as Cart;
 describe('expired cart state recovery',()=>{
