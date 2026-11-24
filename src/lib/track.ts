@@ -2,8 +2,10 @@ import { consentExpiry } from './commerce';
 import { telemetryConfig } from './telemetry.functions';
 import { checkMarketing, grantMarketing, withdrawMarketing } from './marketing.functions';
 import { MARKETING_NOTICE_VERSION } from './marketing-rules';
+import { clearShopifyCookies, sendShopifyEvent, setShopifyShopId, shopifyTrackingTokens, type ShopifyExtra } from './shopify-analytics';
+type Queued={name:string;data:Record<string,unknown>;path:string;extra?:ShopifyExtra|undefined};
 let collectToken='',pixelId='';
-let pending:{name:string;data:Record<string,unknown>;path:string}[]=[];
+let pending:Queued[]=[];
 let pixelLoaded=false;
 function loadPixel(){
  expiredConsent();if(!consent?.marketing||!consent.receipt||!pixelId)return;if(pixelLoaded){const w=window as unknown as {fbq?:(...args:unknown[])=>void};w.fbq?.('consent','grant');return;}
@@ -20,7 +22,7 @@ function loadPixel(){
 }
 // Events raised before the visitor made any cookie choice. Nothing leaves the browser until a choice is saved; on acceptance they are
 // replayed (so the landing PageView/ViewContent of a first visit is not lost), on refusal they are discarded.
-let preConsent:{name:string;data:Record<string,unknown>;path:string}[]=[];
+let preConsent:Queued[]=[];
 const viewContentSent=new Set<string>();
 let clickTime=Date.now();
 export type Consent = { statistics:boolean; marketing:boolean; expires:number; receipt?:string };
@@ -46,7 +48,7 @@ export function initializeTracking(){
  // server-side, is not). Until then nothing is sent and the pixel stays unloaded; an unconfirmed choice re-opens the cookie banner.
  const stored=consent?.marketing&&consent.receipt?consent.receipt:'';
  const permissionCheck=stored?checkMarketing({data:stored}).then(r=>r.valid).catch(()=>true):Promise.resolve(true);
- void Promise.all([telemetryConfig(),permissionCheck]).then(([config,valid])=>{if(!valid&&consent?.receipt===stored)dropUnconfirmedConsent();collectToken=config.token;pixelId=config.pixelId;loadPixel();const events=pending;pending=[];events.forEach(e=>send(e.name,e.data,e.path));}).catch(()=>{pending=[];}); track('PageView');
+ void Promise.all([telemetryConfig(),permissionCheck]).then(([config,valid])=>{if(!valid&&consent?.receipt===stored)dropUnconfirmedConsent();collectToken=config.token;pixelId=config.pixelId;setShopifyShopId(config.shopId||'');loadPixel();const events=pending;pending=[];events.forEach(e=>send(e.name,e.data,e.path,e.extra));}).catch(()=>{pending=[];}); track('PageView');
  return consent;
 }
 function dropUnconfirmedConsent(){
@@ -61,7 +63,8 @@ function applyConsent(){
  safeSet('cw_session',JSON.stringify({id:sessionId,angle,source,clickTime,expires:Date.now()+30*60*1000}));
  loadPixel();
  } else {pending=[];if(pixelLoaded){const w=window as unknown as {fbq?:(...args:unknown[])=>void};w.fbq?.('consent','revoke');}visitorId=null;try{localStorage.removeItem('cw_visitor');localStorage.removeItem('cw_session')}catch{/* no storage */}}
- if(consent){const queued=preConsent;preConsent=[];if(consent.marketing||consent.statistics)queued.forEach(e=>send(e.name,e.data,e.path));}
+ if(!consent?.marketing&&!consent?.statistics)clearShopifyCookies();
+ if(consent){const queued=preConsent;preConsent=[];if(consent.marketing||consent.statistics)queued.forEach(e=>send(e.name,e.data,e.path,e.extra));}
 }
 function clearMarketingCookies(){
  for(const name of ['_fbp','_fbc']){document.cookie=`${name}=; Max-Age=0; path=/`;const labels=location.hostname.split('.');for(let i=0;i<labels.length-1;i++)document.cookie=`${name}=; Max-Age=0; path=/; domain=.${labels.slice(i).join('.')}`;}
@@ -90,28 +93,31 @@ export function cartAttributes(){expiredConsent();return [...names.map(n=>({key:
 // Meta click ID: the pixel's own _fbc cookie, or one built from the landing fbclid with a stable click time.
 function fbc(){return cookie('_fbc')||(source['fbclid']?`fb.1.${clickTime}.${source['fbclid']}`:'')}
 function cookie(name:string){return document.cookie.split('; ').find(x=>x.startsWith(`${name}=`))?.slice(name.length+1)||''}
-export function track(event_name:string,event_data:Record<string,unknown>={}){
+/** Shopify visit tokens for cart requests (links the checkout to the visit in Shopify Analytics); none without consent. */
+export function shopifyTokens(){expiredConsent();return shopifyTrackingTokens(consent)}
+export function track(event_name:string,event_data:Record<string,unknown>={},extra?:ShopifyExtra){
  if(!sessionId||typeof navigator==='undefined')return;expiredConsent();
  const path=location.pathname;
  if(event_name==='ViewContent'){if(viewContentSent.has(path))return;viewContentSent.add(path);}
- if(!consent){if(preConsent.length<50)preConsent.push({name:event_name,data:event_data,path});return;}
- send(event_name,event_data,path);
+ if(!consent){if(preConsent.length<50)preConsent.push({name:event_name,data:event_data,path,extra});return;}
+ send(event_name,event_data,path,extra);
 }
-function send(event_name:string,event_data:Record<string,unknown>,page_path:string){
+function send(event_name:string,event_data:Record<string,unknown>,page_path:string,extra?:ShopifyExtra){
  if(!consent?.marketing&&!consent?.statistics)return;
- if(!collectToken){if(pending.length<100)pending.push({name:event_name,data:event_data,path:page_path});return;}
+ if(!collectToken){if(pending.length<100)pending.push({name:event_name,data:event_data,path:page_path,extra});return;}
  const event_id=crypto.randomUUID();
  const marketing=Boolean(consent?.marketing);
  const payload={token:collectToken,permission:marketing?consent?.receipt:undefined,session_id:sessionId,visitor_id:visitorId,event_name,event_id,page_path,event_data,angle,consent_level:marketing?'marketing':consent?.statistics?'statistics':'necessary',source:marketing?source:{},fbp:marketing?cookie('_fbp')||undefined:undefined,fbc:marketing?fbc()||undefined:undefined};
  navigator.sendBeacon('/api/public/collect',new Blob([JSON.stringify(payload)],{type:'application/json'}));
  const pixel=(window as unknown as {fbq?:(...args:unknown[])=>void}).fbq;
  if(marketing&&pixel&&['PageView','ViewContent','AddToCart','InitiateCheckout'].includes(event_name))pixel('track',event_name,event_data,{eventID:event_id});
+ sendShopifyEvent(event_name,page_path,{statistics:Boolean(consent?.statistics),marketing},extra);
 }
-export function observeBlocks(viewContent?:()=>Record<string,unknown>){
+export function observeBlocks(viewContent?:()=>Record<string,unknown>,viewProducts?:()=>ShopifyExtra['products']){
  const seen=new Map<string,{start:number;time:number;scroll:number}>();
  const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{
   const id=entry.target.id; const item=seen.get(id)||{start:0,time:0,scroll:0};
-  if(entry.isIntersecting){if(!item.start)item.start=performance.now();item.scroll=Math.max(item.scroll,Math.round(entry.intersectionRatio*100));if(id==='features')track('ViewContent',viewContent?.()??{});}
+  if(entry.isIntersecting){if(!item.start)item.start=performance.now();item.scroll=Math.max(item.scroll,Math.round(entry.intersectionRatio*100));if(id==='features')track('ViewContent',viewContent?.()??{},{products:viewProducts?.()});}
   else if(item.start){item.time+=(performance.now()-item.start)/1000;item.start=0;}
   seen.set(id,item);
  }),{threshold:[0,.25,.5,.75,1]});
