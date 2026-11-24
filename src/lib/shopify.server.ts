@@ -1,4 +1,4 @@
-import type { Cart, Product } from './commerce';
+import type { BundlePrice, Cart, Product } from './commerce';
 const productFields = 'id handle title description images(first:5){nodes{url altText}} variants(first:20){nodes{id title availableForSale price{amount currencyCode}}}';
 const cartFields = `id checkoutUrl discountCodes{code applicable} totalQuantity cost{totalAmount{amount currencyCode} subtotalAmount{amount currencyCode}} discountAllocations{discountedAmount{amount currencyCode}} lines(first:100){nodes{id quantity cost{amountPerQuantity{amount currencyCode} totalAmount{amount currencyCode}} discountAllocations{discountedAmount{amount currencyCode}} merchandise{...on ProductVariant{id title availableForSale price{amount currencyCode} product{title handle}}}}}`;
 async function request<T>(query: string, variables: Record<string, unknown> = {}): Promise<T> {
@@ -45,3 +45,20 @@ export async function withBundle(cart: Cart | null) {
  return mutateCart('discounts',{cartId:cart.id,discountCodes:code?[code]:[]});
 }
 export async function quote(lines:{merchandiseId:string;quantity:number}[]) { return withBundle(await mutateCart('create',{input:{lines,buyerIdentity:{countryCode:'HU'}}})); }
+export type { BundlePrice } from './commerce';
+let bundleCache: { at: number; prices: BundlePrice[] } | null = null;
+const BUNDLE_TTL = 10 * 60_000;
+/** Bundle prices for the 1/2/3-pair options, quoted once by Shopify and cached per worker instance so pages render with prices. */
+export async function bundlePrices(): Promise<BundlePrice[]> {
+ if (bundleCache && Date.now() - bundleCache.at < BUNDLE_TTL) return bundleCache.prices;
+ const products = await catalog();
+ const glove = products.find(p => p.title.toLowerCase().includes('kesztyű'));
+ const sock = products.find(p => p.title.toLowerCase().includes('zokni'));
+ const variant = glove?.variants.nodes.find(v => v.availableForSale);
+ if (!variant) return [];
+ const sockVariant = sock?.variants.nodes.find(v => v.availableForSale) ?? sock?.variants.nodes[0];
+ const carts = await Promise.all([1, 2, 3].map(count => quote([{ merchandiseId: variant.id, quantity: count }, ...(count === 3 && sockVariant ? [{ merchandiseId: sockVariant.id, quantity: 1 }] : [])])));
+ const prices = carts.flatMap((cart, i) => cart ? [{ count: i + 1, total: cart.cost.totalAmount, subtotal: cart.cost.subtotalAmount }] : []);
+ if (prices.length === 3) bundleCache = { at: Date.now(), prices };
+ return prices;
+}

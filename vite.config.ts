@@ -33,7 +33,8 @@ export default defineConfig(({ mode }) => {
         cloudflare: {
           deployConfig: true,
           nodeCompat: true,
-          wrangler: { name: "coldwear", compatibility_date: "2026-11-01", observability: { enabled: true } },
+          // `previews` lets Workers Builds publish per-branch Previews (`wrangler preview`); it does not affect `wrangler deploy`.
+          wrangler: { name: "coldwear", compatibility_date: "2026-11-01", observability: { enabled: true }, ...({ previews: {} } as Record<string, unknown>) },
         },
       }),
       viteReact(),

@@ -7,3 +7,4 @@ export const money = (value?: Money) => value ? new Intl.NumberFormat('hu-HU', {
 export const shippingRemaining = (count: number) => Math.max(0, 3 - count);
 export function copyFirstSize(sizes: string[], index: number, value: string) { return index === 0 ? sizes.map((size, i) => i === 0 || !size ? value : size) : sizes.map((size, i) => i === index ? value : size); }
 export function consentExpiry(now: Date) { const date = new Date(now); date.setMonth(date.getMonth() + 6); return date.getTime(); }
+export type BundlePrice = { count: number; total: Money; subtotal: Money };

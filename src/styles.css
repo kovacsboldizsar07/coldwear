@@ -145,7 +145,7 @@
 
 @theme inline {
  --color-bg: var(--background); --color-surface: var(--card); --color-line: var(--border); --color-text: var(--foreground); --color-text-muted: var(--muted-foreground);
- --color-signal: var(--primary); --color-on-signal: var(--primary-foreground); --color-signal-text: oklch(0.52 0.17 40); --color-signal-soft: oklch(0.955 0.03 50);
+ --color-signal: var(--primary); --color-on-signal: var(--primary-foreground); --color-signal-text: oklch(0.52 0.17 40); --color-signal-soft: oklch(0.935 0.009 225);
  --color-block: oklch(0.205 0.026 250); --color-on-block: oklch(0.959 0.006 215); --color-on-block-muted: oklch(0.72 0.026 240); --color-go: oklch(0.495 0.105 157); --color-focus: var(--foreground);
  --font-sans: 'Archivo', sans-serif; --font-mono: 'IBM Plex Mono', monospace;
 }

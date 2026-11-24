@@ -11,8 +11,8 @@ import { track, cartAttributes, waitForConsentSync } from '@/lib/track';
 import { getQuote, changeCart } from '@/lib/shopify.functions';
 import { toast } from 'sonner';
 import { catalogOptions } from './bundle-selector';
-import glovePhoto from '@/assets/glove-pair.png';
-import sockAsset from '@/assets/socks.png';
+import glovePhoto from '@/assets/glove-pair-600.webp';
+import sockAsset from '@/assets/socks.webp';
 
 function SockPhoto() {
  return <img src={sockAsset} alt="ColdWear Thermo zokni" className="h-full w-full bg-surface object-contain"/>;
