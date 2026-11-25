@@ -37,4 +37,17 @@ describe('szerveroldali csomagárak', () => {
     await bundlePrices();
     expect(fetch.mock.calls.length).toBe(calls);
   });
+
+  it('Shopify "Throttled" hiba esetén a legutóbbi jó árakat adja, nem üres listát', async () => {
+    const ok = fakeShopify();
+    vi.stubGlobal('fetch', ok);
+    const mod = await import('@/lib/shopify.server');
+    await mod.bundlePrices();
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(Date.now() + 2 * 60 * 60_000);
+    vi.stubGlobal('fetch', vi.fn(async (_u: string, init: { body: string }) => init.body.includes('products(') ? ok(_u, init) : Response.json({ errors: [{ message: 'Throttled' }] })));
+    const prices = await mod.bundlePrices();
+    vi.useRealTimers();
+    expect(prices.map(p => p.total.amount)).toEqual(['8990', '14990', '18990']);
+  });
 });

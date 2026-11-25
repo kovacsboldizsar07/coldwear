@@ -1,12 +1,18 @@
+import { getRequest } from '@tanstack/react-start/server';
 import type { BundlePrice, Cart, Product } from './commerce';
 const productFields = 'id handle title description images(first:5){nodes{url altText}} variants(first:20){nodes{id title availableForSale price{amount currencyCode}}}';
 const cartFields = `id checkoutUrl discountCodes{code applicable} totalQuantity cost{totalAmount{amount currencyCode} subtotalAmount{amount currencyCode}} discountAllocations{discountedAmount{amount currencyCode}} lines(first:100){nodes{id quantity cost{amountPerQuantity{amount currencyCode} totalAmount{amount currencyCode}} discountAllocations{discountedAmount{amount currencyCode}} merchandise{...on ProductVariant{id title availableForSale price{amount currencyCode} product{id title handle}}}}}`;
 export type TrackingTokens = { uniqueToken: string; visitToken: string };
+/** The visitor's IP. Without it Shopify counts every private-token request against the Worker's own IP and soon answers "Throttled". */
+function buyerIp(): string {
+ try { const h = getRequest()?.headers; return h?.get('cf-connecting-ip') || h?.get('x-forwarded-for')?.split(',')[0]?.trim() || ''; } catch { return ''; }
+}
 async function request<T>(query: string, variables: Record<string, unknown> = {}, tracking?: TrackingTokens): Promise<T> {
  // Server-side only: the Headless channel's private Storefront token.
  const token = process.env['SHOPIFY_STOREFRONT_ACCESS_TOKEN'];
  if (!token) throw new Error('A Shopify kapcsolat nincs beállítva.');
- const response = await fetch('https://coldwear-webshop-build-f7kqk-2ptaz8yb.myshopify.com/api/2025-07/graphql.json', { method:'POST', headers:{'Content-Type':'application/json','Shopify-Storefront-Private-Token':token,...(tracking?{'X-Shopify-UniqueToken':tracking.uniqueToken,'X-Shopify-VisitToken':tracking.visitToken}:{})}, body:JSON.stringify({query,variables}) });
+ const ip = buyerIp();
+ const response = await fetch('https://coldwear-webshop-build-f7kqk-2ptaz8yb.myshopify.com/api/2025-07/graphql.json', { method:'POST', headers:{'Content-Type':'application/json','Shopify-Storefront-Private-Token':token,...(ip?{'Shopify-Storefront-Buyer-IP':ip}:{}),...(tracking?{'X-Shopify-UniqueToken':tracking.uniqueToken,'X-Shopify-VisitToken':tracking.visitToken}:{})}, body:JSON.stringify({query,variables}) });
  if (!response.ok) throw new Error('A Shopify jelenleg nem elérhető. Próbáld újra.');
  const result = await response.json() as { data:T; errors?:{message:string}[] };
  if (result.errors?.length) throw new Error(result.errors.map(x=>x.message).join(', '));
@@ -51,18 +57,46 @@ export async function withBundle(cart: Cart | null) {
 export async function quote(lines:{merchandiseId:string;quantity:number}[]) { return withBundle(await mutateCart('create',{input:{lines,buyerIdentity:{countryCode:'HU'}}})); }
 export type { BundlePrice } from './commerce';
 let bundleCache: { at: number; prices: BundlePrice[] } | null = null;
-const BUNDLE_TTL = 10 * 60_000;
-/** Bundle prices for the 1/2/3-pair options, quoted once by Shopify and cached per worker instance so pages render with prices. */
-export async function bundlePrices(): Promise<BundlePrice[]> {
- if (bundleCache && Date.now() - bundleCache.at < BUNDLE_TTL) return bundleCache.prices;
+let bundleInflight: Promise<BundlePrice[]> | null = null;
+const BUNDLE_TTL = 60 * 60_000;
+const SHARED_KEY = 'https://coldwear.hu/__cache/bundle-prices-v1';
+type EdgeCache = { match(key: string): Promise<Response | undefined>; put(key: string, res: Response): Promise<void> };
+const edgeCache = (): EdgeCache | null => { try { return (globalThis as unknown as { caches?: { default?: EdgeCache } }).caches?.default ?? null; } catch { return null; } };
+async function readShared(): Promise<{ at: number; prices: BundlePrice[] } | null> {
+ try { const res = await edgeCache()?.match(SHARED_KEY); return res ? await res.json() as { at: number; prices: BundlePrice[] } : null; } catch { return null; }
+}
+async function writeShared(entry: { at: number; prices: BundlePrice[] }) {
+ try { await edgeCache()?.put(SHARED_KEY, new Response(JSON.stringify(entry), { headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=86400' } })); } catch { /* best effort */ }
+}
+async function quoteBundles(): Promise<BundlePrice[]> {
  const products = await catalog();
  const glove = products.find(p => p.title.toLowerCase().includes('kesztyű'));
  const sock = products.find(p => p.title.toLowerCase().includes('zokni'));
  const variant = glove?.variants.nodes.find(v => v.availableForSale);
  if (!variant) return [];
  const sockVariant = sock?.variants.nodes.find(v => v.availableForSale) ?? sock?.variants.nodes[0];
- const carts = await Promise.all([1, 2, 3].map(count => quote([{ merchandiseId: variant.id, quantity: count }, ...(count === 3 && sockVariant ? [{ merchandiseId: sockVariant.id, quantity: 1 }] : [])])));
- const prices = carts.flatMap((cart, i) => cart ? [{ count: i + 1, total: cart.cost.totalAmount, subtotal: cart.cost.subtotalAmount }] : []);
- if (prices.length === 3) bundleCache = { at: Date.now(), prices };
- return prices;
+ const carts = await Promise.allSettled([1, 2, 3].map(count => quote([{ merchandiseId: variant.id, quantity: count }, ...(count === 3 && sockVariant ? [{ merchandiseId: sockVariant.id, quantity: 1 }] : [])])));
+ return carts.flatMap((r, i) => r.status === 'fulfilled' && r.value ? [{ count: i + 1, total: r.value.cost.totalAmount, subtotal: r.value.cost.subtotalAmount }] : []);
+}
+/**
+ * Bundle prices for the 1/2/3-pair options, quoted by Shopify and cached (per Worker instance and in the
+ * Cloudflare edge cache) so pages render with prices. Quoting creates Shopify carts, so it must stay rare:
+ * a failed or partial quote never replaces the last good prices, and concurrent requests share one quote.
+ */
+export async function bundlePrices(): Promise<BundlePrice[]> {
+ if (bundleCache && Date.now() - bundleCache.at < BUNDLE_TTL) return bundleCache.prices;
+ const shared = await readShared();
+ if (shared?.prices?.length === 3 && (!bundleCache || shared.at > bundleCache.at)) bundleCache = shared;
+ if (bundleCache && Date.now() - bundleCache.at < BUNDLE_TTL) return bundleCache.prices;
+ bundleInflight ??= (async () => {
+  try {
+   const prices = await quoteBundles();
+   if (prices.length === 3) { bundleCache = { at: Date.now(), prices }; await writeShared(bundleCache); return prices; }
+   return bundleCache?.prices ?? prices;
+  } catch (error) {
+   if (bundleCache) return bundleCache.prices;
+   throw error;
+  } finally { bundleInflight = null; }
+ })();
+ return bundleInflight;
 }
