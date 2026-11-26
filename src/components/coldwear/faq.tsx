@@ -26,7 +26,7 @@ const FAQ_GROUPS = [
   {
     title: 'Szállítás és fizetés',
     items: [
-      { question: 'Mennyi a szállítás, és mikor lehet ingyenes?', answer: 'Az ingyenes szállítás feltétele legalább 3 termék, a zoknit is beleszámítva, vagy legalább 17 000 Ft kedvezmények utáni termékösszeg. A kosár jelzi, mennyi hiányzik a feltételhez. A tényleges szállítási díjat és az alkalmazott szállítási kedvezményt a fizetési oldalon ellenőrizd.' },
+      { question: 'Mennyi a szállítás, és mikor lehet ingyenes?', answer: 'A szállítás 990 Ft. 3 terméktől ingyenes, és a zokni is beleszámít, így a 3 kesztyű + ajándék zokni csomag és például 2 kesztyű + 1 zokni is ingyen megy. A kedvezményt a pénztár automatikusan levonja, kód nem kell hozzá.' },
       { question: 'Mikor és hogyan érkezik meg a rendelésem?', answer: 'A feltüntetett szállítási idő 1–2 munkanap, GLS kézbesítéssel. Ez tájékoztató idő, nem garantált határidő. Az elérhető kézbesítési módokat és a szállítási díjat a fizetési oldalon látod.' },
       { question: 'Hogyan tudok fizetni? Van utánvét?', answer: 'A rendeléshez ténylegesen elérhető fizetési módokat a fizetési oldalon találod. Ha az utánvét választható, annak díját és feltételeit is ott ellenőrizd a rendelés véglegesítése előtt.' },
       { question: 'Hol ellenőrizhetem a rendelés részleteit?', answer: 'Rendelés előtt a kosárban ellenőrizheted a termékeket, méreteket és kedvezményeket. A szállítási díjjal együtt számított végösszeget a fizetési oldal mutatja. Rendelés után őrizd meg a visszaigazolást és a rendelési azonosítót.' },
