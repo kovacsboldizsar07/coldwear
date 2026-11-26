@@ -11,7 +11,7 @@ import { Winter } from '@/components/coldwear/winter';
 import { ProductFaq } from '@/components/coldwear/faq';
 import { dispatchMessage } from '@/lib/dispatch';
 import { money } from '@/lib/commerce';
-import { angleFrom, observeBlocks } from '@/lib/track';
+import { angleFrom, observeBlocks, track } from '@/lib/track';
 import type { BundlePrice, Product } from '@/lib/commerce';
 import palm from '@/assets/glove-palm-1200.webp';
 import palmSmall from '@/assets/glove-palm-600.webp';
@@ -30,13 +30,18 @@ const BENEFITS=['Érintőképes ujjbegy','Szélálló külső','Csúszásgátló
 type Photo={src:string;alt:string;srcSet?:string};
 const HERO_SIZES='(min-width:1024px) 540px, calc(100vw - 32px)';
 const HEADLINES={default:'ColdWear kesztyű: telefonozz benne, ne vedd le',bike:'ColdWear kesztyű: biciklin sem fúj át rajta a szél',fishing:'ColdWear kesztyű: horgászat közben is meleg marad a kezed'} as const;
+// ViewContent fires once per page as soon as the product page loads (the buy box is in the hero, so every visitor sees the product).
+// It waits up to 3 s for the catalog so Meta gets content_ids and value; after that it is sent without them.
+function viewContentData(p:Product|undefined):Record<string,unknown>{const price=p?.variants.nodes[0]?.price;return p?{content_type:'product',content_name:p.title,content_ids:p.variants.nodes.map(v=>v.id.split('/').pop()||v.id),...(price?{value:Number(price.amount),currency:price.currencyCode}:{})}:{content_type:'product',content_name:'ColdWear Thermo kesztyű'}}
+function viewContentProducts(p:Product|undefined){const v=p?.variants.nodes.find(x=>x.availableForSale)??p?.variants.nodes[0];return p&&v?[{productGid:p.id,variantGid:v.id,name:p.title,variantName:v.title,price:v.price.amount}]:undefined}
 export function ThermoProductPage({prices}:{prices?:BundlePrice[]|undefined}={}){
  const [photo,setPhoto]=useState(0),[angle,setAngle]=useState<'default'|'bike'|'fishing'>('default'),[dispatch,setDispatch]=useState(''),[ready,setReady]=useState(false);
  const gloveRef=useRef<Product|undefined>(undefined);
- useEffect(()=>{setReady(true);setAngle(angleFrom(new URLSearchParams(location.search)));setDispatch(dispatchMessage(new Date()));const interval=setInterval(()=>setDispatch(dispatchMessage(new Date())),60_000);const cleanup=observeBlocks(()=>{const p=gloveRef.current;const price=p?.variants.nodes[0]?.price;return p?{content_type:'product',content_name:p.title,content_ids:p.variants.nodes.map(v=>v.id.split('/').pop()||v.id),...(price?{value:Number(price.amount),currency:price.currencyCode}:{})}:{content_type:'product',content_name:'ColdWear Thermo kesztyű'}},()=>{const p=gloveRef.current;const v=p?.variants.nodes.find(x=>x.availableForSale)??p?.variants.nodes[0];return p&&v?[{productGid:p.id,variantGid:v.id,name:p.title,variantName:v.title,price:v.price.amount}]:undefined});return()=>{clearInterval(interval);cleanup()}},[]);
+ useEffect(()=>{setReady(true);setAngle(angleFrom(new URLSearchParams(location.search)));setDispatch(dispatchMessage(new Date()));const interval=setInterval(()=>setDispatch(dispatchMessage(new Date())),60_000);const cleanup=observeBlocks();return()=>{clearInterval(interval);cleanup()}},[]);
  const {data:products=[]}=useQuery({...catalogOptions});
  const glove=ready?products.find(p=>p.title.toLowerCase().includes('kesztyű')):undefined;
  gloveRef.current=glove;
+ useEffect(()=>{if(!ready)return;const send=()=>track('ViewContent',viewContentData(gloveRef.current),{products:viewContentProducts(gloveRef.current)});if(glove){send();return}const t=setTimeout(send,3000);return()=>clearTimeout(t)},[ready,glove]);
  const sock=ready?products.find(p=>p.title.toLowerCase().includes('zokni')):undefined;
  const inUse:Photo={src:touch,alt:'Téli kesztyűt viselő kéz okostelefont tart, az érintőképes ujjbegy közelről'};
  const shopPhotos:Photo[]|undefined=glove?.images?.nodes.length?glove.images.nodes.map(n=>({src:n.url,alt:n.altText||glove.title,...(n.url.startsWith('https://cdn.shopify.com/')?{srcSet:`${n.url}${n.url.includes('?')?'&':'?'}width=600 600w, ${n.url}${n.url.includes('?')?'&':'?'}width=1200 1200w`}:{})})):undefined;

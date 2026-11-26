@@ -115,11 +115,11 @@ function send(event_name:string,event_data:Record<string,unknown>,page_path:stri
  if(marketing&&pixel&&['PageView','ViewContent','AddToCart','InitiateCheckout','Lead'].includes(event_name))pixel('track',event_name,event_data,{eventID:event_id});
  sendShopifyEvent(event_name,page_path,{statistics:Boolean(consent?.statistics),marketing},extra);
 }
-export function observeBlocks(viewContent?:()=>Record<string,unknown>,viewProducts?:()=>ShopifyExtra['products']){
+export function observeBlocks(){
  const seen=new Map<string,{start:number;time:number;scroll:number}>();
  const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{
   const id=entry.target.id; const item=seen.get(id)||{start:0,time:0,scroll:0};
-  if(entry.isIntersecting){if(!item.start)item.start=performance.now();item.scroll=Math.max(item.scroll,Math.round(entry.intersectionRatio*100));if(id==='features')track('ViewContent',viewContent?.()??{},{products:viewProducts?.()});}
+  if(entry.isIntersecting){if(!item.start)item.start=performance.now();item.scroll=Math.max(item.scroll,Math.round(entry.intersectionRatio*100));}
   else if(item.start){item.time+=(performance.now()-item.start)/1000;item.start=0;}
   seen.set(id,item);
  }),{threshold:[0,.25,.5,.75,1]});
