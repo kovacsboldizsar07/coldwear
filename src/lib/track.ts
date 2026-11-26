@@ -39,7 +39,7 @@ export function currentConsent(){expiredConsent();return consent}
 export function initializeTracking(){
  sessionId=crypto.randomUUID();
  try { const saved=JSON.parse(safeGet('cw_consent')||'null') as Consent|null; if(saved&&saved.expires>Date.now())consent={...saved,marketing:Boolean(saved.marketing&&saved.receipt)};else if(saved?.receipt){const receipts=JSON.parse(safeGet('cw_withdrawals')||'[]') as string[];safeSet('cw_withdrawals',JSON.stringify([...new Set([...receipts,saved.receipt])])) ;clearMarketingCookies();} }catch{/* invalid stored consent */}
- const params=new URLSearchParams(location.search); angle=params.get('angle')==='bike'?'bike':'default';
+ const params=new URLSearchParams(location.search); angle=angleFrom(params);
  names.forEach(name=>{source[name]=params.get(name)||''});
  applyConsent();void flushWithdrawals().catch(()=>{});
  window.addEventListener('storage',e=>{if(e.key==='cw_consent'){consentRevision++;try{const saved=JSON.parse(safeGet('cw_consent')||'null') as Consent|null;consent=saved&&saved.expires>Date.now()?{...saved,marketing:Boolean(saved.marketing&&saved.receipt)}:null;}catch{consent=null;}pending=[];applyConsent();if(!consent?.marketing)clearMarketingCookies();window.dispatchEvent(new Event('cw-consent'));}});
@@ -95,6 +95,8 @@ function fbc(){return cookie('_fbc')||(source['fbclid']?`fb.1.${clickTime}.${sou
 function cookie(name:string){return document.cookie.split('; ').find(x=>x.startsWith(`${name}=`))?.slice(name.length+1)||''}
 /** Shopify visit tokens for cart requests (links the checkout to the visit in Shopify Analytics); none without consent. */
 export function shopifyTokens(){expiredConsent();return shopifyTrackingTokens(consent)}
+/** Landing angle: ?angle=bike|fishing, or fishing when the Meta ad set (utm_content) is a fishing audience. */
+export function angleFrom(params:URLSearchParams):'default'|'bike'|'fishing'{const a=params.get('angle');if(a==='bike'||a==='fishing')return a;return /fishing|horg/i.test(params.get('utm_content')||'')?'fishing':'default'}
 export function track(event_name:string,event_data:Record<string,unknown>={},extra?:ShopifyExtra){
  if(!sessionId||typeof navigator==='undefined')return;expiredConsent();
  const path=location.pathname;
