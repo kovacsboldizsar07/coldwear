@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Gift, PackageCheck, Sparkles, Timer } from 'lucide-react';
+import { Gift, PackageCheck, Snowflake, Timer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { track } from '@/lib/track';
 
@@ -28,7 +28,7 @@ const ITEMS = [
 
 const STEPS = [
   { icon: Gift, t: 'Kiválasztod a csomagot', b: 'Minden csomagban van ajándék: 1 vagy 2 párnál min. 5 000 Ft, 3 párnál min. 10 000 Ft értékben.' },
-  { icon: Sparkles, t: 'Mi összeválogatjuk', b: 'Téli darabokat teszünk a kesztyű mellé. Az ajándékok egyméretesek, nem kell méretet választanod.' },
+  { icon: Snowflake, t: 'Mi összeválogatjuk', b: 'Téli ajándékot teszünk a kesztyű mellé.' },
   { icon: PackageCheck, t: 'Egy csomagban érkezik', b: 'A kesztyűvel együtt, külön díj nélkül. Kibontáskor derül ki, mit kaptál.' },
 ];
 
@@ -94,8 +94,7 @@ export function GiftSection() {
     <section id="gift" className="cw-section">
       <div className="cw-container">
         <div className="overflow-hidden rounded-3xl bg-gift-block p-5 text-on-block sm:p-6 lg:p-8">
-          <p className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-gift-accent"><Sparkles size={16} />Téli meglepetés ajándék</p>
-          <h2 className="mt-3 max-w-2xl text-2xl font-extrabold leading-tight sm:text-3xl">
+          <h2 className="max-w-2xl text-2xl font-extrabold leading-tight sm:text-3xl">
             Minden csomagban van egy ajándék. Hogy mi, az kibontáskor derül ki.
           </h2>
           <p className="mt-3 max-w-2xl leading-7 text-on-block-muted">
