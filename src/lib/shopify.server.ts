@@ -1,5 +1,6 @@
 import { getRequest } from '@tanstack/react-start/server';
 import type { BundlePrice, Cart, Product } from './commerce';
+import { giftActive } from './gift-offer';
 const productFields = 'id handle title description images(first:5){nodes{url altText}} variants(first:20){nodes{id title availableForSale price{amount currencyCode}}}';
 const cartFields = `id checkoutUrl discountCodes{code applicable} totalQuantity cost{totalAmount{amount currencyCode} subtotalAmount{amount currencyCode}} discountAllocations{discountedAmount{amount currencyCode}} lines(first:100){nodes{id quantity cost{amountPerQuantity{amount currencyCode} totalAmount{amount currencyCode}} discountAllocations{discountedAmount{amount currencyCode}} merchandise{...on ProductVariant{id title availableForSale price{amount currencyCode} product{id title handle}}}}}`;
 export type TrackingTokens = { uniqueToken: string; visitToken: string };
@@ -40,9 +41,10 @@ export async function mutateCart(operation:'create'|'add'|'update'|'remove'|'att
  return result?.cart ?? null;
 }
 /** Bundle pricing lives in Shopify discount codes; the code is chosen from the cart's composition, the amount comes from Shopify. */
-export function bundleCode(cart: Cart): string | null {
+export function bundleCode(cart: Cart, gift = giftActive()): string | null {
  let gloves=0, socks=0;
  for (const l of cart.lines.nodes) { const t=l.merchandise.product.title.toLowerCase(); if(t.includes('kesztyű')) gloves+=l.quantity; else if(t.includes('zokni')) socks+=l.quantity; }
+ if (gift && gloves>=3) return 'CW-CSOMAG3-AJANDEK';
  if (gloves>=3 && socks>=1) return 'CW-CSOMAG3';
  if (gloves>=2) return 'CW-CSOMAG2';
  return null;
@@ -56,17 +58,18 @@ export async function withBundle(cart: Cart | null) {
 }
 export async function quote(lines:{merchandiseId:string;quantity:number}[]) { return withBundle(await mutateCart('create',{input:{lines,buyerIdentity:{countryCode:'HU'}}})); }
 export type { BundlePrice } from './commerce';
-let bundleCache: { at: number; prices: BundlePrice[] } | null = null;
+let bundleCache: { at: number; prices: BundlePrice[]; gift?: boolean } | null = null;
 let bundleInflight: Promise<BundlePrice[]> | null = null;
 const BUNDLE_TTL = 60 * 60_000;
-const SHARED_KEY = 'https://coldwear.hu/__cache/bundle-prices-v1';
+// The key names the package composition, so cached prices never cross the gift offer's start or end.
+const sharedKey = () => `https://coldwear.hu/__cache/bundle-prices-v2-${giftActive() ? 'gift' : 'sock'}`;
 type EdgeCache = { match(key: string): Promise<Response | undefined>; put(key: string, res: Response): Promise<void> };
 const edgeCache = (): EdgeCache | null => { try { return (globalThis as unknown as { caches?: { default?: EdgeCache } }).caches?.default ?? null; } catch { return null; } };
 async function readShared(): Promise<{ at: number; prices: BundlePrice[] } | null> {
- try { const res = await edgeCache()?.match(SHARED_KEY); return res ? await res.json() as { at: number; prices: BundlePrice[] } : null; } catch { return null; }
+ try { const res = await edgeCache()?.match(sharedKey()); return res ? await res.json() as { at: number; prices: BundlePrice[] } : null; } catch { return null; }
 }
 async function writeShared(entry: { at: number; prices: BundlePrice[] }) {
- try { await edgeCache()?.put(SHARED_KEY, new Response(JSON.stringify(entry), { headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=86400' } })); } catch { /* best effort */ }
+ try { await edgeCache()?.put(sharedKey(), new Response(JSON.stringify(entry), { headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=86400' } })); } catch { /* best effort */ }
 }
 async function quoteBundles(): Promise<BundlePrice[]> {
  const products = await catalog();
@@ -75,7 +78,7 @@ async function quoteBundles(): Promise<BundlePrice[]> {
  const variant = glove?.variants.nodes.find(v => v.availableForSale);
  if (!variant) return [];
  const sockVariant = sock?.variants.nodes.find(v => v.availableForSale) ?? sock?.variants.nodes[0];
- const carts = await Promise.allSettled([1, 2, 3].map(count => quote([{ merchandiseId: variant.id, quantity: count }, ...(count === 3 && sockVariant ? [{ merchandiseId: sockVariant.id, quantity: 1 }] : [])])));
+ const carts = await Promise.allSettled([1, 2, 3].map(count => quote([{ merchandiseId: variant.id, quantity: count }, ...(count === 3 && sockVariant && !giftActive() ? [{ merchandiseId: sockVariant.id, quantity: 1 }] : [])])));
  return carts.flatMap((r, i) => r.status === 'fulfilled' && r.value ? [{ count: i + 1, total: r.value.cost.totalAmount, subtotal: r.value.cost.subtotalAmount }] : []);
 }
 /**
@@ -84,14 +87,15 @@ async function quoteBundles(): Promise<BundlePrice[]> {
  * a failed or partial quote never replaces the last good prices, and concurrent requests share one quote.
  */
 export async function bundlePrices(): Promise<BundlePrice[]> {
+ if (bundleCache && bundleCache.gift !== giftActive()) bundleCache = null;
  if (bundleCache && Date.now() - bundleCache.at < BUNDLE_TTL) return bundleCache.prices;
  const shared = await readShared();
- if (shared?.prices?.length === 3 && (!bundleCache || shared.at > bundleCache.at)) bundleCache = shared;
+ if (shared?.prices?.length === 3 && (!bundleCache || shared.at > bundleCache.at)) bundleCache = { ...shared, gift: giftActive() };
  if (bundleCache && Date.now() - bundleCache.at < BUNDLE_TTL) return bundleCache.prices;
  bundleInflight ??= (async () => {
   try {
    const prices = await quoteBundles();
-   if (prices.length === 3) { bundleCache = { at: Date.now(), prices }; await writeShared(bundleCache); return prices; }
+   if (prices.length === 3) { bundleCache = { at: Date.now(), prices, gift: giftActive() }; await writeShared(bundleCache); return prices; }
    return bundleCache?.prices ?? prices;
   } catch (error) {
    if (bundleCache) return bundleCache.prices;

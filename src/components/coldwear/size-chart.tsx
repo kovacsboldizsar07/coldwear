@@ -1,3 +1,4 @@
+import { giftActive } from '@/lib/gift-offer';
 import { useState } from 'react';
 import handMeasure from '@/assets/hand-measure.webp';
 import { Check, Footprints, Hand, Minus, Plus } from 'lucide-react';
@@ -126,7 +127,7 @@ function SockCalc() {
           <Check /> {size} zokni kiválasztása
         </Button>
       )}
-      <p className="mt-3 text-xs text-text-muted">A zokni a 3 kesztyűs csomag ajándéka.</p>
+      {!giftActive()&&<p className="mt-3 text-xs text-text-muted">A zokni a 3 kesztyűs csomag ajándéka.</p>}
     </div>
   );
 }
@@ -146,8 +147,8 @@ export function SizeChart() {
         </div>
 
         <div className="rounded-3xl border border-line bg-surface p-3 sm:p-5 lg:p-6">
-          <div className="mb-6 grid grid-cols-2 gap-1 rounded-full border border-line bg-bg p-1" role="tablist">
-            {([['glove', 'Kesztyű', Hand], ['sock', 'Zokni', Footprints]] as const).map(([key, label, Icon]) => (
+          <div className={`mb-6 grid grid-cols-2 gap-1 rounded-full border border-line bg-bg p-1 ${giftActive()?'hidden':''}`} role="tablist">
+            {(giftActive()?[['glove', 'Kesztyű', Hand]] as const:[['glove', 'Kesztyű', Hand], ['sock', 'Zokni', Footprints]] as const).map(([key, label, Icon]) => (
               <button key={key} type="button" role="tab" aria-selected={tab === key}
                 onClick={() => { setTab(key); track('size_chart_open', { tab: key }); }}
                 className={`flex h-11 items-center justify-center gap-2 rounded-full text-sm font-bold transition-colors ${tab === key ? 'bg-signal text-on-signal' : 'text-text-muted hover:text-text'}`}>

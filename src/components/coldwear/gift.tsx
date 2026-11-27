@@ -6,14 +6,9 @@ import { track } from '@/lib/track';
 // Guaranteed winter surprise gift in every package. The value claims must stay true and provable:
 // "min. X Ft" is the gift's regular gross price in the ColdWear webshop, and the shop keeps that listing as proof.
 // The offer ends on 10 December 2026 at midnight, Budapest time.
-export const GIFT_END = new Date('2026-12-10T23:59:59+01:00');
+import { GIFT_END, giftActive, giftMinimum } from '@/lib/gift-offer';
+export { GIFT_END, giftActive, giftMinimum };
 export const GIFT_END_LABEL = 'december 10.';
-export function giftActive(now = new Date()) {
-  return now < GIFT_END;
-}
-export function giftMinimum(count: number) {
-  return count >= 3 ? 10_000 : 5_000;
-}
 const ft = (n: number) => `${String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')} Ft`;
 export function giftLabel(count: number) {
   return `min. ${ft(giftMinimum(count))} értékű téli meglepetés ajándék`;
