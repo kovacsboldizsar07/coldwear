@@ -19,6 +19,10 @@ export function giftLabel(count: number) {
   return `min. ${ft(giftMinimum(count))} értékű téli meglepetés ajándék`;
 }
 
+export function giftShortLabel(count: number) {
+  return `min. ${ft(giftMinimum(count))} értékű ajándék`;
+}
+
 const ITEMS = [
   { emoji: '🧤', t: 'Kesztyű', b: 'Egy másik téli darab, egyméretes.' },
   { emoji: '🧢', t: 'Sapka', b: 'Meleg sapka a hideg reggelekre.' },
@@ -71,19 +75,16 @@ export function GiftCountdownBar() {
   );
 }
 
-/** Small strip in the hero, above the headline. */
+/** Small strip in the hero, above the headline. Left-aligned with the headline: no indent, the gift emoji sits in the title. */
 export function GiftStrip() {
   return (
     <a
       href="#gift"
       onClick={() => track('gift_strip_click')}
-      className="flex items-center gap-3 rounded-2xl border border-gift/30 bg-gift-soft px-3 py-2.5 text-sm transition-colors hover:border-gift/60"
+      className="block rounded-2xl border border-gift/30 bg-gift-soft px-4 py-3 text-sm leading-5 transition-colors hover:border-gift/60"
     >
-      <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-gift text-lg text-on-gift" aria-hidden>🎁</span>
-      <span className="min-w-0 leading-5">
-        <strong className="block">Most minden csomag mellé ajándék jár</strong>
-        <span className="text-text-muted">Garantált téli meglepetés: min. 5 000 Ft, 3 párnál min. 10 000 Ft értékben.</span>
-      </span>
+      <strong className="block text-[15px]">🎁 Most minden csomag mellé ajándék jár</strong>
+      <span className="mt-0.5 block text-text-muted">Garantált téli meglepetés: min. 5 000 Ft, 3 párnál min. 10 000 Ft értékben.</span>
     </a>
   );
 }

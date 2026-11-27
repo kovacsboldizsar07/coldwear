@@ -30,7 +30,9 @@ let withdrawal:Promise<void>=Promise.resolve();
 let consentRevision=0;
 function expiredConsent(){if(consent&&consent.expires<=Date.now()){void saveConsent(false,false).catch(()=>{});}}
 let consent:Consent|null=null;
-let sessionId='', visitorId:string|null=null, angle='default';
+let sessionId='', visitorId:string|null=null, angle='default', headline='';
+/** Headline A/B variant shown to this visitor; sent with every event and as a cart attribute so orders can be split by variant. */
+export function setHeadlineVariant(v:string){headline=v}
 let source:Record<string,string>={};
 const names=['utm_source','utm_medium','utm_campaign','utm_content','fbclid','gclid','ttclid'];
 function safeGet(key:string){try{return localStorage.getItem(key)}catch{return null}}
@@ -89,7 +91,7 @@ export async function saveConsent(statistics:boolean,marketing:boolean){
  }
 }
 export async function waitForConsentSync(){await flushWithdrawals();withdrawal=Promise.resolve();}
-export function cartAttributes(){expiredConsent();return [...names.map(n=>({key:`cw_${n}`,value:consent?.marketing?source[n]||'':''})),{key:'cw_angle',value:angle},{key:'cw_permission',value:consent?.marketing?consent.receipt||'':''},{key:'cw_consent',value:consent?.marketing?'1':'0'},{key:'cw_fbp',value:consent?.marketing?cookie('_fbp'):''},{key:'cw_fbc',value:consent?.marketing?fbc():''}];}
+export function cartAttributes(){expiredConsent();return [...names.map(n=>({key:`cw_${n}`,value:consent?.marketing?source[n]||'':''})),{key:'cw_angle',value:angle},{key:'cw_headline',value:headline},{key:'cw_permission',value:consent?.marketing?consent.receipt||'':''},{key:'cw_consent',value:consent?.marketing?'1':'0'},{key:'cw_fbp',value:consent?.marketing?cookie('_fbp'):''},{key:'cw_fbc',value:consent?.marketing?fbc():''}];}
 // Meta click ID: the pixel's own _fbc cookie, or one built from the landing fbclid with a stable click time.
 function fbc(){return cookie('_fbc')||(source['fbclid']?`fb.1.${clickTime}.${source['fbclid']}`:'')}
 function cookie(name:string){return document.cookie.split('; ').find(x=>x.startsWith(`${name}=`))?.slice(name.length+1)||''}
@@ -99,7 +101,7 @@ export function shopifyTokens(){expiredConsent();return shopifyTrackingTokens(co
 export function angleFrom(params:URLSearchParams):'default'|'bike'|'fishing'{const a=params.get('angle');if(a==='bike'||a==='fishing')return a;return /fishing|horg/i.test(params.get('utm_content')||'')?'fishing':'default'}
 export function track(event_name:string,event_data:Record<string,unknown>={},extra?:ShopifyExtra){
  if(!sessionId||typeof navigator==='undefined')return;expiredConsent();
- const path=location.pathname;
+ const path=location.pathname;if(headline)event_data={...event_data,headline};
  if(event_name==='ViewContent'){if(viewContentSent.has(path))return;viewContentSent.add(path);}
  if(!consent){if(preConsent.length<50)preConsent.push({name:event_name,data:event_data,path,extra});return;}
  send(event_name,event_data,path,extra);

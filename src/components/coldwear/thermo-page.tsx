@@ -11,7 +11,7 @@ import { Winter } from '@/components/coldwear/winter';
 import { ProductFaq } from '@/components/coldwear/faq';
 import { GiftSection, GiftStrip, giftActive } from '@/components/coldwear/gift';
 import { money } from '@/lib/commerce';
-import { angleFrom, observeBlocks, track } from '@/lib/track';
+import { angleFrom, observeBlocks, setHeadlineVariant, track } from '@/lib/track';
 import type { BundlePrice, Product } from '@/lib/commerce';
 import palm from '@/assets/glove-palm-1200.webp';
 import palmSmall from '@/assets/glove-palm-600.webp';
@@ -31,15 +31,20 @@ type Photo={src:string;alt:string;srcSet?:string};
 const HERO_SIZES='(min-width:1024px) 540px, calc(100vw - 32px)';
 const HEADLINES={default:'ColdWear kesztyű: telefonozz benne, ne vedd le',bike:'ColdWear kesztyű: biciklin sem fúj át rajta a szél',fishing:'ColdWear kesztyű: horgászat közben is meleg marad a kezed'} as const;
 // While the gift offer runs the headline sells the offer, not the brand.
-const GIFT_HEADLINES={default:'Téli kesztyű, amiben telefonozhatsz. Most ajándék is jár mellé.',bike:'Szélálló téli kesztyű biciklire. Most ajándék is jár mellé.',fishing:'Téli kesztyű horgászathoz. Most ajándék is jár mellé.'} as const;
+// While the gift offer runs, the headline is an A/B/C test: each visitor gets one variant (kept in localStorage),
+// and the variant goes with every tracked event and onto the cart (cw_headline), so orders can be split by headline.
+// ?headline=phone|hike|wind forces one (for checking).
+const GIFT_HEADLINES={phone:'Téli kesztyű, amiben telefonozhatsz. Most ajándék is jár mellé.',hike:'Téli kesztyű, amiben túrázhatsz. Most ajándék is jár mellé.',wind:'Téli kesztyű, amin nem fúj át a szél. Most ajándék is jár mellé.'} as const;
+type HeadlineVariant=keyof typeof GIFT_HEADLINES;
+function pickHeadline():HeadlineVariant{const keys=Object.keys(GIFT_HEADLINES) as HeadlineVariant[];const forced=new URLSearchParams(location.search).get('headline');if(keys.includes(forced as HeadlineVariant))return forced as HeadlineVariant;try{const saved=localStorage.getItem('cw_headline');if(keys.includes(saved as HeadlineVariant))return saved as HeadlineVariant;const v=keys[Math.floor(Math.random()*keys.length)]!;localStorage.setItem('cw_headline',v);return v}catch{return keys[Math.floor(Math.random()*keys.length)]!}}
 // ViewContent fires once per page as soon as the product page loads (the buy box is in the hero, so every visitor sees the product).
 // It waits up to 3 s for the catalog so Meta gets content_ids and value; after that it is sent without them.
 function viewContentData(p:Product|undefined):Record<string,unknown>{const price=p?.variants.nodes[0]?.price;return p?{content_type:'product',content_name:p.title,content_ids:p.variants.nodes.map(v=>v.id.split('/').pop()||v.id),...(price?{value:Number(price.amount),currency:price.currencyCode}:{})}:{content_type:'product',content_name:'ColdWear Thermo kesztyű'}}
 function viewContentProducts(p:Product|undefined){const v=p?.variants.nodes.find(x=>x.availableForSale)??p?.variants.nodes[0];return p&&v?[{productGid:p.id,variantGid:v.id,name:p.title,variantName:v.title,price:v.price.amount}]:undefined}
 export function ThermoProductPage({prices}:{prices?:BundlePrice[]|undefined}={}){
- const [photo,setPhoto]=useState(0),[angle,setAngle]=useState<'default'|'bike'|'fishing'>('default'),[ready,setReady]=useState(false);
+ const [photo,setPhoto]=useState(0),[angle,setAngle]=useState<'default'|'bike'|'fishing'>('default'),[ready,setReady]=useState(false),[headline,setHeadline]=useState<HeadlineVariant|null>(null);
  const gloveRef=useRef<Product|undefined>(undefined);
- useEffect(()=>{setReady(true);setAngle(angleFrom(new URLSearchParams(location.search)));const cleanup=observeBlocks();return()=>{cleanup()}},[]);
+ useEffect(()=>{setReady(true);if(giftActive()){const h=pickHeadline();setHeadlineVariant(h);setHeadline(h)}setAngle(angleFrom(new URLSearchParams(location.search)));const cleanup=observeBlocks();return()=>{cleanup()}},[]);
  const {data:products=[]}=useQuery({...catalogOptions});
  const glove=ready?products.find(p=>p.title.toLowerCase().includes('kesztyű')):undefined;
  gloveRef.current=glove;
@@ -53,8 +58,6 @@ export function ThermoProductPage({prices}:{prices?:BundlePrice[]|undefined}={})
  const photos:Photo[]=shopPhotos?[features,shopPhotos[0]!,inUse,...shopPhotos.slice(1)]:[features,{src:pair,srcSet:`${pairSmall} 600w, ${pair} 1200w`,alt:'ColdWear thermo kesztyűpár felülnézetben, cipzáras csukló és csúszásgátló tenyér'},inUse,{src:zip,srcSet:`${zipSmall} 600w, ${zip} 1200w`,alt:'ColdWear thermo kesztyű felülnézet, cipzáras csukló'},{src:palm,srcSet:`${palmSmall} 600w, ${palm} 1200w`,alt:'ColdWear thermo kesztyű elölnézet, csúszásgátló tenyér'}];
  // Server-rendered bundle prices (from the route loader) so the price is in the first HTML; the variant price is the fallback.
  const single=prices?.find(p=>p.count===1)?.total??glove?.variants.nodes[0]?.price;
- const two=prices?.find(p=>p.count===2)?.total;
- const pairOfTwo=two?{amount:String(Math.round(Number(two.amount)/2)),currencyCode:two.currencyCode}:undefined;
  function chooseSockBundle(){window.dispatchEvent(new CustomEvent('cw:bundle',{detail:{count:3}}));document.getElementById('bundle_selector')?.scrollIntoView({behavior:'smooth',block:'start'})}
  return <>
  <section id="hero" className="py-6 lg:py-9"><div className="cw-container grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-9">
@@ -64,8 +67,8 @@ export function ThermoProductPage({prices}:{prices?:BundlePrice[]|undefined}={})
   </div>
   <div className="min-w-0">
    {giftActive()&&<GiftStrip/>}
-   <h1 className="mt-3 text-[26px] font-extrabold leading-[1.12] sm:mt-3 sm:text-4xl lg:text-[40px]">{(giftActive()?GIFT_HEADLINES:HEADLINES)[angle]}</h1>
-   <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-text-muted"><strong className="text-xl font-extrabold text-text tabular-nums">{single?<>{money(single)}<span className="text-sm font-semibold text-text-muted"> / pár</span></>:<span className="inline-block h-6 w-28 animate-pulse rounded-md bg-line align-middle" aria-label="Ár betöltése"/>}</strong>{pairOfTwo&&<span className="font-semibold text-signal-text">2 párnál {money(pairOfTwo)}/pár</span>}<span className="flex items-center gap-1.5"><Lock size={14} className="text-signal-text"/>Fizetés átvételkor</span><span className="flex items-center gap-1.5"><Truck size={14} className="text-signal-text"/>GLS 1–2 nap</span></div>
+   <h1 className="mt-3 text-[26px] font-extrabold leading-[1.12] sm:mt-3 sm:text-4xl lg:text-[40px]">{giftActive()?<span className={headline?'':'invisible'}>{GIFT_HEADLINES[headline??'phone']}</span>:HEADLINES[angle]}</h1>
+   <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-text-muted"><strong className="text-xl font-extrabold text-text tabular-nums">{single?<>{money(single)}<span className="text-sm font-semibold text-text-muted"> / pár</span></>:<span className="inline-block h-6 w-28 animate-pulse rounded-md bg-line align-middle" aria-label="Ár betöltése"/>}</strong><span className="flex items-center gap-1.5"><Lock size={14} className="text-signal-text"/>Fizetés átvételkor</span><span className="flex items-center gap-1.5"><Truck size={14} className="text-signal-text"/>GLS 1–2 nap</span></div>
    <div className="mt-4 grid grid-cols-1 gap-2 min-[380px]:grid-cols-3 lg:grid-cols-2">{BENEFITS.map((b,i)=><span key={b} className={`items-center gap-2 rounded-full bg-signal-soft px-2.5 py-2 text-xs sm:px-3 sm:text-sm font-semibold ${i<3?'flex':'hidden lg:flex'}`}><span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-signal text-on-signal"><Check size={12} strokeWidth={3}/></span>{b}</span>)}</div>
    <div className="mt-4 sm:mt-5"><BundleSelector initialPrices={prices}/></div>
    <div className="mt-6 rounded-2xl bg-signal-soft p-4"><p className="font-bold">Vékony, mégis meleg.</p><p className="mt-1.5 text-sm leading-6 text-text-muted">Vezetés közben érzed benne a kormányt. Ha megállsz és csörög a telefon, nem kell levenned. A kötött kesztyűn átfúj a szél, a síkesztyűben semmit nem tudsz csinálni. Ez a kettő között van.</p></div>
