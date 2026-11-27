@@ -1,3 +1,6 @@
+import { giftActive } from '@/lib/gift-offer';
+// While the gift offer runs the 3-pair package has no sock, so the sock-gift answers are hidden.
+const SOCK_GIFT_QUESTIONS = new Set(['Hogyan kapom meg az ajándék zoknit?', 'Hogyan válasszak zokniméretet?']);
 import { Link } from '@tanstack/react-router';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
@@ -6,7 +9,7 @@ const FAQ_GROUPS = [
     title: 'Használat és védelem',
     items: [
       { question: 'Milyen hidegre ajánlott a kesztyű?', answer: '−10 °C-ig ajánlott, leginkább a magyar téli időre. A hőérzet függ a széltől, a mozgástól, a kint töltött időtől és attól is, mennyire vagy fázós.' },
-      { question: 'Mire használhatom?', answer: 'Téli sétához, hétköznapi közlekedéshez, kerékpározáshoz és vezetéshez. A vékonyabb kialakítás segíti a fogást, a polár belső pedig melegen tart. Nem munkavédelmi vagy speciális sportkesztyű.' },
+      { question: 'Mire használhatom?', answer: 'Téli sétához, hétköznapi közlekedéshez, kerékpározáshoz és vezetéshez. A vékony softshell anyag segíti a fogást, a szélálló külső pedig megfogja a hideg szelet. Nem munkavédelmi vagy speciális sportkesztyű.' },
       { question: 'Tudom benne használni a telefonomat?', answer: 'Igen, az érintőképes ujjbegyekkel kezelheted a kijelzőt anélkül, hogy levennéd. A pontos működés a méret illeszkedésétől és a kijelzővédőtől is függhet. Vezetés közben ne használd a telefonodat.' },
       { question: 'Vízálló vagy vízlepergető?', answer: 'Vízlepergető. Ez nem jelent teljes vízállóságot, ezért vízbe merítéshez vagy tartós áztatáshoz nem ajánlott.' },
       { question: 'Mire jó a csúszásgátló tenyér és a cipzár?', answer: 'A tenyér mintázata segíti a biztosabb fogást. A csuklón lévő cipzár megkönnyíti a felvételt, becsukva pedig szorosabb illeszkedést ad.' },
@@ -18,6 +21,10 @@ const FAQ_GROUPS = [
       { question: 'Hogyan válasszam ki a kesztyű méretét?', answer: 'Mérd meg a tenyered körméretét a hüvelykujj nélkül, a képen jelölt helyen. A mérőszalag simuljon a kezedre, de ne szorítsa. A mérettáblázat és a méretkalkulátor segít a választásban.' },
       { question: 'Mi legyen, ha két méret határán vagyok?', answer: 'A kalkulátor a határértéken a nagyobb méretet ajánlja. Ellenőrizd a tenyérszélességet is a táblázatban: a kesztyű legyen kényelmes, de az ujjbegyeknél ne maradjon sok üres hely.' },
       { question: 'Választhatok eltérő méreteket egy csomagban?', answer: 'Igen. A csomagválasztóban minden kesztyűpár méretét külön állíthatod be, így másoknak is rendelhetsz ugyanabban a csomagban. Kosárba helyezés előtt ellenőrizd az összes kiválasztott méretet.' },
+      { question: 'Mi lesz a téli meglepetés ajándék?', answer: 'Kesztyű, sapka, zokni vagy sál, illetve ezek kombinációja. Hogy pontosan mi, az kibontáskor derül ki. Az értéke garantált: 1 vagy 2 pár kesztyű mellé legalább 5 000 Ft, 3 pár mellé legalább 10 000 Ft, a ColdWear webshopban feltüntetett szokásos bruttó eladási ár alapján.' },
+      { question: 'Kell méretet választanom az ajándékhoz?', answer: 'Nem. Az ajándékok egyméretesek, így neked és annak is jók, akinek ajándékba veszed.' },
+      { question: 'Kell fizetnem az ajándékért?', answer: 'Nem. Az ajándék a kesztyűvel egy csomagban érkezik, külön díj és külön szállítási költség nélkül. Az ajánlat a készlet erejéig, de legkésőbb 2026. december 10. éjfélig leadott rendelésekre érvényes.' },
+      { question: 'Mi történik az ajándékkal, ha elállok a vásárlástól?', answer: 'Elállás esetén az ajándékot is vissza kell küldeni a kesztyűvel együtt.' },
       { question: 'Hogyan kapom meg az ajándék zoknit?', answer: 'Válaszd a három kesztyűs csomagot, majd add meg az ajándék zokni méretét is. A csomagválasztóban és a kosárban ellenőrizheted a csomag tartalmát és az alkalmazott kedvezményt.' },
       { question: 'Hogyan válasszak zokniméretet?', answer: 'A cipőméreted alapján válaszd ki a megfelelő mérettartományt. A rendeléskor elérhető méreteket a zokniméret-választó mutatja, a mérettáblázatban pedig külön zoknirészt találsz.' },
       { question: 'Kell kuponkódot beírnom a csomaghoz?', answer: 'A csomagkedvezményt a kosár automatikusan kezeli a benne lévő termékek alapján. A fizetés előtt mindig ellenőrizd a kedvezményt és a végösszeget. Ha változtatod a kosár tartalmát, a kedvezmény is módosulhat.' },
@@ -26,7 +33,7 @@ const FAQ_GROUPS = [
   {
     title: 'Szállítás és fizetés',
     items: [
-      { question: 'Mennyi a szállítás, és mikor lehet ingyenes?', answer: 'Az ingyenes szállítás feltétele legalább 3 termék, a zoknit is beleszámítva, vagy legalább 17 000 Ft kedvezmények utáni termékösszeg. A kosár jelzi, mennyi hiányzik a feltételhez. A tényleges szállítási díjat és az alkalmazott szállítási kedvezményt a fizetési oldalon ellenőrizd.' },
+      { question: 'Mennyi a szállítás, és mikor lehet ingyenes?', answer: 'A szállítás 990 Ft. 3 terméktől ingyenes, és a zokni is beleszámít, így a 3 kesztyűs csomag és például 2 kesztyű + 1 zokni is ingyen megy. A kedvezményt a pénztár automatikusan levonja, kód nem kell hozzá.' },
       { question: 'Mikor és hogyan érkezik meg a rendelésem?', answer: 'A feltüntetett szállítási idő 1–2 munkanap, GLS kézbesítéssel. Ez tájékoztató idő, nem garantált határidő. Az elérhető kézbesítési módokat és a szállítási díjat a fizetési oldalon látod.' },
       { question: 'Hogyan tudok fizetni? Van utánvét?', answer: 'A rendeléshez ténylegesen elérhető fizetési módokat a fizetési oldalon találod. Ha az utánvét választható, annak díját és feltételeit is ott ellenőrizd a rendelés véglegesítése előtt.' },
       { question: 'Hol ellenőrizhetem a rendelés részleteit?', answer: 'Rendelés előtt a kosárban ellenőrizheted a termékeket, méreteket és kedvezményeket. A szállítási díjjal együtt számított végösszeget a fizetési oldal mutatja. Rendelés után őrizd meg a visszaigazolást és a rendelési azonosítót.' },
@@ -53,7 +60,7 @@ export function ProductFaq() {
             <div key={group.title} className="min-w-0">
               <h3 className="mb-3 text-lg font-extrabold text-signal-text">{group.title}</h3>
               <Accordion type="multiple" className="overflow-hidden rounded-2xl border border-line bg-surface">
-                {group.items.map((item, itemIndex) => (
+                {group.items.filter((item) => !(giftActive() && SOCK_GIFT_QUESTIONS.has(item.question))).map((item, itemIndex) => (
                   <AccordionItem key={item.question} value={`${groupIndex}-${itemIndex}`} className="border-line px-4 last:border-b-0 sm:px-6">
                     <AccordionTrigger className="gap-4 py-5 text-base font-bold leading-6 hover:no-underline [&>svg]:text-signal-text">
                       {item.question}
