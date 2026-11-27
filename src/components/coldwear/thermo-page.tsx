@@ -9,6 +9,7 @@ import { Guarantee } from '@/components/coldwear/guarantee';
 import { Water } from '@/components/coldwear/water';
 import { Winter } from '@/components/coldwear/winter';
 import { ProductFaq } from '@/components/coldwear/faq';
+import { GiftSection, GiftStrip, giftActive } from '@/components/coldwear/gift';
 import { dispatchMessage } from '@/lib/dispatch';
 import { money } from '@/lib/commerce';
 import { angleFrom, observeBlocks, track } from '@/lib/track';
@@ -26,7 +27,7 @@ import sockPhoto from '@/assets/socks.webp';
 import infographic from '@/assets/glove-infographic-1000.webp';
 import infographicSmall from '@/assets/glove-infographic-600.webp';
 // The first three are shown everywhere; the rest only on large screens (the feature cards repeat them below).
-const BENEFITS=['Érintőképes ujjbegy','Szélálló külső','Csúszásgátló tenyér','Vízlepergető felület','Cipzáras csukló','Polár belső'];
+const BENEFITS=['Érintőképes ujjbegy','Szélálló külső','Csúszásgátló tenyér','Vízlepergető felület','Cipzáras csukló','Vékony, jó fogás'];
 type Photo={src:string;alt:string;srcSet?:string};
 const HERO_SIZES='(min-width:1024px) 540px, calc(100vw - 32px)';
 const HEADLINES={default:'ColdWear kesztyű: telefonozz benne, ne vedd le',bike:'ColdWear kesztyű: biciklin sem fúj át rajta a szél',fishing:'ColdWear kesztyű: horgászat közben is meleg marad a kezed'} as const;
@@ -62,15 +63,17 @@ export function ThermoProductPage({prices}:{prices?:BundlePrice[]|undefined}={})
   </div>
   <div className="min-w-0">
    <p className="text-sm font-semibold text-signal-text">{dispatch||'Feladás még ma, ha 14:00 előtt rendelsz.'}</p>
-   <h1 className="mt-2 text-[26px] font-extrabold leading-[1.12] sm:mt-3 sm:text-4xl lg:text-[40px]">{HEADLINES[angle]}</h1>
+   {giftActive()&&<div className="mt-3"><GiftStrip/></div>}
+   <h1 className="mt-3 text-[26px] font-extrabold leading-[1.12] sm:mt-3 sm:text-4xl lg:text-[40px]">{HEADLINES[angle]}</h1>
    <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-text-muted"><strong className="text-xl font-extrabold text-text tabular-nums">{single?<>{money(single)}<span className="text-sm font-semibold text-text-muted"> / pár</span></>:<span className="inline-block h-6 w-28 animate-pulse rounded-md bg-line align-middle" aria-label="Ár betöltése"/>}</strong>{pairOfTwo&&<span className="font-semibold text-signal-text">2 párnál {money(pairOfTwo)}/pár</span>}<span className="flex items-center gap-1.5"><Lock size={14} className="text-signal-text"/>Fizetés átvételkor</span><span className="flex items-center gap-1.5"><Truck size={14} className="text-signal-text"/>GLS 1–2 nap</span></div>
    <div className="mt-4 grid grid-cols-1 gap-2 min-[380px]:grid-cols-3 lg:grid-cols-2">{BENEFITS.map((b,i)=><span key={b} className={`items-center gap-2 rounded-full bg-signal-soft px-2.5 py-2 text-xs sm:px-3 sm:text-sm font-semibold ${i<3?'flex':'hidden lg:flex'}`}><span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-signal text-on-signal"><Check size={12} strokeWidth={3}/></span>{b}</span>)}</div>
    <div className="mt-4 sm:mt-5"><BundleSelector initialPrices={prices}/></div>
    <div className="mt-6 rounded-2xl bg-signal-soft p-4"><p className="font-bold">Vékony, mégis meleg.</p><p className="mt-1.5 text-sm leading-6 text-text-muted">Vezetés közben érzed benne a kormányt. Ha megállsz és csörög a telefon, nem kell levenned. A kötött kesztyűn átfúj a szél, a síkesztyűben semmit nem tudsz csinálni. Ez a kettő között van.</p></div>
-   <div className="mt-6"><h2 className="mb-3 text-lg font-bold">Jól működik együtt</h2><div className="flex items-center gap-3 rounded-2xl border border-line bg-signal-soft p-4 sm:gap-4"><div className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-line bg-surface sm:size-20"><img src={sock?.images?.nodes[0]?.url||sockPhoto} alt={sock?.images?.nodes[0]?.altText||'ColdWear thermo zokni'} loading="lazy" className="h-full w-full object-contain"/></div><div className="min-w-0 flex-1"><p className="font-extrabold leading-tight">COLDWEAR THERMO ZOKNI</p><p className="mt-1 text-sm leading-5 text-text-muted">Elvezeti a párát, erősített sarok és orr.</p><div className="mt-3 sm:mt-4 sm:text-right"><Button className="h-11 w-full rounded-full font-bold sm:w-auto sm:px-7" onClick={chooseSockBundle}>Ajándékba kérem</Button></div></div></div><p className="mt-2 text-sm text-text-muted">3 kesztyű mellé 1 zokni ajándék, ingyenes szállítással.</p></div>
+   <div className="mt-6"><h2 className="mb-3 text-lg font-bold">Jól működik együtt</h2><div className="flex items-center gap-3 rounded-2xl border border-line bg-signal-soft p-4 sm:gap-4"><div className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-line bg-surface sm:size-20"><img src={sock?.images?.nodes[0]?.url||sockPhoto} alt={sock?.images?.nodes[0]?.altText||'ColdWear thermo zokni'} loading="lazy" className="h-full w-full object-contain"/></div><div className="min-w-0 flex-1"><p className="font-extrabold leading-tight">COLDWEAR THERMO ZOKNI</p><p className="mt-1 text-sm leading-5 text-text-muted">Elvezeti a párát, erősített sarok és orr.</p><div className="mt-3 sm:mt-4 sm:text-right"><Button className="h-11 w-full rounded-full font-bold sm:w-auto sm:px-7" onClick={chooseSockBundle}>Ajándékba kérem</Button></div></div></div><p className="mt-2 text-sm text-text-muted">3 kesztyű mellé 1 zokni{giftActive()?' és min. 10 000 Ft értékű téli meglepetés ajándék':' ajándék'}, ingyenes szállítással.</p></div>
   </div>
  </div></section>
  <section id="features" className="bg-surface py-8 lg:py-10"><div className="cw-container"><h2 className="max-w-xl text-2xl font-extrabold leading-tight sm:text-3xl">Arra készült, amit naponta csinálsz.</h2><div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{[{t:'Érintőképes ujjbegyek',b:'Az ujjbegyek vezetik a kijelzőt: üzenetet írsz, hívást fogadsz, nem kell levenned.',img:touch,alt:'Fekete téli kesztyűt viselő kéz okostelefont tart, az érintőképes ujjbegy közelről'},{t:'Csúszásgátló tenyér',b:'Szilikon minta az egész tenyéren: a telefon nem csúszik ki, a kormányt stabilan fogod.',img:grip,alt:'ColdWear thermo kesztyű csúszásgátló tenyér közeli fotó, szilikon mintázattal'},{t:'Cipzáras csukló',b:'Széthúzod, könnyen belebújsz, összehúzod, és szorosan ül.',img:zipClose,alt:'ColdWear thermo kesztyű cipzáras csukló közeli fotó, kihúzott cipzárral'}].map(f=><article key={f.t} className="overflow-hidden rounded-2xl border border-line bg-bg"><div className="aspect-[4/3] bg-surface">{f.img?<img src={f.img} alt={f.alt} loading="lazy" className="h-full w-full object-contain p-4 sm:p-4"/>:<div className="flex h-full items-center justify-center text-sm text-text-muted">[Közeli fotó: ujjbegyek]</div>}</div><div className="border-t border-signal p-4 lg:p-5"><h3 className="text-lg font-extrabold">{f.t}</h3><p className="mt-2 text-sm leading-6 text-text-muted">{f.b}</p></div></article>)}</div></div></section>
+  {giftActive()&&<GiftSection/>}
   <Water/>
   <Winter/>
   <Guarantee/>
