@@ -43,7 +43,10 @@ export function CartDrawer(){
   useCart.setState({busy:true});
   try{
     await waitForConsentSync();
-    const fresh=await changeCart({data:{operation:'attributes',cartId:cart.id,attributes:cartAttributes()}});
+    // The gift is marked on the order as a cart attribute (shown under "Additional details" in Shopify), not as a line item,
+    // so it never counts toward the "free shipping from 3 items" rule.
+    const giftAttribute=giftActive()&&gloveCount>0?[{key:'cw_ajandek',value:`Téli meglepetés ajándék, ${giftLabel(gloveCount).replace(' értékű téli meglepetés ajándék','')} értékben`}]:[];
+    const fresh=await changeCart({data:{operation:'attributes',cartId:cart.id,attributes:[...cartAttributes(),...giftAttribute]}});
     if(!fresh){
       useCart.setState({cart:null,cartId:null});
       toast.info('A korábbi kosarad lejárt. Kérjük, válaszd ki újra a termékeket.');
